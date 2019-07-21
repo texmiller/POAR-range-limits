@@ -1,0 +1,125 @@
+
+    model{
+    
+    ## Priors
+    #1. Survival
+    alpha.surv~dnorm(0,0.001)   ##hyperprior for survival
+    sigma.surv.site~dunif(0,1000) ##site variance
+    tau.surv.site<-1/(sigma.surv.site*sigma.surv.site)
+    sigma.surv.block~dunif(0,1000) ##site variance
+    tau.surv.block<-1/(sigma.surv.block*sigma.surv.block)
+    beta.surv.sex~dnorm(0,0.001)
+    beta.surv.long~dnorm(0,0.001)
+    beta.surv.sex.long~dnorm(0,0.001)
+
+    #2. Growth
+    alpha.grow~dnorm(0,0.001)   ##hyperprior for growth
+    sigma.grow.site~dunif(0,1000) ##site variance
+    tau.grow.site<-1/(sigma.grow.site*sigma.grow.site)
+    sigma.grow.block~dunif(0,1000) ##site variance
+    tau.grow.block<-1/(sigma.grow.block*sigma.grow.block)
+    sigma.grow~dunif(0,1000) ##residual growth variance
+    tau.grow<-1/(sigma.grow*sigma.grow)    
+    beta.grow.sex~dnorm(0,0.001)
+    beta.grow.long~dunif(-1,1)
+    beta.grow.sex.long~dnorm(0,0.001)
+
+    #3. Flowering
+    alpha.flow~dnorm(0,0.001)   ##hyperprior for flowival
+    sigma.flow.site~dunif(0,1000) ##site variance
+    tau.flow.site<-1/(sigma.flow.site*sigma.flow.site)
+    sigma.flow.block~dunif(0,1000) ##site variance
+    tau.flow.block<-1/(sigma.flow.block*sigma.flow.block)
+    beta.flow.sex~dnorm(0,0.001)
+    beta.flow.long~dnorm(0,0.001)
+    beta.flow.sex.long~dnorm(0,0.001)
+
+    #4. Panicles
+    alpha.panic~dnorm(0,0.001)   ##hyperprior for panicival
+    sigma.panic.site~dunif(0,1000) ##site variance
+    tau.panic.site<-1/(sigma.panic.site*sigma.panic.site)
+    sigma.panic.block~dunif(0,1000) ##site variance
+    tau.panic.block<-1/(sigma.panic.block*sigma.panic.block)
+    beta.panic.sex~dnorm(0,0.001)
+    beta.panic.long~dnorm(0,0.001)
+    beta.panic.sex.long~dnorm(0,0.001)
+    sigma.panic.ind~dunif(0,1000) ##individual random effect for overdispersion
+    tau.panic.ind<-1/(sigma.panic.ind*sigma.panic.ind)
+    #alpha.gamma.panic~dunif(0,100)
+
+    # Assign random effects for sites and blocks
+    for(i in 1:N.sites){
+    alpha.surv.site[i]~dnorm(alpha.surv,tau.surv.site)
+    alpha.grow.site[i]~dnorm(alpha.grow,tau.grow.site)
+    alpha.flow.site[i]~dnorm(alpha.flow,tau.flow.site)
+    alpha.panic.site[i]~dnorm(alpha.panic,tau.panic.site)
+    for(j in 1:N.blocks){
+    alpha.surv.site.block[i,j]~dnorm(alpha.surv.site[i],tau.surv.block)
+    alpha.grow.site.block[i,j]~dnorm(alpha.grow.site[i],tau.grow.block)
+    alpha.flow.site.block[i,j]~dnorm(alpha.flow.site[i],tau.flow.block)
+    alpha.panic.site.block[i,j]~dnorm(alpha.panic.site[i],tau.panic.block)
+    }
+    }
+    
+    #1. Survival Likelihood 
+    for(i in 1:N.obs.surv){
+    y.surv[i]~dbern(p.surv[i])
+    logit(p.surv[i])<-alpha.surv.site.block[site.surv[i],block.surv[i]] + 
+                 beta.surv.sex*male.surv[i]+
+                 beta.surv.long*long.surv[i]+
+                 beta.surv.sex.long*male.surv[i]*long.surv[i]
+    }
+    #2. Growth Likelihood 
+    for(i in 1:N.obs.grow){
+    y.grow[i]~dnorm(mu[i],tau.grow)
+    mu[i]<-alpha.grow.site.block[site.grow[i],block.grow[i]] + 
+            beta.grow.sex*male.grow[i]+
+            beta.grow.long*long.grow[i]+
+            beta.grow.sex.long*male.grow[i]*long.grow[i]
+    }
+    #3. Flowering Likelihood 
+    for(i in 1:N.obs.flow){
+    y.flow[i]~dbern(p.flow[i])
+    logit(p.flow[i])<-alpha.flow.site.block[site.flow[i],block.flow[i]] + 
+                 beta.flow.sex*male.flow[i]+
+                 beta.flow.long*long.flow[i]+
+                 beta.flow.sex.long*male.flow[i]*long.flow[i]
+    }
+    #4. Panicles Likelihood 
+    for(i in 1:N.obs.panic){
+    y.panic[i]~dpois(mu.panic[i])T(1,)
+    #mustar[i]<-rho[i]*mu.panic[i]
+    log(mu.panic[i])<-alpha.panic.site.block[site.panic[i],block.panic[i]] + 
+    beta.panic.sex*male.panic[i]+
+    beta.panic.long*long.panic[i]+
+    beta.panic.sex.long*male.panic[i]*long.panic[i]
+    #rho[i]~dnorm(0,tau.panic.ind)
+    #rho[i]~dgamma(alpha.gamma.panic,alpha.gamma.panic)
+    }
+
+    ## Prediction
+    for(i in 1:N.longitudes){
+    surv.F.pred[i]<-exp(alpha.surv+beta.surv.long*longitudes[i])/(1+exp(alpha.surv+beta.surv.long*longitudes[i]))
+    surv.M.pred[i]<-exp(alpha.surv+beta.surv.sex+(beta.surv.long+beta.surv.sex.long)*longitudes[i])/(1+exp(alpha.surv+beta.surv.sex+(beta.surv.long+beta.surv.sex.long)*longitudes[i]))
+    grow.F.pred[i]<-alpha.grow+beta.grow.long*longitudes[i]
+    grow.M.pred[i]<-alpha.grow+beta.grow.sex+(beta.grow.long+beta.grow.sex.long)*longitudes[i]
+    flow.F.pred[i]<-exp(alpha.flow+beta.flow.long*longitudes[i])/(1+exp(alpha.flow+beta.flow.long*longitudes[i]))
+    flow.M.pred[i]<-exp(alpha.flow+beta.flow.sex+(beta.flow.long+beta.flow.sex.long)*longitudes[i])/(1+exp(alpha.flow+beta.flow.sex+(beta.flow.long+beta.flow.sex.long)*longitudes[i]))
+    panic.F.pred[i]<-exp(alpha.panic+beta.panic.long*longitudes[i])
+    panic.M.pred[i]<-exp(alpha.panic+beta.panic.sex+(beta.panic.long+beta.panic.sex.long)*longitudes[i])
+    }
+
+    ## Posterior predictive check
+    # Panicle
+    for(i in 1:N.obs.panic){
+    panic.resi[i] <- (y.panic[i] - mu.panic[i])/sqrt(mu.panic[i])
+    y.panic.new[i] ~ dpois(mu.panic[i])T(1,)
+    panic.resi.new[i] <- (y.panic.new[i] - mu.panic[i])/sqrt(mu.panic[i])
+    panic.D[i] <- pow(panic.resi[i],2)
+    panic.D.new[i] <- pow(panic.resi.new[i],2)
+    }
+    panic.fit <- sum(panic.D[])
+    panic.fit.new <- sum(panic.D.new[])
+
+    }##end model
+    

@@ -1,0 +1,35 @@
+Hypotheses --------------------------------------------------------------------------
+
+Sex*Longitude
+1. Sex
+2. Longitude
+3. Longitude * Sex
+
+Provenance (group collections as North/Middle/South)
+4. Provenance
+5. Provenance * Longitude
+
+Individual (quantify individual performance)
+4. Individual_ID
+5. Individual_ID * Longitude
+
+Sex*Climate (climate defined as "growing season") 
+2. Climate
+3. Climate * Sex
+
+SITE NOTE ON CLIMATE
+Need to do determine "growing season" using some exploratory analyses. This can be done:
+1. Using a "climate window" approach as predictor (van de Pol et al. 2016, in Methods in EE), both precipitation and temperature
+2. Using growth/survival/flowering as response.
+
+
+VITAL RATES --------------------------------------------------------------------------
+
+1. Survival 
+2. Growth 
+	delta.tillers
+	Clone size
+3. Flowering
+	Flower probability
+	Flower number
+	Flower avg. size
