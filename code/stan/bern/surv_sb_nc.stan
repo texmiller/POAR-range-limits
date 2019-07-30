@@ -7,7 +7,6 @@ data {
   
   int<lower=0> site_s[n_s];  // site placeholder
   int<lower=0> block_s[n_s]; // site placeholder
-  // int<lower=0> site_block_s[n_blocks]; // site within block placeholder
   
   // Data for the survival model
   vector[n_s] size_s; // log size at time t
@@ -23,6 +22,10 @@ parameters {
   real<lower=0> site_a_tau_s;
   vector[n_sites] site_a_s_zzz;
 
+  real block_a_u_s;
+  real<lower=0> block_a_tau_s;
+  vector[n_blocks] block_a_s_zzz;
+
   real b_s;   // Survival reg. slope
   real b_l;   // Survival reg. slope
   real b_sex;   // Survival intercept for MALES
@@ -34,25 +37,41 @@ transformed parameters {
   
   // placeholders of year intercept random year effects
   vector[n_sites] site_a_s;
+  vector[n_blocks] block_a_s;
+  real mS[n_s];
   
   site_a_s  = site_a_u_s  + site_a_tau_s  * site_a_s_zzz;
+  block_a_s = block_a_u_s + block_a_tau_s * block_a_s_zzz;
+  
+  // prediction
+  for(nsurv in 1:n_s){
+    mS[nsurv] = site_a_s[site_s[nsurv]] +
+                block_a_s[block_s[nsurv]] + 
+                b_s   * size_s[nsurv] +
+                b_l   * long_s[nsurv] +
+                b_sex * male_s[nsurv] +
+                b_sex_l * male_s[nsurv] * long_s[nsurv];
+  }
   
 }
 
 model {
   
-  real mS[n_s];
-  int i_s_site;
-  
   // Hyper-priors
   site_a_u_s    ~ normal(0, 100);
   site_a_tau_s  ~ inv_gamma(0.001, 0.001);
+  block_a_u_s    ~ normal(0, 100);
+  block_a_tau_s  ~ inv_gamma(0.001, 0.001);
 
   // site ranef
   for (i in 1:n_sites){
     site_a_s_zzz[i] ~ normal(site_a_u_s, site_a_tau_s);
   }
   
+  for (i in 1:n_blocks){
+    block_a_s_zzz[i] ~ normal(block_a_u_s, block_a_tau_s);
+  }
+
   // site ranef
   
   // priors on parameters
@@ -61,17 +80,17 @@ model {
   b_sex   ~ normal(0, 100);   // Sex slope
   b_sex_l ~ normal(0, 100);   // Sex slope
  
-  // Sampling -------------------------------------------
-  
-  // survival
-  for(nsurv in 1:n_s){
-    i_s_site  = site_s[nsurv];
-    mS[nsurv] = site_a_s[i_s_site] + 
-                b_s   * size_s[nsurv] +
-                b_l   * long_s[nsurv] +
-                b_sex * male_s[nsurv] +
-                b_sex_l * male_s[nsurv] * long_s[nsurv];
-  }
+  // sampling 
   y_s ~ bernoulli_logit(mS);
   
+}
+
+generated quantities{
+    
+  vector[n_s] log_lik;
+  
+  for(i in 1:n_s){
+    log_lik[i] = bernoulli_logit_lpmf(y_s[i] | mS[i]);
+  }
+    
 }

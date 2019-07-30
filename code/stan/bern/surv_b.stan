@@ -5,8 +5,8 @@ data {
   int<lower=0> n_blocks;         // N. of locations
   int<lower=0> n_s;    // N. of data points for the survival model  
   
-  int<lower=0> site_s[n_s];  // site placeholder
-  int<lower=0> block_s[n_s];  // site placeholder
+  int<lower=0> site_s[n_s];  // site index
+  int<lower=0> block_s[n_s]; // block indexes index
   
   // Data for the survival model
   vector[n_s] size_s;  // log size at time t
@@ -29,10 +29,22 @@ parameters {
   
 }
 
-model {
-  
+transformed parameters{
+
   real mS[n_s];
-  int i_s_block;
+  
+  for(nsurv in 1:n_s){
+    mS[nsurv] = block_a_s[block_s[nsurv]] + 
+                b_s   * size_s[nsurv] +
+                b_l   * long_s[nsurv] +
+                b_sex * male_s[nsurv] +
+                b_sex_l * male_s[nsurv] * long_s[nsurv];
+  }
+
+}
+
+
+model {
   
   // Hyper-priors (0 because slopes should be ~0)
   block_a_u_s    ~ normal(0, 1000);
@@ -50,16 +62,16 @@ model {
   b_sex_l ~ normal(0, 100);   // Sex slope
  
   // Sampling ---------------------------------------------
-  
-  // survival
-  for(nsurv in 1:n_s){
-    i_s_block = block_s[nsurv];
-    mS[nsurv] = block_a_s[i_s_block] + 
-                b_s   * size_s[nsurv] +
-                b_l   * long_s[nsurv] +
-                b_sex * male_s[nsurv] +
-                b_sex_l * male_s[nsurv] * long_s[nsurv];
-  }
   y_s ~ bernoulli_logit(mS);
   
+}
+
+generated quantities{
+    
+  vector[n_s] log_lik;
+  
+  for(i in 1:n_s){
+    log_lik[i] = bernoulli_logit_lpmf(y_s[i] | mS[i]);
+  }
+    
 }
