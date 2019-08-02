@@ -52,9 +52,9 @@ data_l <- list( n_sites  = poar.surv$site %>% n_distinct,
 
 # simulation parameters
 sim_pars <- list(
-  warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
+  warmup = 5000, 
+  iter = 20000, 
+  thin = 5, 
   chains = 4
 )
 
@@ -87,7 +87,8 @@ fit_all_mods <- function(mod_fil){
       warmup = sim_pars$warmup,
       iter = sim_pars$iter,
       thin = sim_pars$thin,
-      chains = sim_pars$chains 
+      chains = sim_pars$chains,
+      control = list( adapt_delta = 0.99, max_treedepth = 20)
     )
   
    return(fit_out)
@@ -109,7 +110,7 @@ all_fits[[6]] <- fit_all_mods( all_rds[6] )
 
 all_fits      <- setNames(all_fits, mod_names)
 
-load('results/surv_mod_sel.RData')
+# load('results/surv_mod_sel.RData')
 
 # Extract log likelihoods
 log_liks   <- lapply(all_fits, extract_log_lik)
@@ -118,18 +119,24 @@ log_liks   <- lapply(all_fits, extract_log_lik)
 loo_l      <- lapply(log_liks, loo) %>%
                   setNames( paste0('loo_', mod_names) )
 loo_df     <- loo::compare(loo_l$loo_s,     loo_l$loo_b,     
-                           loo_l$loo_sb,    loo_l$loo_sb_nest,
+                           loo_l$loo_sb_nest,
                            loo_l$loo_s_nc,  loo_l$loo_b_nc,     
-                           loo_l$loo_sb_nc, loo_l$loo_sb_nest_nc ) %>%
+                           loo_l$loo_sb_nest_nc ) %>%
                 as.data.frame 
 
 # WAIC estimates
 waic_l    <- lapply(log_liks, waic) %>%
                 setNames( paste0('waic_', mod_names) )
 waic_df   <- loo::compare(waic_l$waic_s,     waic_l$waic_b,     
-                          waic_l$waic_sb,    waic_l$waic_sb_nest,
+                          waic_l$waic_sb_nest,
                           waic_l$waic_s_nc,  waic_l$waic_b_nc,     
-                          waic_l$waic_sb_nc, waic_l$waic_sb_nest_nc ) %>%
+                          waic_l$waic_sb_nest_nc ) %>%
                 as.data.frame
 
+
+# output
+write.csv(loo_df,  'results/mod_sel/surv_loo.csv',
+          row.names=F )
+write.csv(waic_df, 'results/mod_sel/surv_waic.csv',
+          row.names=F )
 

@@ -28,10 +28,10 @@ poar      <- read.csv('data/demography.csv', stringsAsFactors = F)
 
 # simulation parameters
 sim_pars <- list(
-  warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
-  chains = 3
+  warmup = 5000, 
+  iter = 20000, 
+  thin = 5, 
+  chains = 4
 )
 
 # general purpose function to fit all models
@@ -102,7 +102,7 @@ all_rds   <- gsub('\\.stan','.rds',all_mods)
 
 
 # fit all models at once
-all_fits1     <- lapply(all_rds, fit_all_mods)
+# all_fits1     <- lapply(all_rds, fit_all_mods)
 all_fits      <- list()
 all_fits[[1]] <- fit_all_mods( all_rds[1] )
 all_fits[[2]] <- fit_all_mods( all_rds[2] )
@@ -131,4 +131,12 @@ waic_df   <- loo::compare(waic_l$waic_s,     waic_l$waic_b,
                           waic_l$waic_sb_nest,
                           waic_l$waic_s_nc,  waic_l$waic_b_nc,     
                           waic_l$waic_sb_nest_nc ) %>%
-                as.data.frame
+
+                  as.data.frame
+
+# output
+write.csv(loo_df,  'results/mod_sel/panic_loo.csv',
+          row.names=F )
+write.csv(waic_df, 'results/mod_sel/panic_waic.csv',
+          row.names=F )
+

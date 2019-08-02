@@ -1,6 +1,4 @@
-## Fit size-dependent vital rates and build MPM
-# library(R2jags)
-# library(mcmcplots)
+# Perform model selection on growth models (select random effects only)
 library(scales)
 library(dplyr)
 library(rstan)
@@ -55,9 +53,9 @@ data_l <- list( n_sites  = poar.grow$site %>% n_distinct,
 
 # simulation parameters
 sim_pars <- list(
-  warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
+  warmup = 5000, 
+  iter = 20000, 
+  thin = 5, 
   chains = 4
 )
 
@@ -80,25 +78,18 @@ fit_all_mods <- function(mod_fil){
       warmup = sim_pars$warmup,
       iter = sim_pars$iter,
       thin = sim_pars$thin,
-      chains = sim_pars$chains 
+      chains = sim_pars$chains,
+      control = list( adapt_delta = 0.99, max_treedepth = 20)
     )
   
    return(fit_out)
    
 }
 
-
-fit_surv <- stan(
-  file = 'code/stan/grow/grow_b.stan',
-  data = data_l,
-  pars = quote_bare( block_a_s, b_s, b_l, b_sex, b_sex_l ),
-  warmup = sim_pars$warmup,
-  iter = sim_pars$iter,
-  thin = sim_pars$thin,
-  chains = 1 #sim_pars$chains#,
-  # control = list(adapt_delta = 0.999, stepsize = 0.001, max_treedepth = 20)
-)
-
+mod_names <- c( 's','b','sb_nest',
+                # non-centered models
+                paste0(c('s','b','sb_nest'),'_nc') 
+               ) 
 all_mods  <- paste0( 'code/stan/negbin/grow_', mod_names, '.stan' )
 all_rds   <- gsub('\\.stan','.rds',all_mods)
 
@@ -132,3 +123,9 @@ waic_df   <- loo::compare(waic_l$waic_s,     waic_l$waic_b,
                           waic_l$waic_sb_nest_nc ) %>%
                 as.data.frame
 
+
+# output
+write.csv(loo_df,  'results/mod_sel/grow_loo.csv',
+          row.names=F )
+write.csv(waic_df, 'results/mod_sel/grow_waic.csv',
+          row.names=F )
