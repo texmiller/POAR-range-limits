@@ -1,0 +1,101 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage[round]{natbib}
+\usepackage{graphicx}
+\geometry{a4paper}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+\usepackage[running]{lineno}
+\usepackage{setspace}
+\usepackage{amsfonts,amssymb,amsmath,graphicx,hyperref}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{hyperref}
+\doublespacing
+
+<<setup,echo=F, message=F, warning=F>>=
+knitr::opts_chunk$set(fig.pos = 'H')
+library(tidyverse)
+setwd("C:/Users/tm9/Dropbox/git projects/POAR-range-limits")
+@
+
+%-------------------------------------------------------------------------
+
+\title{Two-sex demography, sexual niche differentiation, and range limits}
+
+
+\author{Tom E.X. Miller$^{\ast}$}
+\author{Aldo Compagnoni}
+
+\affil{Program in Ecology and Evolutionary Biology, Department of BioSciences, Rice University, Houston, TX USA}
+\renewcommand\Authands{ and }
+\date{*Corresponding author: tom.miller@rice.edu (1-713-348-4218)}
+
+%-------------------------------------------------------------------------
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+\maketitle
+
+
+%-------------------------------------------------------------------------
+\newpage
+\section*{Abstract}
+\linenumbers
+
+%-------------------------------------------------------------------------
+\section*{Keywords}
+
+
+%--------------------------------------------------------------------
+\newpage
+\section*{Introduction}
+
+P1: importance of understanding range limits in basic and applied ecology, theory for proximate causes of range limits, demographic failure at range edges and the idea that range limits are niche limits
+
+P2: The idea that range limits are niche limits intersects awkwardly with another prevalent concept in ecology: intraspecific niche heterogeneity. If a species' range limits reflect its niche limits, and a single species contains many niches, then whose niche is it that determines the geographic distribution.
+
+P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
+
+P4: Most ecological theory assumes female dominance. In this case, there is a straightforward answer to the question above -- the female niche is the relevant set of constraints for understanding range limits. However, while female dominance is often a reasonable and useful assumption, it may break down under extreme sex ratio bias, where mates may be limiting. If so, this creates an additional, two-sex pathway by which males could limit the position of species ranges. 
+
+P5: In this study we used a dioecious grass species as a focal species to quantify the relative importance of female-dominant and two-sex mechanisms of range limitation. 
+
+%--------------------------------------------------------------------
+\section*{Materials and methods}
+
+\subsection*{Study system and natural population surveys}
+
+\subsection*{Common garden experiment}
+
+\subsubsection*{Source material and experimental sites}
+
+\subsubsection*{Data collection}
+
+\subsection*{Mechanistic model of range limits}
+
+\subsubsection*{Statistical modeling}
+
+\subsubsection*{Demographic modeling}
+
+%--------------------------------------------------------------------
+\section*{Results}
+
+%--------------------------------------------------------------------
+\section*{Discussion}
+%--------------------------------------------------------------------
+\section*{Acknowledgements}
+
+\section*{Author contributions}
+
+\section*{Data accessibility}
+
+%--------------------------------------------------------------------
+\bibliographystyle{gcb}
+\bibliography{cholla_climate}
+
+
+
+\end{document}
