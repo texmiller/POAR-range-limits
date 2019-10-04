@@ -3,6 +3,7 @@ library(scales)
 library(dplyr)
 library(rstan)
 library(shinystan)
+library(tidyverse)
 library(loo)
 options( stringsAsFactors = T)
 source('code/format/plot_binned_prop.R')
@@ -18,15 +19,17 @@ quote_bare <- function( ... ){
 }
 
 # read demographic data
-poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
-viabVr  <- read.csv('data/viability.csv')
-
+#poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
+# Tom's Cornell desktop
+poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+#viabVr  <- read.csv('data/viability.csv')
+viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 
 # Data formatting -------------------------------------------------
 
 # Survival
 poar.surv <- poar %>% 
-                subset( tillerN_t0>0 ) %>%
+                subset(year, code, tillerN_t0>0 ) %>%
                 select(site, unique.block, Sex, 
                        long.center, long.scaled, 
                        tillerN_t0, surv_t1) %>% 
@@ -38,6 +41,43 @@ poar.surv <- poar %>%
                         block = unique.block ) %>% 
                 mutate( log_size_t0   = log(tillerN_t0),
                         log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
+
+# Tom's survival model experiments ----------------------------------------
+# data for model
+data_l <- list( y_s        = poar.surv$surv_t1,
+                size_s     = poar.surv$log_size_t0,
+                n_s        = poar.surv$surv_t1 %>% length
+)
+# simulation parameters
+sim_pars <- list(
+  warmup = 1000, 
+  iter = 4000, 
+  thin = 2, 
+  chains = 4
+)
+# fit the "big" model 
+fit_mod <- stan(
+  file = 'code/stan/surv_tom.stan',
+  data = data_l,
+  pars = quote_bare( b_0, b_s ),
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = 4 )
+
+surv_summary <- summary(fit_mod)
+x_surv <- seq(min(poar.surv$log_size_t0),max(poar.surv$log_size_t0),length.out=100)
+invlogit <- function(x){exp(x)/(1+exp(x))}
+
+plot(jitter(poar.surv$log_size_t0),jitter(poar.surv$surv_t1))
+lines(x_surv,invlogit(surv_summary$summary[,"mean"]["b_0"] + surv_summary$summary[,"mean"]["b_s"] * x_surv),lwd=3)
+
+###########################################################################
+
+
+
+
+
 
 # growth 
 poar.grow <- poar %>% 
