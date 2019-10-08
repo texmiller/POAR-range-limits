@@ -5,6 +5,7 @@ library(rstan)
 library(shinystan)
 library(tidyverse)
 library(loo)
+library(bayesplot)
 options( stringsAsFactors = T)
 source('code/format/plot_binned_prop.R')
 # set rstan options
@@ -22,21 +23,25 @@ quote_bare <- function( ... ){
 #poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
 # Tom's Cornell desktop
 poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+# Tom's laptop
+poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 #viabVr  <- read.csv('data/viability.csv')
 viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 
 # Data formatting -------------------------------------------------
 
 # Survival
 poar.surv <- poar %>% 
-                subset(year, code, tillerN_t0>0 ) %>%
-                select(site, unique.block, Sex, 
+                subset(tillerN_t0>0 ) %>%
+                select(year, Code, site, unique.block, Sex, 
                        long.center, long.scaled, 
                        tillerN_t0, surv_t1) %>% 
                 na.omit %>% 
                 mutate( site         = site %>% as.factor %>% as.numeric,
                         unique.block = unique.block %>% as.factor %>% as.numeric,
-                        Sex          = Sex %>% as.factor %>% as.numeric ) %>% 
+                        Sex          = Sex %>% as.factor %>% as.numeric,
+                        source = Code %>% as.factor %>% as.numeric) %>% 
                 rename( sex   = Sex,
                         block = unique.block ) %>% 
                 mutate( log_size_t0   = log(tillerN_t0),
@@ -44,26 +49,52 @@ poar.surv <- poar %>%
 
 # Tom's survival model experiments ----------------------------------------
 # data for model
-data_l <- list( y_s        = poar.surv$surv_t1,
+data_l <- list( #response data
+                y_s        = poar.surv$surv_t1,
+                n_s        = poar.surv$surv_t1 %>% length,
+                #covariates
                 size_s     = poar.surv$log_size_t0,
-                n_s        = poar.surv$surv_t1 %>% length
+                male_s     = poar.surv$sex-1,
+                long_s     = poar.surv$long.center,
+                n_sites    = poar.surv$site %>% n_distinct,
+                site_s     = poar.surv$site,
+                n_sources  = poar.surv$source %>% n_distinct(),
+                source_s =  poar.surv$source,
+                n_blocks = poar.surv$block %>% n_distinct(),
+                block_s = poar.surv$block
+                
 )
+# parameters to estimate
+params <- quote_bare( b_0, b_size, b_sex, b_long,
+                      b_size_sex, b_size_long, b_long_sex, b_size_long_sex,
+                      site_tau, block_tau, source_tau)
 # simulation parameters
 sim_pars <- list(
   warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
+  iter = 5000, 
+  thin = 3, 
   chains = 4
 )
-# fit the "big" model 
+# fit the toy model 
 fit_mod <- stan(
   file = 'code/stan/surv_tom.stan',
   data = data_l,
-  pars = quote_bare( b_0, b_s ),
+  #pars = params,
   warmup = sim_pars$warmup,
   iter = sim_pars$iter,
   thin = sim_pars$thin,
-  chains = 4 )
+  chains = sim_pars$chains )
+
+## assess fit and convergence
+mcmc_dens_overlay(fit_mod,par=params)
+mcmc_trace(fit_mod,par=params)
+mcmc_intervals(fit_mod,par=params)
+
+## posterior predictive check
+y_s_new <- rstan::extract(fit_mod, pars = c("y_s_new"))
+color_scheme_set("brightblue")
+ppc_dens_overlay(data_l$y_s, y_s_new[[1]][1:5,])
+
 
 surv_summary <- summary(fit_mod)
 x_surv <- seq(min(poar.surv$log_size_t0),max(poar.surv$log_size_t0),length.out=100)
