@@ -2,11 +2,11 @@
 data {
   // Data for all vital rates
   int<lower=0> n_sites;         // N. of sites
-  int<lower=0> n_blocks;         // N. of sites
   int<lower=0> n_sources;         // N. of source populations
   
   // Data for survival sub-model (s)
   int<lower=0> n_s;    // N. of data points for the survival model
+  int<lower=0> n_blocks_s;         // N. of blocks
   int<lower=0> site_s[n_s];  // site index
   int<lower=0> block_s[n_s];  // site index
   int<lower=0> source_s[n_s];  // source index
@@ -17,6 +17,7 @@ data {
   
   // Data for growth sub-model (g)
   int<lower=0> n_g;    // N. of data points for the survival model
+  int<lower=0> n_blocks_g;         // N. of blocks
   int<lower=0> site_g[n_g];  // site index
   int<lower=0> block_g[n_g];  // site index
   int<lower=0> source_g[n_g];  // source index
@@ -27,6 +28,7 @@ data {
     
   // Data for flowering sub-model (f)
   int<lower=0> n_f;    // N. of data points for the survival model
+  int<lower=0> n_blocks_f;         // N. of blocks
   int<lower=0> site_f[n_f];  // site index
   int<lower=0> block_f[n_f];  // site index
   int<lower=0> source_f[n_f];  // source index
@@ -37,6 +39,7 @@ data {
     
   // Data for fertility sub-model (p)
   int<lower=0> n_p;    // N. of data points for the survival model
+  int<lower=0> n_blocks_p;         // N. of blocks
   int<lower=0> site_p[n_p];  // site index
   int<lower=0> block_p[n_p];  // site index
   int<lower=0> source_p[n_p];  // source index
@@ -48,8 +51,14 @@ data {
   // Data for seed viability sub-model (v)
   int<lower=0> n_v;   // data points
   int<lower=0> y_v[n_v];  // number of viable seeds
-  int<lower=0> tot_seeds[n_v]; // number of trials
-  real SR[n_v]; // Sex ratio (proportion female?)
+  int<lower=0> tot_seeds_v[n_v]; // number of trials
+  real SR_v[n_v]; // Sex ratio (proportion female?)
+  // Data for seed germination sub-model (m)
+  int<lower=0> n_m;   // data points
+  int<lower=0> y_m[n_m];  // number of germinating seeds
+  int<lower=0> tot_seeds_m[n_m]; // number of trials
+  real SR_m[n_m]; // Sex ratio (proportion female?)
+  
 }
 
 parameters {
@@ -67,7 +76,7 @@ parameters {
   real<lower=0> site_tau_s; 
   real site_rfx_s[n_sites];
   real<lower=0> block_tau_s; 
-  real block_rfx_s[n_blocks];  
+  real block_rfx_s[n_blocks_s];  
   real<lower=0> source_tau_s; 
   real source_rfx_s[n_sources];
   
@@ -85,7 +94,7 @@ parameters {
   real<lower=0> site_tau_g; 
   real site_rfx_g[n_sites];
   real<lower=0> block_tau_g; 
-  real block_rfx_g[n_blocks];  
+  real block_rfx_g[n_blocks_g];  
   real<lower=0> source_tau_g; 
   real source_rfx_g[n_sources];
   real<lower=0> phi_g; // Growth dispersion parameter 
@@ -104,7 +113,7 @@ parameters {
   real<lower=0> site_tau_f; 
   real site_rfx_f[n_sites];
   real<lower=0> block_tau_f; 
-  real block_rfx_f[n_blocks];  
+  real block_rfx_f[n_blocks_f];  
   real<lower=0> source_tau_f; 
   real source_rfx_f[n_sources];
       
@@ -122,20 +131,28 @@ parameters {
   real<lower=0> site_tau_p; 
   real site_rfx_p[n_sites];
   real<lower=0> block_tau_p; 
-  real block_rfx_p[n_blocks];  
+  real block_rfx_p[n_blocks_p];  
   real<lower=0> source_tau_p; 
   real source_rfx_p[n_sources];
-  real<lower=0> phi_g; // Panicle dispersion parameter
+  real<lower=0> phi_p; // Panicle dispersion parameter
   
   // Seed viability parameters
   real<lower=0,upper=1> v0;
   real<lower=0> a_v;
+  // Germination rate
+  real<lower=0,upper=1> m;
   }
 
 transformed parameters{
   
-  // prediction for survival
   real predS[n_s];
+  real predG[n_g];
+  real predF[n_f];
+  real predP[n_p];
+  real<lower=0,upper=1> predV[n_v];
+  real<lower=0,upper=1> predM[n_m];
+  
+  // prediction for survival
   for(isurv in 1:n_s){
     predS[isurv] = b0_s + 
                 #main effects
@@ -153,7 +170,6 @@ transformed parameters{
   }
   
   // prediction for growth
-  real predG[n_g];
   for(igrow in 1:n_g){
     predG[igrow] = b0_g + 
                 #main effects
@@ -171,7 +187,6 @@ transformed parameters{
   }
 
   // prediction for flowering
-  real predF[n_f];
   for(iflow in 1:n_f){
     predF[iflow] = b0_f + 
                 #main effects
@@ -189,7 +204,6 @@ transformed parameters{
   }
 
   // prediction for panicles
-  real predP[n_p];
   for(ipan in 1:n_p){
     predP[ipan] = b0_p + 
                 #main effects
@@ -207,9 +221,12 @@ transformed parameters{
   }  
   
   // Prediction for seed viability
-  real<lower=0,upper=1> predV[n_v];
   for(iviab in 1:n_v){
-    predV[iviab] = v0 * (1 - pow(SR[ii],a_v) ) + 0.00001;
+    predV[iviab] = v0 * (1 - pow(SR_v[iviab],a_v) ) + 0.00001;
+  }
+  // Prediction for germination
+  for(igerm in 1:n_m){
+    predM[igerm] = m * v0 * (1 - pow(SR_m[igerm],a_v) ) + 0.00001;
   }
   
 }
@@ -234,7 +251,7 @@ model {
     site_rfx_s[i] ~ normal(0, site_tau_s);
   }
   block_tau_s ~ inv_gamma(0.001, 0.001);
-  for (i in 1:n_blocks){
+  for (i in 1:n_blocks_s){
     block_rfx_s[i] ~ normal(0, block_tau_s);
   }
   source_tau_s ~ inv_gamma(0.001, 0.001);
@@ -255,7 +272,7 @@ model {
     site_rfx_g[i] ~ normal(0, site_tau_g);
   }
   block_tau_g ~ inv_gamma(0.001, 0.001);
-  for (i in 1:n_blocks){
+  for (i in 1:n_blocks_g){
     block_rfx_g[i] ~ normal(0, block_tau_g);
   }
   source_tau_g ~ inv_gamma(0.001, 0.001);
@@ -276,7 +293,7 @@ model {
     site_rfx_f[i] ~ normal(0, site_tau_f);
   }
   block_tau_f ~ inv_gamma(0.001, 0.001);
-  for (i in 1:n_blocks){
+  for (i in 1:n_blocks_f){
     block_rfx_f[i] ~ normal(0, block_tau_f);
   }
   source_tau_f ~ inv_gamma(0.001, 0.001);
@@ -297,7 +314,7 @@ model {
     site_rfx_p[i] ~ normal(0, site_tau_p);
   }
   block_tau_p ~ inv_gamma(0.001, 0.001);
-  for (i in 1:n_blocks){
+  for (i in 1:n_blocks_p){
     block_rfx_p[i] ~ normal(0, block_tau_p);
   }
   source_tau_p ~ inv_gamma(0.001, 0.001);
@@ -307,22 +324,55 @@ model {
   
   v0  ~ beta(10,1);  // intercept viability model
   a_v ~ gamma(1,1);  // "decay" in viability with SR
+  m  ~ beta(10,1);  // intercept viability model
   
   // sampling
-  y_s ~ bernoulli_logit(predS);
-  y_g ~ neg_binomial_2_log(predG, phi_g);
-  target += - log1m(neg_binomial_2_log_lpmf(0 | predG, phi_g)); // manually zero-truncating
-  y_f ~ bernoulli_logit(predF);
-  y_p ~ neg_binomial_2_log(predP, phi_p);
-  target += - log1m(neg_binomial_2_log_lpmf(0 | predP, phi_p)); // manually zero-truncating
-  y_v ~ binomial(tot_seeds, predV);
+  for (i in 1:n_s) {
+  y_s[i] ~ bernoulli_logit(predS[i]);
+  }
+  for (i in 1:n_g) {
+  y_g[i] ~ neg_binomial_2_log(predG[i], phi_g);
+  target += - log1m(neg_binomial_2_log_lpmf(0 | predG[i], phi_g)); // manually zero-truncating
+  }
+  for (i in 1:n_f) {
+  y_f[i] ~ bernoulli_logit(predF[i]);
+  }
+  for (i in 1:n_p) {
+  y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
+  target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); // manually zero-truncating
+  }
+  for (i in 1:n_v) {
+  y_v[i] ~ binomial(tot_seeds_v[i], predV[i]);
+  }
+  for (i in 1:n_m) {
+  y_m[i] ~ binomial(tot_seeds_m[i], predM[i]);
+  }
 }
 
 generated quantities {
  real y_s_new[n_s];
+ real y_g_new[n_g];
+ real y_f_new[n_f];
+ real y_p_new[n_p];
+ real y_v_new[n_v];
+ real y_m_new[n_m];
 
  for (i in 1:n_s) {
- y_s_new[i] = bernoulli_logit_rng(mS[i]);
+ y_s_new[i] = bernoulli_logit_rng(predS[i]);
  }
-
+ for (i in 1:n_g) {
+ y_g_new[i] = neg_binomial_2_log_rng(predG[i], phi_g);
+ }
+ for (i in 1:n_f) {
+ y_f_new[i] = bernoulli_logit_rng(predF[i]);
+ }
+ for (i in 1:n_p) {
+ y_p_new[i] = neg_binomial_2_log_rng(predP[i], phi_p);
+ }
+ for (i in 1:n_v) {
+ y_v_new[i] = binomial_rng(tot_seeds_v[i], predV[i]);
+ }
+ for (i in 1:n_m) {
+ y_m_new[i] = binomial_rng(tot_seeds_m[i], predM[i]);
+ } 
 }

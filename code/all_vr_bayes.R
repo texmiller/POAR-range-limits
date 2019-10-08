@@ -105,21 +105,17 @@ lines(x_surv,invlogit(surv_summary$summary[,"mean"]["b_0"] + surv_summary$summar
 
 ###########################################################################
 
-
-
-
-
-
 # growth 
 poar.grow <- poar %>% 
                 subset( tillerN_t0 > 0 & tillerN_t1 > 0 ) %>%
-                select( site, unique.block, Sex, 
+                select( year, Code, site, unique.block, Sex, 
                         long.center, long.scaled, 
                         tillerN_t0, tillerN_t1 ) %>% 
                 na.omit %>% 
                 mutate( site         = site %>% as.factor %>% as.numeric,
                         unique.block = unique.block %>% as.factor %>% as.numeric,
-                        Sex          = Sex %>% as.factor %>% as.numeric ) %>% 
+                        Sex          = Sex %>% as.factor %>% as.numeric,
+                        source = Code %>% as.factor %>% as.numeric ) %>% 
                 rename( sex   = Sex,
                         block = unique.block ) %>% 
                 mutate( log_size_t0   = log(tillerN_t0),
@@ -128,13 +124,14 @@ poar.grow <- poar %>%
 # flowering
 poar.flow <- poar %>% 
                 subset( tillerN_t1 > 0 ) %>%
-                select( site, unique.block, Sex, 
+                select( year, Code, site, unique.block, Sex, 
                         long.center, long.scaled, 
                         tillerN_t1, flow_t1 ) %>% 
                 na.omit %>% 
                 mutate( site         = site %>% as.factor %>% as.numeric,
                         unique.block = unique.block %>% as.factor %>% as.numeric,
-                        Sex          = Sex %>% as.factor %>% as.numeric ) %>% 
+                        Sex          = Sex %>% as.factor %>% as.numeric,
+                        source = Code %>% as.factor %>% as.numeric ) %>% 
                 rename( sex      = Sex,
                         block    = unique.block ) %>% 
                 mutate( log_size_t1   = log(tillerN_t1),
@@ -144,13 +141,14 @@ poar.flow <- poar %>%
 # Panicules 
 poar.panic<- poar %>% 
                 subset( flowerN_t1 > 0 & tillerN_t1 > 0 ) %>%
-                select( site, unique.block, Sex, 
+                select( year, Code, site, unique.block, Sex, 
                         long.center, long.scaled, 
                         tillerN_t1, flowerN_t1 ) %>% 
                 na.omit %>% 
                 mutate( site         = site %>% as.factor %>% as.numeric,
                         unique.block = unique.block %>% as.factor %>% as.numeric,
-                        Sex          = Sex %>% as.factor %>% as.numeric ) %>% 
+                        Sex          = Sex %>% as.factor %>% as.numeric,
+                        source = Code %>% as.factor %>% as.numeric ) %>% 
                 rename( panic_t1 = flowerN_t1,
                         sex      = Sex,
                         block    = unique.block ) %>% 
@@ -160,13 +158,51 @@ poar.panic<- poar %>%
 
 # viability data
 viab   <- viabVr %>% 
-            select( plot, germTot, germFail, sr_f ) %>% 
-            rename( SR        = sr_f,
-                    y_germ    = germTot ) %>% 
-            mutate( tot_seeds = y_germ + germFail ) %>% 
-            select( y_germ, tot_seeds, SR ) %>% 
-            na.omit
+  select( plot, totS, yesMaybe, sr_f ) %>% 
+  rename( SR        = sr_f,
+          y_viab = yesMaybe,
+          tot_seeds_viab = totS) %>% 
+  select(y_viab, tot_seeds_viab, SR ) %>% 
+  na.omit
 
+# germination data
+germ   <- viabVr %>% 
+  select( plot, germTot, germFail, sr_f ) %>% 
+  rename( SR        = sr_f,
+          y_germ    = germTot ) %>% 
+  mutate(tot_seeds_germ = y_germ + germFail ) %>% 
+  select(y_germ, tot_seeds_germ, SR ) %>% 
+  na.omit
+
+
+# Viab - Germ test --------------------------------------------------------
+viab   <- viabVr %>% 
+  select( plot, totS, yesMaybe, sr_f ) %>% 
+  rename( SR        = sr_f,
+          y_viab = yesMaybe,
+          tot_seeds_viab = totS) %>% 
+  select(y_viab, tot_seeds_viab, SR ) %>% 
+  na.omit
+
+germ   <- viabVr %>% 
+  select( plot, germTot, germFail, sr_f ) %>% 
+  rename( SR        = sr_f,
+          y_germ    = germTot ) %>% 
+  mutate(tot_seeds_germ = y_germ + germFail ) %>% 
+  select(y_germ, tot_seeds_germ, SR ) %>% 
+  na.omit
+
+data_viab_germ <- list(
+  n_v       = nrow(viab),
+  y_v       = viab$y_viab,
+  tot_seeds_v = viab$tot_seeds_viab,
+  SR_v        = viab$SR,
+  
+  n_g       = nrow(germ),
+  y_g       = germ$y_germ,
+  tot_seeds_g = germ$tot_seeds_germ,
+  SR_g        = germ$SR  
+)
 
 # simulation parameters
 sim_pars <- list(
@@ -177,20 +213,29 @@ sim_pars <- list(
 )
 
 # fit the "big" model 
-fit_mod <- stan(
-    file = 'code/stan/germ.stan',
-    data = data_v,
-    pars = quote_bare( v0, a_g ),
-    warmup = sim_pars$warmup,
-    iter = sim_pars$iter,
-    thin = sim_pars$thin,
-    chains = 4 )
+fit_viab <- stan(
+  file = 'code/stan/viab_germ_test.stan',
+  data = data_viab_germ,
+  pars = quote_bare( v0, a_v, g ),
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = 4 )
+
+mcmc_dens_overlay(fit_viab,par=quote_bare( v0, a_v, g ))
+
+##############################################################
+
 
 
 # data for model
-data_l <- list( n_sites    = poar.surv$site %>% n_distinct,
+data_all <- list( n_sites    = poar.surv$site %>% n_distinct,
+                n_sources  = poar.surv$source %>% n_distinct(),
+                
+                # survival data
                 n_blocks_s = poar.surv$block %>% n_distinct,
                 site_s     = poar.surv$site,
+                source_s =  poar.surv$source,
                 block_s    = poar.surv$block,
                 site_block_s = data.frame( site_i  = poar.surv$site,
                                            block_i = poar.surv$block ) %>% 
@@ -204,6 +249,7 @@ data_l <- list( n_sites    = poar.surv$site %>% n_distinct,
                 # growth data
                 n_blocks_g = poar.grow$block %>% n_distinct,
                 site_g     = poar.grow$site,
+                source_g =  poar.grow$source,
                 block_g    = poar.grow$block,
                 site_block_g = data.frame( site_i  = poar.grow$site,
                                            block_i = poar.grow$block ) %>% 
@@ -217,6 +263,7 @@ data_l <- list( n_sites    = poar.surv$site %>% n_distinct,
                 # flowering data
                 n_blocks_f = poar.flow$block %>% n_distinct,
                 site_f   = poar.flow$site,
+                source_f =  poar.flow$source,
                 block_f  = poar.flow$block,
                 site_block_f = data.frame( site_i  = poar.flow$site,
                                            block_i = poar.flow$block ) %>% 
@@ -227,9 +274,10 @@ data_l <- list( n_sites    = poar.surv$site %>% n_distinct,
                 y_f      = poar.flow$flow_t1,
                 n_f      = nrow(poar.flow),
                 
-                # panicule data
+                # panicle data
                 n_blocks_p = poar.panic$block %>% n_distinct,
                 site_p   = poar.panic$site,
+                source_p =  poar.panic$source,
                 block_p  = poar.panic$block,
                 site_block_p = data.frame( site_i  = poar.panic$site,
                                            block_i = poar.panic$block ) %>% 
@@ -240,35 +288,36 @@ data_l <- list( n_sites    = poar.surv$site %>% n_distinct,
                 y_p      = poar.panic$panic_t1,
                 n_p      = nrow(poar.panic),
                 
-                # germination
+                # viability
                 n_v       = nrow(viab),
-                y_v       = viab$y_germ,
-                tot_seeds = viab$tot_seeds,
-                SR        = viab$SR   )
-
-
+                y_v       = viab$y_viab,
+                tot_seeds_v = viab$tot_seeds_viab,
+                SR_v        = viab$SR,
+                
+                # germination
+                n_m       = nrow(germ),
+                y_m       = germ$y_germ,
+                tot_seeds_m = germ$tot_seeds_germ,
+                SR_m        = germ$SR    )
 
 
 # simulation parameters
 sim_pars <- list(
-  warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
+  warmup = 2000, 
+  iter = 25000, 
+  thin = 3, 
   chains = 4
 )
 
 # fit the "big" model 
-fit_mod <- stan(
-    file = 'code/stan/all_vr_s.stan',
-    data = data_l,
-    pars = quote_bare( site_a_u_s, b_s_s, b_l_s, b_sex_s, b_sex_l_s,
-                       site_a_u_g, b_s_g, b_l_g, b_sex_g, b_sex_l_g,
-                       site_a_u_f, b_s_f, b_l_f, b_sex_f, b_sex_l_f,
-                       site_a_u_p, b_s_p, b_l_p, b_sex_p, b_sex_l_p,
-                       v0,         a_v ),
+fit_full <- stan(
+    file = 'code/stan/poar_full.stan',
+    data = data_all,
     warmup = sim_pars$warmup,
     iter = sim_pars$iter,
     thin = sim_pars$thin,
     chains = 4 )
+
+
 
 saveRDS(fit_mod, 'results/all_vr_site.rds')
