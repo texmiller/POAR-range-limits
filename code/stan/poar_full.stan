@@ -349,30 +349,4 @@ model {
   }
 }
 
-generated quantities {
- real y_s_new[n_s];
- real y_g_new[n_g];
- real y_f_new[n_f];
- real y_p_new[n_p];
- real y_v_new[n_v];
- real y_m_new[n_m];
 
- for (i in 1:n_s) {
- y_s_new[i] = bernoulli_logit_rng(predS[i]);
- }
- for (i in 1:n_g) {
- y_g_new[i] = neg_binomial_2_log_rng(predG[i], phi_g);
- }
- for (i in 1:n_f) {
- y_f_new[i] = bernoulli_logit_rng(predF[i]);
- }
- for (i in 1:n_p) {
- y_p_new[i] = neg_binomial_2_log_rng(predP[i], phi_p);
- }
- for (i in 1:n_v) {
- y_v_new[i] = binomial_rng(tot_seeds_v[i], predV[i]);
- }
- for (i in 1:n_m) {
- y_m_new[i] = binomial_rng(tot_seeds_m[i], predM[i]);
- } 
-}

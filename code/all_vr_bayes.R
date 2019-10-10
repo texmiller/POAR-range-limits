@@ -6,6 +6,7 @@ library(shinystan)
 library(tidyverse)
 library(loo)
 library(bayesplot)
+library(gtools)
 options( stringsAsFactors = T)
 source('code/format/plot_binned_prop.R')
 # set rstan options
@@ -318,6 +319,19 @@ fit_full <- stan(
     thin = sim_pars$thin,
     chains = 4 )
 
+saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
 
+# Posterior predictive checks ---------------------------------------------
+## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
+n_post_draws <- 500
 
-saveRDS(fit_mod, 'results/all_vr_site.rds')
+predS <- rstan::extract(fit_full, pars = c("predS"))$predS
+
+y_s_sim <- matrix(NA,n_post_draws,length(data_all$y_s))
+
+rbinom(n=1, size=1, prob = inv.logit(predS[1,1:10]))
+
+post_draws <- sample.int(dim(predS)[1], 500)
+
+ppc_dens_overlay(data_all$y_s, predS[post_draws,])
+
