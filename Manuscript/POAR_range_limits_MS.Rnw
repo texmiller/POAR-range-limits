@@ -71,20 +71,35 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
 Individuals grow via rhizomes to form patches up to \bf{quantity} in area. 
-Sex is genetically based in \textit{P. arachnifera} (cite).
+Sex is genetically based in \textit{P. arachnifera} \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
 We surveyed \bf{number} \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
 We visited \bf{number} populations in spring 2012 and \bf{number} populations in spring 2013. 
-Locations and exact dates are provided in Table. 
-At each population, we 
-
+Survey locations are shown in \bf{map} and coordinates and dates are provided in Table \bf{number}. 
+At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
+We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
+Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
+This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters. 
 
 \subsection*{Common garden experiment}
 
 \subsubsection*{Source material and experimental sites}
+We established a common garden experiment at \bf{N} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (MAP).
+Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude, averaging over latitudes. 
+During the three years of this experiment, total precipitation at each site closely tracked longitude (figure correlating precip and longitude), as expected based on longer-term climate trends (map).
+Source material for this experiment came from \bf{N} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
+At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \bf{N} per sex, range: \bf{N} -- \bf{N} ). 
+These were brought back to the Rice University greenhouse, where they were clonally propagated in cylidrical cone-tainers with ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
+
+Common gardens were set up in Fall (October--December) 2014. 
+At each site, we established \bf{N} experimental blocks, which typically corresponded to a tree or woodland edge, providing partial shade that mimics this species' natural micro-environment. 
+We planted \bf{N} females and \bf{N} males in each block, for a total of \bf{N} individuals per sex per site and \bf{N} total plants across sites. 
+To promote establishment, we cleared vegetation immediately surrounding transplants and provided ca. $1$ L of water at the time of transplanting but provided no subsequent watering, fertilization, or competitor removal. 
 
 \subsubsection*{Data collection}
+We visited each site during May of 2015, 2016, and 2017. 
+For each individual in each year, we recorded survival status (alive or dead), size (number of tillers), flowering status (reproductive or vegetative), the number of panicles produced by flowering plants, and panicle length, which is proportional to production of seeds (in females) and pollen (in males). 
 
 \subsection*{Pollination experiment}
 
