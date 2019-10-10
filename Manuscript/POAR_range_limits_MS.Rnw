@@ -67,12 +67,26 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 \section*{Materials and methods}
 
 \subsection*{Study system and natural population surveys}
+\textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
+Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
+Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
+Individuals grow via rhizomes to form patches up to \bf{quantity} in area. 
+Sex is genetically based in \textit{P. arachnifera} (cite).
+The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
+
+We surveyed \bf{number} \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
+We visited \bf{number} populations in spring 2012 and \bf{number} populations in spring 2013. 
+Locations and exact dates are provided in Table. 
+At each population, we 
+
 
 \subsection*{Common garden experiment}
 
 \subsubsection*{Source material and experimental sites}
 
 \subsubsection*{Data collection}
+
+\subsection*{Pollination experiment}
 
 \subsection*{Mechanistic model of range limits}
 
