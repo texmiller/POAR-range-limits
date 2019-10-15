@@ -7,6 +7,7 @@ library(tidyverse)
 library(loo)
 library(bayesplot)
 library(gtools)
+library(countreg)
 options( stringsAsFactors = T)
 source('code/format/plot_binned_prop.R')
 # set rstan options
@@ -77,14 +78,14 @@ sim_pars <- list(
   chains = 4
 )
 # fit the toy model 
-fit_mod <- stan(
-  file = 'code/stan/surv_tom.stan',
-  data = data_l,
+#fit_mod <- stan(
+#  file = 'code/stan/surv_tom.stan',
+#  data = data_l,
   #pars = params,
-  warmup = sim_pars$warmup,
-  iter = sim_pars$iter,
-  thin = sim_pars$thin,
-  chains = sim_pars$chains )
+#  warmup = sim_pars$warmup,
+#  iter = sim_pars$iter,
+#  thin = sim_pars$thin,
+#  chains = sim_pars$chains )
 
 ## assess fit and convergence
 mcmc_dens_overlay(fit_mod,par=params)
@@ -214,14 +215,14 @@ sim_pars <- list(
 )
 
 # fit the "big" model 
-fit_viab <- stan(
-  file = 'code/stan/viab_germ_test.stan',
-  data = data_viab_germ,
-  pars = quote_bare( v0, a_v, g ),
-  warmup = sim_pars$warmup,
-  iter = sim_pars$iter,
-  thin = sim_pars$thin,
-  chains = 4 )
+#fit_viab <- stan(
+#  file = 'code/stan/viab_germ_test.stan',
+#  data = data_viab_germ,
+##  pars = quote_bare( v0, a_v, g ),
+#  warmup = sim_pars$warmup,
+#  iter = sim_pars$iter,
+#  thin = sim_pars$thin,
+#  chains = 4 )
 
 mcmc_dens_overlay(fit_viab,par=quote_bare( v0, a_v, g ))
 
@@ -311,27 +312,51 @@ sim_pars <- list(
 )
 
 # fit the "big" model 
-fit_full <- stan(
-    file = 'code/stan/poar_full.stan',
-    data = data_all,
-    warmup = sim_pars$warmup,
-    iter = sim_pars$iter,
-    thin = sim_pars$thin,
-    chains = 4 )
+# fit_full <- stan(
+#    file = 'code/stan/poar_full.stan',
+#    data = data_all,
+#    warmup = sim_pars$warmup,
+#    iter = sim_pars$iter,
+#    thin = sim_pars$thin,
+#    chains = 4 )
 
-saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+#saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+fit_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
 
 # Posterior predictive checks ---------------------------------------------
 ## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
-n_post_draws <- 500
-
 predS <- rstan::extract(fit_full, pars = c("predS"))$predS
+predG <- rstan::extract(fit_full, pars = c("predG"))$predG
+phi_G <- rstan::extract(fit_full, pars = c("phi_g"))$phi_g
+predF <- rstan::extract(fit_full, pars = c("predF"))$predF
+predP <- rstan::extract(fit_full, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_full, pars = c("phi_p"))$phi_p
+predV <- rstan::extract(fit_full, pars = c("predV"))$predV
+predM <- rstan::extract(fit_full, pars = c("predM"))$predM
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predS)[1], n_post_draws)
 
 y_s_sim <- matrix(NA,n_post_draws,length(data_all$y_s))
+y_g_sim <- matrix(NA,n_post_draws,length(data_all$y_g))
+y_f_sim <- matrix(NA,n_post_draws,length(data_all$y_f))
+y_p_sim <- matrix(NA,n_post_draws,length(data_all$y_p))
+y_v_sim <- matrix(NA,n_post_draws,length(data_all$y_v))
+y_m_sim <- matrix(NA,n_post_draws,length(data_all$y_m))
 
-rbinom(n=1, size=1, prob = inv.logit(predS[1,1:10]))
+for(i in 1:n_post_draws){
+  ## sample survival data (bernoulli)
+  y_s_sim[i,] <- rbinom(n=length(data_all$y_s), size=1, prob = inv.logit(predS[i,]))
+  ## sample growth data (zero-truncated NB)
+  y_g_sim[i,] <- rztnbinom(n=length(data_all$y_g), mu = exp(predG[i,]), size=phi_G[i])
+  ## sample flowering data (bernoulli)
+  y_f_sim[i,] <- rbinom(n=length(data_all$y_f), size=1, prob = inv.logit(predF[i,]))
+  ## sample panicle data (zero-truncated NB)
+  y_p_sim[i,] <- rztnbinom(n=length(data_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
+  ## sample viability data (binomial)
+  y_v_sim[i,] <- rbinom(n=length(data_all$y_v), size=data_all$tot_seeds_v, prob = predV[i,])
+  ## sample germination data (binomial)
+  y_m_sim[i,] <- rbinom(n=length(data_all$y_m), size=data_all$tot_seeds_m, prob = predM[i,])
+}
 
-post_draws <- sample.int(dim(predS)[1], 500)
-
-ppc_dens_overlay(data_all$y_s, predS[post_draws,])
 
