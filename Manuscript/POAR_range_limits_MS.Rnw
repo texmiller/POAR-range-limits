@@ -70,7 +70,7 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 \textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
-Individuals grow via rhizomes to form patches up to in area. 
+Individuals grow via rhizomes to form patches up to \bf{quantity} in area. 
 Sex is genetically based in \textit{P. arachnifera} \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
