@@ -139,8 +139,10 @@ parameters {
   // Seed viability parameters
   real<lower=0,upper=1> v0;
   real<lower=0> a_v;
+  real<lower=0.1> phi_v;             
   // Germination rate
   real<lower=0,upper=1> m;
+  real<lower=0.1> phi_m;             
   }
 
 transformed parameters{
@@ -151,6 +153,12 @@ transformed parameters{
   real predP[n_p];
   real<lower=0,upper=1> predV[n_v];
   real<lower=0,upper=1> predM[n_m];
+  
+  // beta-binom reparameterization for viab and germ
+  vector[n_v] alpha_v; 
+  vector[n_v] beta_v;   
+  vector[n_m] alpha_m; 
+  vector[n_m] beta_m;  
   
   // prediction for survival
   for(isurv in 1:n_s){
@@ -223,11 +231,15 @@ transformed parameters{
   // Prediction for seed viability
   for(iviab in 1:n_v){
     predV[iviab] = v0 * (1 - pow(SR_v[iviab],a_v) ) + 0.00001;
-  }
+    alpha_v[iviab] = predV[iviab] * phi_v;
+    beta_v[iviab] = (1 - predV[iviab]) * phi_v; 
+    }
   // Prediction for germination
   for(igerm in 1:n_m){
     predM[igerm] = m * v0 * (1 - pow(SR_m[igerm],a_v) ) + 0.00001;
-  }
+    alpha_m[igerm] = predM[igerm] * phi_m;
+    beta_m[igerm] = (1 - predM[igerm]) * phi_m; 
+    }
   
 }
 
@@ -324,7 +336,9 @@ model {
   
   v0  ~ beta(10,1);  // intercept viability model
   a_v ~ gamma(1,1);  // "decay" in viability with SR
+  phi_v ~ pareto(0.1,1.5);
   m  ~ beta(10,1);  // intercept viability model
+  phi_m ~ pareto(0.1,1.5);
   
   // sampling
   for (i in 1:n_s) {
@@ -342,10 +356,10 @@ model {
   target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); // manually zero-truncating
   }
   for (i in 1:n_v) {
-  y_v[i] ~ binomial(tot_seeds_v[i], predV[i]);
+  y_v[i] ~ beta_binomial(tot_seeds_v[i], alpha_v[i], beta_v[i]);
   }
   for (i in 1:n_m) {
-  y_m[i] ~ binomial(tot_seeds_m[i], predM[i]);
+  y_m[i] ~ beta_binomial(tot_seeds_m[i], alpha_m[i], beta_m[i]);
   }
 }
 
