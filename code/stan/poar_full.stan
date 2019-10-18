@@ -72,6 +72,10 @@ parameters {
   real bsizelong_s;
   real blongsex_s;
   real bsizelongsex_s;
+  real blong2_s;  
+  real bsizelong2_s;
+  real blong2sex_s;
+  real bsizelong2sex_s;
   //random effects
   real<lower=0> site_tau_s; 
   real site_rfx_s[n_sites];
@@ -90,6 +94,10 @@ parameters {
   real bsizelong_g;
   real blongsex_g;
   real bsizelongsex_g;
+  real blong2_g;  
+  real bsizelong2_g;
+  real blong2sex_g;
+  real bsizelong2sex_g;
   //random effects
   real<lower=0> site_tau_g; 
   real site_rfx_g[n_sites];
@@ -109,6 +117,10 @@ parameters {
   real bsizelong_f;
   real blongsex_f;
   real bsizelongsex_f;
+  real blong2_f;  
+  real bsizelong2_f;
+  real blong2sex_f;
+  real bsizelong2sex_f;
   //random effects
   real<lower=0> site_tau_f; 
   real site_rfx_f[n_sites];
@@ -127,6 +139,10 @@ parameters {
   real bsizelong_p;
   real blongsex_p;
   real bsizelongsex_p;
+  real blong2_p;  
+  real bsizelong2_p;
+  real blong2sex_p;
+  real bsizelong2sex_p;
   //random effects
   real<lower=0> site_tau_p; 
   real site_rfx_p[n_sites];
@@ -163,15 +179,20 @@ transformed parameters{
   // prediction for survival
   for(isurv in 1:n_s){
     predS[isurv] = b0_s + 
-                #main effects
+                //main effects
                 bsize_s * size_s[isurv] + bsex_s * male_s[isurv] + blong_s * long_s[isurv] + 
-                #2-way interactions
+                //2-way interactions
                 bsizesex_s * size_s[isurv] * male_s[isurv] +
                 bsizelong_s * size_s[isurv] * long_s[isurv] +
                 blongsex_s * long_s[isurv] * male_s[isurv] +
-                #3-way interaction
+                //3-way interaction
                 bsizelongsex_s * size_s[isurv] * long_s[isurv] * male_s[isurv] +
-                #random effects
+                //quadratic longitude effects
+                blong2_s * pow(long_s[isurv],2) + 
+                bsizelong2_s * size_s[isurv] * pow(long_s[isurv],2) +
+                blong2sex_s * pow(long_s[isurv],2) * male_s[isurv] +
+                bsizelong2sex_s * size_s[isurv] * pow(long_s[isurv],2) * male_s[isurv] +
+                //random effects
                 site_rfx_s[site_s[isurv]] +
                 block_rfx_s[block_s[isurv]] +
                 source_rfx_s[source_s[isurv]];
@@ -180,15 +201,20 @@ transformed parameters{
   // prediction for growth
   for(igrow in 1:n_g){
     predG[igrow] = b0_g + 
-                #main effects
+                //main effects
                 bsize_g * size_g[igrow] + bsex_g * male_g[igrow] + blong_g * long_g[igrow] + 
-                #2-way interactions
+                //2-way interactions
                 bsizesex_g * size_g[igrow] * male_g[igrow] +
                 bsizelong_g * size_g[igrow] * long_g[igrow] +
                 blongsex_g * long_g[igrow] * male_g[igrow] +
-                #3-way interaction
+                //3-way interaction
                 bsizelongsex_g * size_g[igrow] * long_g[igrow] * male_g[igrow] +
-                #random effects
+                //quadratic longitude effects
+                blong2_g * pow(long_g[igrow],2) + 
+                bsizelong2_g * size_g[igrow] * pow(long_g[igrow],2) +
+                blong2sex_g * pow(long_g[igrow],2) * male_g[igrow] +
+                bsizelong2sex_g * size_g[igrow] * pow(long_g[igrow],2) * male_g[igrow] +
+                //random effects
                 site_rfx_g[site_g[igrow]] +
                 block_rfx_g[block_g[igrow]] +
                 source_rfx_g[source_g[igrow]];
@@ -197,15 +223,20 @@ transformed parameters{
   // prediction for flowering
   for(iflow in 1:n_f){
     predF[iflow] = b0_f + 
-                #main effects
+                //main effects
                 bsize_f * size_f[iflow] + bsex_f * male_f[iflow] + blong_f * long_f[iflow] + 
-                #2-way interactions
+                //2-way interactions
                 bsizesex_f * size_f[iflow] * male_f[iflow] +
                 bsizelong_f * size_f[iflow] * long_f[iflow] +
                 blongsex_f * long_f[iflow] * male_f[iflow] +
-                #3-way interaction
+                //3-way interaction
                 bsizelongsex_f * size_f[iflow] * long_f[iflow] * male_f[iflow] +
-                #random effects
+                //quadratic longitude effects
+                blong2_f * pow(long_f[iflow],2) + 
+                bsizelong2_f * size_f[iflow] * pow(long_f[iflow],2) +
+                blong2sex_f * pow(long_f[iflow],2) * male_f[iflow] +
+                bsizelong2sex_f * size_f[iflow] * pow(long_f[iflow],2) * male_f[iflow] +
+                //random effects
                 site_rfx_f[site_f[iflow]] +
                 block_rfx_f[block_f[iflow]] +
                 source_rfx_f[source_f[iflow]];
@@ -214,15 +245,20 @@ transformed parameters{
   // prediction for panicles
   for(ipan in 1:n_p){
     predP[ipan] = b0_p + 
-                #main effects
+                //main effects
                 bsize_p * size_p[ipan] + bsex_p * male_p[ipan] + blong_p * long_p[ipan] + 
-                #2-way interactions
+                //2-way interactions
                 bsizesex_p * size_p[ipan] * male_p[ipan] +
                 bsizelong_p * size_p[ipan] * long_p[ipan] +
                 blongsex_p * long_p[ipan] * male_p[ipan] +
-                #3-way interaction
+                //3-way interaction
                 bsizelongsex_p * size_p[ipan] * long_p[ipan] * male_p[ipan] +
-                #random effects
+                //quadratic longitude effects
+                blong2_p * pow(long_p[ipan],2) + 
+                bsizelong2_p * size_p[ipan] * pow(long_p[ipan],2) +
+                blong2sex_p * pow(long_p[ipan],2) * male_p[ipan] +
+                bsizelong2sex_p * size_p[ipan] * pow(long_p[ipan],2) * male_p[ipan] +
+                //random effects
                 site_rfx_p[site_p[ipan]] +
                 block_rfx_p[block_p[ipan]] +
                 source_rfx_p[source_p[ipan]];
@@ -257,7 +293,11 @@ model {
   bsizesex_s ~ normal(0, 100);   
   bsizelong_s ~ normal(0, 100);   
   blongsex_s ~ normal(0, 100);   
-  bsizelongsex_s ~ normal(0, 100);  
+  bsizelongsex_s ~ normal(0, 100);   
+  blong2_s ~ normal(0, 100);   
+  bsizelong2_s ~ normal(0, 100);   
+  blong2sex_s ~ normal(0, 100);   
+  bsizelong2sex_s ~ normal(0, 100);    
   site_tau_s ~ inv_gamma(0.001, 0.001);
   for (i in 1:n_sites){
     site_rfx_s[i] ~ normal(0, site_tau_s);
@@ -278,7 +318,11 @@ model {
   bsizesex_g ~ normal(0, 100);   
   bsizelong_g ~ normal(0, 100);   
   blongsex_g ~ normal(0, 100);   
-  bsizelongsex_g ~ normal(0, 100);  
+  bsizelongsex_g ~ normal(0, 100);   
+  blong2_g ~ normal(0, 100);   
+  bsizelong2_g ~ normal(0, 100);   
+  blong2sex_g ~ normal(0, 100);   
+  bsizelong2sex_g ~ normal(0, 100);    
   site_tau_g ~ inv_gamma(0.001, 0.001);
   for (i in 1:n_sites){
     site_rfx_g[i] ~ normal(0, site_tau_g);
@@ -299,7 +343,11 @@ model {
   bsizesex_f ~ normal(0, 100);   
   bsizelong_f ~ normal(0, 100);   
   blongsex_f ~ normal(0, 100);   
-  bsizelongsex_f ~ normal(0, 100);  
+  bsizelongsex_f ~ normal(0, 100);   
+  blong2_f ~ normal(0, 100);   
+  bsizelong2_f ~ normal(0, 100);   
+  blong2sex_f ~ normal(0, 100);   
+  bsizelong2sex_f ~ normal(0, 100);    
   site_tau_f ~ inv_gamma(0.001, 0.001);
   for (i in 1:n_sites){
     site_rfx_f[i] ~ normal(0, site_tau_f);
@@ -320,7 +368,11 @@ model {
   bsizesex_p ~ normal(0, 100);   
   bsizelong_p ~ normal(0, 100);   
   blongsex_p ~ normal(0, 100);   
-  bsizelongsex_p ~ normal(0, 100);  
+  bsizelongsex_p ~ normal(0, 100);   
+  blong2_p ~ normal(0, 100);   
+  bsizelong2_p ~ normal(0, 100);   
+  blong2sex_p ~ normal(0, 100);   
+  bsizelong2sex_p ~ normal(0, 100);  
   site_tau_p ~ inv_gamma(0.001, 0.001);
   for (i in 1:n_sites){
     site_rfx_p[i] ~ normal(0, site_tau_p);
