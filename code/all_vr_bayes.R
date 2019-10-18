@@ -2,6 +2,9 @@
 #library(scales)
 #library(dplyr)
 library(rstan)
+# set rstan options
+rstan_options( auto_write = TRUE )
+options( mc.cores = parallel::detectCores() )
 #library(shinystan)
 library(tidyverse)
 #library(loo)
@@ -11,9 +14,6 @@ library(tidyverse)
 library(rmutil)
 #options( stringsAsFactors = T)
 #source('code/format/plot_binned_prop.R')
-# set rstan options
-rstan_options( auto_write = TRUE )
-options( mc.cores = parallel::detectCores() )
 
 # quote a series of bare names
 quote_bare <- function( ... ){
@@ -26,12 +26,12 @@ invlogit<-function(x){exp(x)/(1+exp(x))}
 # read demographic data
 #poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
 # Tom's Cornell desktop
-#poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 # Tom's laptop
-poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+#poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 #viabVr  <- read.csv('data/viability.csv')
-#viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
-viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+#viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 
 # Data formatting -------------------------------------------------
 
@@ -332,20 +332,20 @@ sim_pars <- list(
   warmup = 2000, 
   iter = 25000, 
   thin = 3, 
-  chains = 4
+  chains = 3
 )
 
 # fit the "big" model 
-# fit_full <- stan(
-#    file = 'code/stan/poar_full.stan',
-#    data = data_all,
-#    warmup = sim_pars$warmup,
-#    iter = sim_pars$iter,
-#    thin = sim_pars$thin,
-#    chains = 4 )
+ fit_full <- stan(
+    file = 'code/stan/poar_full.stan',
+    data = data_all,
+    warmup = sim_pars$warmup,
+    iter = sim_pars$iter,
+    thin = sim_pars$thin,
+    chains = sim_pars$chains )
 
-#saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
-fit_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+#fit_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
 
 # Posterior predictive checks ---------------------------------------------
 ## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
