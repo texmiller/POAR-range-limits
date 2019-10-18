@@ -1,15 +1,16 @@
 # Fit bayesian model containing all data
-library(scales)
-library(dplyr)
+#library(scales)
+#library(dplyr)
 library(rstan)
-library(shinystan)
+#library(shinystan)
 library(tidyverse)
-library(loo)
-library(bayesplot)
-library(gtools)
-library(countreg)
-options( stringsAsFactors = T)
-source('code/format/plot_binned_prop.R')
+#library(loo)
+#library(bayesplot)
+#library(gtools)
+#library(countreg)
+library(rmutil)
+#options( stringsAsFactors = T)
+#source('code/format/plot_binned_prop.R')
 # set rstan options
 rstan_options( auto_write = TRUE )
 options( mc.cores = parallel::detectCores() )
@@ -20,15 +21,16 @@ quote_bare <- function( ... ){
     eval( ) %>% 
     sapply( deparse )
 }
+invlogit<-function(x){exp(x)/(1+exp(x))}
 
 # read demographic data
 #poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
 # Tom's Cornell desktop
-poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+#poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 # Tom's laptop
 poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 #viabVr  <- read.csv('data/viability.csv')
-viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+#viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 
 # Data formatting -------------------------------------------------
@@ -48,62 +50,62 @@ poar.surv <- poar %>%
                         block = unique.block ) %>% 
                 mutate( log_size_t0   = log(tillerN_t0),
                         log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
-
-# Tom's survival model experiments ----------------------------------------
-# data for model
-data_l <- list( #response data
-                y_s        = poar.surv$surv_t1,
-                n_s        = poar.surv$surv_t1 %>% length,
-                #covariates
-                size_s     = poar.surv$log_size_t0,
-                male_s     = poar.surv$sex-1,
-                long_s     = poar.surv$long.center,
-                n_sites    = poar.surv$site %>% n_distinct,
-                site_s     = poar.surv$site,
-                n_sources  = poar.surv$source %>% n_distinct(),
-                source_s =  poar.surv$source,
-                n_blocks = poar.surv$block %>% n_distinct(),
-                block_s = poar.surv$block
-                
-)
-# parameters to estimate
-params <- quote_bare( b_0, b_size, b_sex, b_long,
-                      b_size_sex, b_size_long, b_long_sex, b_size_long_sex,
-                      site_tau, block_tau, source_tau)
-# simulation parameters
-sim_pars <- list(
-  warmup = 1000, 
-  iter = 5000, 
-  thin = 3, 
-  chains = 4
-)
-# fit the toy model 
-#fit_mod <- stan(
-#  file = 'code/stan/surv_tom.stan',
-#  data = data_l,
-  #pars = params,
-#  warmup = sim_pars$warmup,
-#  iter = sim_pars$iter,
-#  thin = sim_pars$thin,
-#  chains = sim_pars$chains )
-
-## assess fit and convergence
-mcmc_dens_overlay(fit_mod,par=params)
-mcmc_trace(fit_mod,par=params)
-mcmc_intervals(fit_mod,par=params)
-
-## posterior predictive check
-y_s_new <- rstan::extract(fit_mod, pars = c("y_s_new"))
-color_scheme_set("brightblue")
-ppc_dens_overlay(data_l$y_s, y_s_new[[1]][1:5,])
-
-
-surv_summary <- summary(fit_mod)
-x_surv <- seq(min(poar.surv$log_size_t0),max(poar.surv$log_size_t0),length.out=100)
-invlogit <- function(x){exp(x)/(1+exp(x))}
-
-plot(jitter(poar.surv$log_size_t0),jitter(poar.surv$surv_t1))
-lines(x_surv,invlogit(surv_summary$summary[,"mean"]["b_0"] + surv_summary$summary[,"mean"]["b_s"] * x_surv),lwd=3)
+# 
+# # Tom's survival model experiments ----------------------------------------
+# # data for model
+# data_l <- list( #response data
+#                 y_s        = poar.surv$surv_t1,
+#                 n_s        = poar.surv$surv_t1 %>% length,
+#                 #covariates
+#                 size_s     = poar.surv$log_size_t0,
+#                 male_s     = poar.surv$sex-1,
+#                 long_s     = poar.surv$long.center,
+#                 n_sites    = poar.surv$site %>% n_distinct,
+#                 site_s     = poar.surv$site,
+#                 n_sources  = poar.surv$source %>% n_distinct(),
+#                 source_s =  poar.surv$source,
+#                 n_blocks = poar.surv$block %>% n_distinct(),
+#                 block_s = poar.surv$block
+#                 
+# )
+# # parameters to estimate
+# params <- quote_bare( b_0, b_size, b_sex, b_long,
+#                       b_size_sex, b_size_long, b_long_sex, b_size_long_sex,
+#                       site_tau, block_tau, source_tau)
+# # simulation parameters
+# sim_pars <- list(
+#   warmup = 1000, 
+#   iter = 5000, 
+#   thin = 3, 
+#   chains = 4
+# )
+# # fit the toy model 
+# #fit_mod <- stan(
+# #  file = 'code/stan/surv_tom.stan',
+# #  data = data_l,
+#   #pars = params,
+# #  warmup = sim_pars$warmup,
+# #  iter = sim_pars$iter,
+# #  thin = sim_pars$thin,
+# #  chains = sim_pars$chains )
+# 
+# ## assess fit and convergence
+# mcmc_dens_overlay(fit_mod,par=params)
+# mcmc_trace(fit_mod,par=params)
+# mcmc_intervals(fit_mod,par=params)
+# 
+# ## posterior predictive check
+# y_s_new <- rstan::extract(fit_mod, pars = c("y_s_new"))
+# color_scheme_set("brightblue")
+# ppc_dens_overlay(data_l$y_s, y_s_new[[1]][1:5,])
+# 
+# 
+# surv_summary <- summary(fit_mod)
+# x_surv <- seq(min(poar.surv$log_size_t0),max(poar.surv$log_size_t0),length.out=100)
+# invlogit <- function(x){exp(x)/(1+exp(x))}
+# 
+# plot(jitter(poar.surv$log_size_t0),jitter(poar.surv$surv_t1))
+# lines(x_surv,invlogit(surv_summary$summary[,"mean"]["b_0"] + surv_summary$summary[,"mean"]["b_s"] * x_surv),lwd=3)
 
 ###########################################################################
 
@@ -177,54 +179,76 @@ germ   <- viabVr %>%
   na.omit
 
 
-# Viab - Germ test --------------------------------------------------------
-viab   <- viabVr %>% 
-  select( plot, totS, yesMaybe, sr_f ) %>% 
-  rename( SR        = sr_f,
-          y_viab = yesMaybe,
-          tot_seeds_viab = totS) %>% 
-  select(y_viab, tot_seeds_viab, SR ) %>% 
-  na.omit
-
-germ   <- viabVr %>% 
-  select( plot, germTot, germFail, sr_f ) %>% 
-  rename( SR        = sr_f,
-          y_germ    = germTot ) %>% 
-  mutate(tot_seeds_germ = y_germ + germFail ) %>% 
-  select(y_germ, tot_seeds_germ, SR ) %>% 
-  na.omit
-
-data_viab_germ <- list(
-  n_v       = nrow(viab),
-  y_v       = viab$y_viab,
-  tot_seeds_v = viab$tot_seeds_viab,
-  SR_v        = viab$SR,
-  
-  n_g       = nrow(germ),
-  y_g       = germ$y_germ,
-  tot_seeds_g = germ$tot_seeds_germ,
-  SR_g        = germ$SR  
-)
-
-# simulation parameters
-sim_pars <- list(
-  warmup = 1000, 
-  iter = 4000, 
-  thin = 2, 
-  chains = 4
-)
-
-# fit the "big" model 
-#fit_viab <- stan(
-#  file = 'code/stan/viab_germ_test.stan',
-#  data = data_viab_germ,
-##  pars = quote_bare( v0, a_v, g ),
-#  warmup = sim_pars$warmup,
-#  iter = sim_pars$iter,
-#  thin = sim_pars$thin,
-#  chains = 4 )
-
-mcmc_dens_overlay(fit_viab,par=quote_bare( v0, a_v, g ))
+# # Viab - Germ test --------------------------------------------------------
+# viab   <- viabVr %>% 
+#   select( plot, totS, yesMaybe, sr_f ) %>% 
+#   rename( SR        = sr_f,
+#           y_viab = yesMaybe,
+#           tot_seeds_viab = totS) %>% 
+#   select(y_viab, tot_seeds_viab, SR ) %>% 
+#   na.omit
+# 
+# germ   <- viabVr %>% 
+#   select( plot, germTot, germFail, sr_f ) %>% 
+#   rename( SR        = sr_f,
+#           y_germ    = germTot ) %>% 
+#   mutate(tot_seeds_germ = y_germ + germFail ) %>% 
+#   select(y_germ, tot_seeds_germ, SR ) %>% 
+#   na.omit
+# 
+# data_viab_germ <- list(
+#   n_v       = nrow(viab),
+#   y_v       = viab$y_viab,
+#   tot_seeds_v = viab$tot_seeds_viab,
+#   SR_v        = viab$SR,
+#   
+#   n_g       = nrow(germ),
+#   y_g       = germ$y_germ,
+#   tot_seeds_g = germ$tot_seeds_germ,
+#   SR_g        = germ$SR  
+# )
+# 
+# # simulation parameters
+# sim_pars <- list(
+#   warmup = 1000, 
+#   iter = 4000, 
+#   thin = 2, 
+#   chains = 4
+# )
+# 
+# # fit the "big" model 
+# fit_viab <- stan(
+#   file = 'code/stan/viab_germ_test_betabin.stan',
+#   data = data_viab_germ,
+#   #pars = quote_bare( v0, a_v, g ),
+#   warmup = sim_pars$warmup,
+#   iter = sim_pars$iter,
+#   thin = sim_pars$thin,
+#   chains = 4 )
+# 
+# mcmc_dens_overlay(fit_viab,par=quote_bare( v0, a_v, g ))
+# 
+# # PPC
+# predV <- rstan::extract(fit_viab, pars = c("predV"))$predV
+# phi_v <- rstan::extract(fit_viab, pars = c("phi_v"))$phi_v
+# predG <- rstan::extract(fit_viab, pars = c("predG"))$predG
+# phi_g <- rstan::extract(fit_viab, pars = c("phi_g"))$phi_g
+# 
+# n_post_draws <- 500
+# post_draws <- sample.int(dim(predV)[1], n_post_draws)
+# y_v_sim <- matrix(NA,n_post_draws,length(data_viab_germ$y_v))
+# y_g_sim <- matrix(NA,n_post_draws,length(data_viab_germ$y_g))
+# 
+# for(i in 1:n_post_draws){
+#   ## sample viability data (binomial)
+#   #y_v_sim[i,] <- rbinom(n=length(data_viab_germ$y_v), size=data_viab_germ$tot_seeds_v, prob = predV[i,])
+#   y_v_sim[i,] <- rbetabinom(n=length(data_viab_germ$y_v), size=data_viab_germ$tot_seeds_v, m = predV[i,], s = phi_v[i])
+#   ## sample germination data (binomial)
+#   #y_g_sim[i,] <- rbinom(n=length(data_viab_germ$y_g), size=data_viab_germ$tot_seeds_g, prob = predG[i,])
+#   y_g_sim[i,] <- rbetabinom(n=length(data_viab_germ$y_g), size=data_viab_germ$tot_seeds_g, m = predG[i,], s = phi_g[i])
+# }
+# ppc_dens_overlay(data_viab_germ$y_v, y_v_sim) ## maybe need beta-binomial?
+# ppc_dens_overlay(data_viab_germ$y_g, y_g_sim) ## maybe need beta-binomial?
 
 ##############################################################
 
@@ -346,11 +370,11 @@ y_m_sim <- matrix(NA,n_post_draws,length(data_all$y_m))
 
 for(i in 1:n_post_draws){
   ## sample survival data (bernoulli)
-  y_s_sim[i,] <- rbinom(n=length(data_all$y_s), size=1, prob = inv.logit(predS[i,]))
+  y_s_sim[i,] <- rbinom(n=length(data_all$y_s), size=1, prob = invlogit(predS[i,]))
   ## sample growth data (zero-truncated NB)
   y_g_sim[i,] <- rztnbinom(n=length(data_all$y_g), mu = exp(predG[i,]), size=phi_G[i])
   ## sample flowering data (bernoulli)
-  y_f_sim[i,] <- rbinom(n=length(data_all$y_f), size=1, prob = inv.logit(predF[i,]))
+  y_f_sim[i,] <- rbinom(n=length(data_all$y_f), size=1, prob = invlogit(predF[i,]))
   ## sample panicle data (zero-truncated NB)
   y_p_sim[i,] <- rztnbinom(n=length(data_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
   ## sample viability data (binomial)
