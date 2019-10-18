@@ -1,3 +1,4 @@
+library(scales)
 ## Load the Stan output for full vital rate model
 source('code/all_vr_bayes.R')
 
@@ -241,3 +242,80 @@ points(allsites$long[allsites$transition_year==2015],allsites$ppt[allsites$trans
 points(allsites$long[allsites$transition_year==2016],allsites$ppt[allsites$transition_year==2016],cex=2,pch=3)
 legend("topleft",legend=c(2014:2016),bty="n",pch=1:3,cex=1.2)
 ## add 30-year normals
+
+
+# Natural population survey -----------------------------------------------
+## The data manipulation steps here come from the script 'POAR_population_preproposal_figure.R', which is a 
+## mashup of code from me, Aldo, and maybe some Emily Begnel.
+
+#create the "big" POAR file including data from both years
+POAR12_1=read.csv(file="C:/Users/tm9/Dropbox/POAR--Aldo&Tom/POAR GIS Final Data_2012(1.10.2014).csv")
+POAR13=read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/POAR GIS Final Data_2013.csv")
+POAR12=read.csv(file="C:/Users/tm9/Dropbox/POAR--Aldo&Tom/POAR GIS Final Data.csv")
+#POAR13=POAR13[-1,]   #This excludes data from Clear Bay in 2013 
+
+#NOTE Compare the two
+POAR12_1=POAR12_1[order(POAR12_1$Population),]
+POAR12=POAR12[order(POAR12$Population),c(1:7)]
+#DISCREPANCIES with:
+#Clear bay: original file misses polygon data, mine is more current
+#Wichita Mountains: original file misses point data, mine is more current
+#Quartz Mountain: original file has polygons data that I do not have. I therefore use the POAR12 data)
+POAR12_1[10,6:7]=POAR12[10,6:7]  #I substitude POAR12 data to my current file
+POAR12=POAR12_1
+POAR12$year="2012" ; POAR13$year="2013"   
+
+#COMBINE CLEAR BAY AND THUNDERBIRD LAKE
+tmp=rbind(POAR12[14,],POAR13[1,])
+newDf=data.frame("Population"="ClearBay-Thunderbird", 
+                 "Latitude"=apply(tmp[,2:3],2,FUN=mean)[1],"Longitude"=apply(tmp[,2:3],2,FUN=mean)[2],
+                 "Total.Points"=apply(tmp[,4:7],2,FUN=sum)[1],"Total.Polygons"=apply(tmp[,4:7],2,FUN=sum)[2],
+                 "Total.Male.Infl."=apply(tmp[,4:7],2,FUN=sum)[3],
+                 "Total.Female.Infl."=apply(tmp[,4:7],2,FUN=sum)[4],"year"="2013",row.names=16
+)
+
+#TWO GRAPHS
+#POAR=rbind(POAR12,POAR13)                     #Separate Clear bay and Thunderbird lake
+POAR=rbind(POAR12[-14,],rbind(POAR13[-1,],newDf))        #Clear bay and Thunderbird lake Combined
+POAR=POAR[order(as.character(POAR$Population)),]
+#POAR=rbind(POAR12[,c(1:7,12)],POAR13) #I only include shared columns 
+#POAR=rbind(POAR12[,c(1:7,12)],POAR13) #
+
+## Fit Stan model (should be quick and simple)
+survey_dat <- list(y = POAR$Total.Female.Infl.,
+                   n_trials = POAR$Total.Male.Infl.+POAR$Total.Female.Infl.,
+                   longit = POAR$Longitude - mean(POAR$Longitude),
+                   N = nrow(POAR))
+# simulation parameters
+sim_pars <- list(
+  warmup = 5000, 
+  iter = 25000, 
+  thin = 3, 
+  chains = 3
+)
+# fit the "big" model 
+fit_surv <- stan(
+  file = 'code/stan/poar_survey.stan',
+  data = survey_dat,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+
+summary(fit_surv)$summary
+coef_surv <- rstan::extract(fit_surv,par=c("b0","b_long"))
+x_long <- seq(min(survey_dat$longit),max(survey_dat$longit),length = 100)
+
+n_post <-500
+sample_post <- sample.int(length(coef_surv$b0),n_post)
+plot(survey_dat$longit + mean(POAR$Longitude),
+     survey_dat$y/survey_dat$n_trials,type="n",
+     xlab="Longitude",ylab="Proportion female inflorescences",cex.lab=1.4)
+for(i in 1:n_post){
+  lines(x_long + mean(POAR$Longitude),
+        invlogit(coef_surv$b0[sample_post[i]] + coef_surv$b_long[sample_post[i]] * x_long),
+        col=alpha("darkgrey",0.05))
+}
+points(survey_dat$longit + mean(POAR$Longitude),
+       survey_dat$y/survey_dat$n_trials,
+       cex=3*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
