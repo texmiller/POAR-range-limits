@@ -1,4 +1,5 @@
 # Format demographic data
+rm(list=ls())
 setwd("D:/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 setwd("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 setwd("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
@@ -209,27 +210,15 @@ all.equal( s15_aldo %>% arrange( Block, Aluminum.Tag, ID, Code, Sex),
 # official s15 file!
 s15 <- s15_tom
 
-# fix issues this
-f14 <- f14 %>% 
-         mutate( Code = replace(Code,
-                                ID == 309 & Aluminum.Tag == 83 & site == 'elreno',
-                                'LLELA') ) %>% 
-         mutate( Code = replace(Code,
-                                ID == 5   & Aluminum.Tag == 25 & site == 'llano',
-                                'COB') ) %>% 
-         mutate( Code = replace(Code,
-                                ID == 319 & Aluminum.Tag == 81 & site == 'llano',
-                                'QLP') ) 
-  
-
 # Now merge, all problems fixed
 d_14_15 <- merge(f14, s15)
 d_14_15 <- mutate(d_14_15, year = 2015)
 
-# make sure merge with "all=F" and "all=T" yield same n. of rows
-expect_equal( merge(f14, s15) %>% nrow,
-              merge(f14, s15, all=T) %>% nrow )
-
+# SHOULD FAIL: mistakes create mismatches b/w "all=F" and "all=T" 
+expect_false( identical( merge(f14, s15),
+                         merge(f14, s15, all=T) 
+                        )
+              )
 
 
 # 2015 to 2016 transition --------------------------------------------------------------
@@ -316,7 +305,7 @@ d_all <- bind_rows( list(d_14_15, d_15_16, d_16_17) )
 # claculate clone areas 
 # When size >0, idenfity when width/length is == 0 
 d_all <- d_all %>% mutate(sum_widths = MaxWidth_t0 + MaxLength_t0)
-r_w   <- which(d_all$sum_widths > 0 & d_all$MaxWidth_t0 == 0  )
+r_w   <- which(d_all$sum_widths > 0 & d_all$MaxWidth_t0 == 0 )
 r_l   <- which(d_all$sum_widths > 0 & d_all$MaxLength_t0 == 0 )
 
 # test: no overlap b/w r_W and r_l
@@ -339,25 +328,29 @@ d_all$site <- trimws(d_all$site)
 d_all$Code <- trimws(d_all$Code)
 d_all$Sex  <- trimws(d_all$Sex)
 
-# Mistakes in the "Code" variable
-# Format site names to make data frames "mergeable"
-coll_codes <- data.frame( raw = unique(d_all$Code),
-                          correct = c( 'QLP','CWM','HHC','SSC','LAR','COB','SLR','LLELA',
-                                'LAR','CWM','HHC','QLP','QLP','COB','SSC','SSC')
-                         )
 
-# change site names
-d_all <- d_all %>% 
-          mutate(Code = coll_codes[match(Code, coll_codes$raw),
-                                   "correct"] )
+# This bit of code does not make sense any more: The codes are now correct.
+# "correct" contains 16 elements: the 8 "correct" ones, and the 8 mistakes shown in line 155 (code_issues)
+
+# # Mistakes in the "Code" variable
+# # Format site names to make data frames "mergeable"
+# coll_codes <- data.frame( raw = unique(d_all$Code),
+#                           correct = c( 'QLP','CWM','HHC','SSC','LAR','COB','SLR','LLELA',
+#                                        'LAR','CWM','HHC','QLP','QLP','COB','SSC','SSC')
+#                          )
+# 
+# # change site names
+# d_all <- d_all %>% 
+#           mutate(Code = coll_codes[match(Code, coll_codes$raw),
+#                                    "correct"] )
 
 # mistakes found in "Woodward/2017/collections_2017.R"
 
 # check mistakes one by one: 5, 68, 309, 319, 377
-# mistake in Code (not Sex)
+# no mistake here
 subset(d_all, ID == 68) %>% 
   select( year, ID, site, Code, Sex ) %>% 
-  unique
+  unique 
 
 # Clear mistake: all ids from COB are three-digits
 subset(d_all, ID == 5) %>% 
@@ -370,11 +363,12 @@ subset(d_all, ID == 377) %>%
   unique
 
 # clear mistake: 309 is a male only in LLANO
+# Also, this is LLELA only in elreno, in 2016 and 2017 (should be LAR)
 subset(d_all, ID == 309) %>% 
   select( year, ID, site, Code, Sex ) %>% 
   unique
 
-# clear mistake: 319 is QLP male only in LLANO
+# clear mistake: 319 is QLP male only in LLANO (should be SLR)
 subset(d_all, ID == 319) %>% 
   select( year, ID, site, Code, Sex ) %>% 
   unique
@@ -439,7 +433,12 @@ poar <- d_all %>%
           mutate(ploidy = replace(ploidy, Code == "HHC" | Code == "LLELA", "high") ) %>%
           sex_symbol() %>% 
           # drop the 3 "bad" sites (Lubbock, Wichita Falls, LLELA)
-          subset( !(site %in% c("llela", "lubbock", "wf")) )
+          # lubbock: only 7 individuals survived, only in 2015
+          # Wichita Falls: only 7 individuals survive to 2015, 3 to 2016
+          # LLELA: 22 indiv. surviva to 2015, 3 to 2016, 2 to 2017
+          subset( !(site %in% c("llela", "lubbock", "wf")) ) %>% 
+          # Remove resuscitated individuals
+          subset( !(surv_t1 %in% 1 & tillerN_t0 %in% 0) )
 
 
 # Write out data ----------------------------------------------------------------
