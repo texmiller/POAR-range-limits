@@ -1,7 +1,7 @@
 # Format demographic data
 setwd("D:/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 setwd("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
-setwd("C:/cloud/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
+setwd("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 options(stringsAsFactors=F)
 library(dplyr)
 library(testthat)
@@ -18,7 +18,7 @@ s17     <- read.csv("spr17/s2017DemoData.csv")
 # all collections in greenhouse (for debugging mistakes)
 all_coll<- read.csv("D:/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
 all_coll<- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
-all_coll<- read.csv("C:/cloud/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
+all_coll<- read.csv("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
 
 # format data for merge-----------------------------------------------------------------
 
@@ -160,10 +160,9 @@ s15_issue_df <- s15 %>%
                   select( Code, ID ) %>% 
                   unique
 
-# Test that the issue IDs refer to one "Code" only
+# Test that there are not more than 1 "issue" per ID
 s15_issue_df %>% 
   count( ID ) %>% 
-  subset( n == 1 ) %>% 
   .$n %>% 
   unique %>% 
   expect_equal( 1 )
@@ -171,7 +170,7 @@ s15_issue_df %>%
 # IDs associated with issues
 issue_ids     <- s15_issue_df$ID
 
-# corrected Codes
+# corrected Codes (from f14)
 correct_id_df <- f14 %>% 
                   subset( ID %in% issue_ids ) %>% 
                   select( Code, ID ) %>% 
@@ -182,30 +181,55 @@ correct_id_df <- f14 %>%
 s15_aldo <- s15 %>%
               # update codes
               left_join( correct_id_df ) %>% 
+              # swap bad codes in 2015 with those from 2014
               mutate( Code = replace(Code,
                                      !is.na(code_correct),
                                      code_correct[!is.na(code_correct)]) ) %>% 
               select( -code_correct ) %>% 
-              # update wrong ID
+              # replace one wrong ID
               mutate( ID = replace(ID, ID == 396, 296) )
   
-# test: no difference in codes
+# test: no difference in codes (from 2014 to 15)
 unique(s15_aldo$Code) %>% 
   setdiff( unique(f14$Code) ) %>% 
   length %>% 
   expect_equal( 0 )
 
-# test: no difference in IDs
+# test: no difference in IDs (from 2014 to 15)
 unique(s15_aldo$ID) %>% 
   setdiff( unique(f14$ID) ) %>% 
   length %>% 
   expect_equal( 0 )
 
+# test that Tom's and Aldo's files are the same
+all.equal( s15_aldo %>% arrange( Block, Aluminum.Tag, ID, Code, Sex),
+           s15_tom %>% arrange( Block, Aluminum.Tag, ID, Code, Sex) ) %>% 
+  expect_true
+
+# official s15 file!
 s15 <- s15_tom
+
+# fix issues this
+f14 <- f14 %>% 
+         mutate( Code = replace(Code,
+                                ID == 309 & Aluminum.Tag == 83 & site == 'elreno',
+                                'LLELA') ) %>% 
+         mutate( Code = replace(Code,
+                                ID == 5   & Aluminum.Tag == 25 & site == 'llano',
+                                'COB') ) %>% 
+         mutate( Code = replace(Code,
+                                ID == 319 & Aluminum.Tag == 81 & site == 'llano',
+                                'QLP') ) 
+  
 
 # Now merge, all problems fixed
 d_14_15 <- merge(f14, s15)
 d_14_15 <- mutate(d_14_15, year = 2015)
+
+# make sure merge with "all=F" and "all=T" yield same n. of rows
+expect_equal( merge(f14, s15) %>% nrow,
+              merge(f14, s15, all=T) %>% nrow )
+
 
 
 # 2015 to 2016 transition --------------------------------------------------------------
@@ -229,6 +253,10 @@ s16[s16$ID==setdiff(unique(s16$ID),unique(s15$ID)),]$ID<-296
 # merge data and format 
 d_15_16 <- merge(s15, s16)
 d_15_16 <- mutate(d_15_16, year = 2016)
+
+# make sure merge with "all=F" and "all=T" yield same n. of rows
+expect_equal( merge(s15, s16) %>% nrow,
+              merge(s15, s16, all=T) %>% nrow )
 
 
 # 2016 to 2017 transition --------------------------------------------------------------
@@ -270,9 +298,14 @@ s16[s16$ID==setdiff(unique(s16$ID),unique(s17$ID)),]
 #2. Fix the other ID problem
 s17[s17$ID==setdiff(unique(s17$ID),unique(s16$ID))[1],]$ID<-296
 
-# merge data and format 
+# merge data and format (NOTE: )
 d_16_17 <- merge(s16, s17)
 d_16_17 <- mutate(d_16_17, year = 2017)
+
+# "all=F" and "all=T" DO NOT yield same rows: 2017 misses lubbock and Witchita Falls data
+expect_equal( anti_join(s16, s17) %>% 
+                .$site %>% 
+                unique, c('lubbock','wf') )
 
 
 # Format final data frame -------------------------------------------------------
