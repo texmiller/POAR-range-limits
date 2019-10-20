@@ -1,0 +1,136 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage[round]{natbib}
+\usepackage{graphicx}
+\geometry{a4paper}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+\usepackage[running]{lineno}
+\usepackage{setspace}
+\usepackage{amsfonts,amssymb,amsmath,graphicx,hyperref}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{hyperref}
+\doublespacing
+
+<<setup,echo=F, message=F, warning=F>>=
+knitr::opts_chunk$set(fig.pos = 'H')
+library(tidyverse)
+setwd("C:/Users/tm9/Dropbox/git projects/POAR-range-limits")
+@
+
+%-------------------------------------------------------------------------
+
+\title{Two-sex demography, sexual niche differentiation, and range limits}
+
+
+\author{Tom E.X. Miller$^{\ast}$}
+\author{Aldo Compagnoni}
+
+\affil{Program in Ecology and Evolutionary Biology, Department of BioSciences, Rice University, Houston, TX USA}
+\renewcommand\Authands{ and }
+\date{*Corresponding author: tom.miller@rice.edu (1-713-348-4218)}
+
+%-------------------------------------------------------------------------
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+\maketitle
+
+
+%-------------------------------------------------------------------------
+\newpage
+\section*{Abstract}
+\linenumbers
+
+%-------------------------------------------------------------------------
+\section*{Keywords}
+
+
+%--------------------------------------------------------------------
+\newpage
+\section*{Introduction}
+
+P1: importance of understanding range limits in basic and applied ecology, theory for proximate causes of range limits, demographic failure at range edges and the idea that range limits are niche limits
+
+P2: The idea that range limits are niche limits intersects awkwardly with another prevalent concept in ecology: intraspecific niche heterogeneity. If a species' range limits reflect its niche limits, and a single species contains many niches, then whose niche is it that determines the geographic distribution.
+
+P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
+
+P4: Most ecological theory assumes female dominance. In this case, there is a straightforward answer to the question above -- the female niche is the relevant set of constraints for understanding range limits. However, while female dominance is often a reasonable and useful assumption, it may break down under extreme sex ratio bias, where mates may be limiting. If so, this creates an additional, two-sex pathway by which males could limit the position of species ranges. 
+
+P5: In this study we used a dioecious grass species as a focal species to quantify the relative importance of female-dominant and two-sex mechanisms of range limitation. 
+
+%--------------------------------------------------------------------
+\section*{Materials and methods}
+
+\subsection*{Study system and natural population surveys}
+\textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
+Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
+Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
+Individuals grow via rhizomes to form patches up to \textbf{quantity} in area. 
+Sex is genetically based in \textit{P. arachnifera} \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
+The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
+
+We surveyed \textbf{number} \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
+We visited \textbf{number} populations in spring 2012 and \textbf{number} populations in spring 2013. 
+Survey locations are shown in \textbf{map} and coordinates and dates are provided in Table \textbf{number}. 
+At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
+We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
+Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
+This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters. 
+
+\subsection*{Common garden experiment}
+
+\subsubsection*{Source material and experimental sites}
+We established a common garden experiment at \textbf{N} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (MAP).
+Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude, averaging over latitudes. 
+During the three years of this experiment, total precipitation at each site closely tracked longitude (figure correlating precip and longitude), as expected based on longer-term climate trends (map).
+Source material for this experiment came from \textbf{N} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
+At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \textbf{N} per sex, range: \textbf{N} -- \textbf{N} ). 
+These were brought back to the Rice University greenhouse, where they were clonally propagated in cylidrical cone-tainers with ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
+
+Common gardens were set up in Fall (October--December) 2014. 
+At each site, we established \textbf{N} experimental blocks, which typically corresponded to a tree or woodland edge, providing partial shade that mimics this species' natural micro-environment. 
+We planted \textbf{N} females and \textbf{N} males in each block, for a total of \textbf{N} individuals per sex per site and \textbf{N} total plants across sites. 
+To promote establishment, we cleared vegetation immediately surrounding transplants and provided ca. $1$ L of water at the time of transplanting but provided no subsequent watering, fertilization, or competitor removal. 
+
+\subsubsection*{Data collection}
+We visited each site during May of 2015, 2016, and 2017. 
+For each individual in each year, we recorded survival status (alive or dead), size (number of tillers), flowering status (reproductive or vegetative), the number of panicles produced by flowering plants, and panicle length, which is proportional to production of seeds (in females) and pollen (in males). 
+
+\subsection*{Pollination experiment}
+
+\subsection*{Mechanistic model of range limits}
+
+\subsubsection*{Statistical modeling}
+
+\subsubsection*{Demographic modeling}
+
+%--------------------------------------------------------------------
+\section*{Results}
+
+%--------------------------------------------------------------------
+\section*{Discussion}
+%--------------------------------------------------------------------
+\section*{Acknowledgements}
+
+\section*{Author contributions}
+
+\section*{Data accessibility}
+
+%--------------------------------------------------------------------
+\bibliographystyle{gcb}
+\bibliography{POAR_range_limits}
+
+%--------------------------------------------------------------------
+\newpage
+\section*{Appendix A: Site locations and climate}
+\renewcommand{\thefigure}{A\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{A\arabic{equation}}\setcounter{equation}{0}
+
+
+\end{document}
