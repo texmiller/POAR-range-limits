@@ -32,9 +32,15 @@ surv_mean_sizes <- poar_surv_binned %>% group_by(sex,size_bin) %>% summarise(siz
 
 # pull out stan coefficients
 surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
-                                                        bsizesex_s, bsizelong_s,blongsex_s,
-                                                        bsizelongsex_s))
+                                                        bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
 long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1)
+
+mcmc_intervals(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
+                                          bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                          blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
 
 win.graph()
 par(mfrow=c(4,3))
@@ -52,13 +58,18 @@ with(poar_surv_binned,{
                        mean(surv_coef$bsizelong_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
                        mean(surv_coef$bsizesex_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
                        mean(surv_coef$blongsex_s) * long_seq * (s-1) +
-                       mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+                       mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                       mean(surv_coef$blong2_s) * (long_seq^2) +
+                       mean(surv_coef$bsizelong2_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                       mean(surv_coef$blong2sex_s) * (long_seq^2) * (s-1) +
+                       mean(surv_coef$bsizelong2sex_s)  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
                        ),
             col=sex_cols[s],lwd=3)
     }
   }
 })
 
+warnings()
 ## Growth
 poar_grow_binned <- poar.grow %>% 
   mutate(size_bin = as.integer(cut_number(log_size_t0,size_bin_num))) %>% 
@@ -71,8 +82,11 @@ grow_mean_sizes <- poar_grow_binned %>% group_by(sex,size_bin) %>% summarise(siz
 
 # pull out stan coefficients
 grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
-                                                        bsizesex_g, bsizelong_g,blongsex_g,
-                                                        bsizelongsex_g))
+                                                        bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
+                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_dens_overlay(fit_full,par=quote_bare(b0_g,bsize_g,bsex_g,blong_g,
+                                          bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
+                                          blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
 
 with(poar_grow_binned,{
   for(i in 1:size_bin_num){
@@ -88,7 +102,11 @@ with(poar_grow_binned,{
                        mean(grow_coef$bsizelong_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * long_seq +
                        mean(grow_coef$bsizesex_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (s-1) +
                        mean(grow_coef$blongsex_g) * long_seq * (s-1) +
-                       mean(grow_coef$bsizelongsex_g)  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
+                       mean(grow_coef$bsizelongsex_g)  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                  mean(grow_coef$blong2_g) * (long_seq^2) +
+                  mean(grow_coef$bsizelong2_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (long_seq^2) +
+                  mean(grow_coef$blong2sex_g) * (long_seq^2) * (s-1) +
+                  mean(grow_coef$bsizelong2sex_g)  * (long_seq^2) * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
             ),
             col=sex_cols[s],lwd=3)
     }
@@ -107,8 +125,8 @@ flow_mean_sizes <- poar_flow_binned %>% group_by(sex,size_bin) %>% summarise(siz
 
 # pull out stan coefficients
 flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
-                                                        bsizesex_f, bsizelong_f,blongsex_f,
-                                                        bsizelongsex_f))
+                                                        bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
+                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f))
 
 with(poar_flow_binned,{
   for(i in 1:size_bin_num){
@@ -124,7 +142,11 @@ with(poar_flow_binned,{
                        mean(flow_coef$bsizelong_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * long_seq +
                        mean(flow_coef$bsizesex_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (s-1) +
                        mean(flow_coef$blongsex_f) * long_seq * (s-1) +
-                       mean(flow_coef$bsizelongsex_f)  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
+                       mean(flow_coef$bsizelongsex_f)  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                       mean(flow_coef$blong2_f) * (long_seq^2) +
+                       mean(flow_coef$bsizelong2_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (long_seq^2) +
+                       mean(flow_coef$blong2sex_f) * (long_seq^2) * (s-1) +
+                       mean(flow_coef$bsizelong2sex_f)  * (long_seq^2) * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
             ),
             col=sex_cols[s],lwd=3)
     }
@@ -144,8 +166,8 @@ panic_mean_sizes <- poar_panic_binned %>% group_by(sex,size_bin) %>% summarise(s
 
 # pull out stan coefficients
 panic_coef <- rstan::extract(fit_full, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
-                                                        bsizesex_p, bsizelong_p,blongsex_p,
-                                                        bsizelongsex_p))
+                                                        bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
+                                                        blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p                                                        ))
 
 with(poar_panic_binned,{
   for(i in 1:size_bin_num){
@@ -161,7 +183,11 @@ with(poar_panic_binned,{
                   mean(panic_coef$bsizelong_p) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * long_seq +
                   mean(panic_coef$bsizesex_p) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (s-1) +
                   mean(panic_coef$blongsex_p) * long_seq * (s-1) +
-                  mean(panic_coef$bsizelongsex_p)  * long_seq * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i]
+                  mean(panic_coef$bsizelongsex_p)  * long_seq * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
+                  mean(panic_coef$blong2_p) * (long_seq^2) +
+                  mean(panic_coef$bsizelong2_p) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (long_seq^2) +
+                  mean(panic_coef$blong2sex_p) * (long_seq^2) * (s-1) +
+                  mean(panic_coef$bsizelong2sex_p)  * (long_seq^2) * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i]
             ),
             col=sex_cols[s],lwd=3)
     }

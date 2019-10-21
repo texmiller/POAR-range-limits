@@ -344,8 +344,8 @@ sim_pars <- list(
     thin = sim_pars$thin,
     chains = sim_pars$chains )
 
-saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
-#fit_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+#saveRDS(fit_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+fit_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
 
 # Posterior predictive checks ---------------------------------------------
 ## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
