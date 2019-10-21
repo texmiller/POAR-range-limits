@@ -2,6 +2,7 @@
 rm(list=ls())
 setwd("D:/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 setwd("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
+setwd("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 setwd("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 options(stringsAsFactors=F)
 library(dplyr)
@@ -19,6 +20,7 @@ s17     <- read.csv("spr17/s2017DemoData.csv")
 # all collections in greenhouse (for debugging mistakes)
 all_coll<- read.csv("D:/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
 all_coll<- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
+all_coll<- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
 all_coll<- read.csv("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
 
 # format data for merge-----------------------------------------------------------------
