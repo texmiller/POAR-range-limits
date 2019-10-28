@@ -434,11 +434,6 @@ poar <- d_all %>%
           mutate(ploidy = "low") %>%
           mutate(ploidy = replace(ploidy, Code == "HHC" | Code == "LLELA", "high") ) %>%
           sex_symbol() %>% 
-          # drop the 3 "bad" sites (Lubbock, Wichita Falls, LLELA)
-          # lubbock: only 7 individuals survived, only in 2015
-          # Wichita Falls: only 7 individuals survive to 2015, 3 to 2016
-          # LLELA: 22 indiv. surviva to 2015, 3 to 2016, 2 to 2017
-          subset( !(site %in% c("llela", "lubbock", "wf")) ) %>% 
           # Remove resuscitated individuals
           subset( !(surv_t1 %in% 1 & tillerN_t0 %in% 0) )
 
@@ -448,6 +443,14 @@ poar <- d_all %>%
 # demographic data
 write.csv(d_all, "C:/CODE/POAR-range-limits/data/f14_s17_data.csv", row.names = F)
 
-# analysis data frame
-write.csv(poar, "C:/CODE/POAR-range-limits/data/demography.csv", row.names = F)
+# analysis data frame dropping three "bad" sites
+write.csv(poar %>% 
+            # drop the 3 "bad" sites (Lubbock, Wichita Falls, LLELA)
+            # lubbock: only 7 individuals survived, only in 2015
+            # Wichita Falls: only 7 individuals survive to 2015, 3 to 2016
+            # LLELA: 22 indiv. surviva to 2015, 3 to 2016, 2 to 2017
+            subset( !(site %in% c("llela", "lubbock", "wf")) ), 
+          "POAR-range-limits/data/demography.csv", row.names = F)
 
+# analysis data including three "bad" sites
+write.csv(poar,"POAR-range-limits/data/demography_allsites.csv", row.names = F)

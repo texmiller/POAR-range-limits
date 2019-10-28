@@ -384,3 +384,158 @@ for(i in 1:n_post_draws){
 }
 
 
+
+# Now include "bad" sites -------------------------------------------------
+
+poar_allsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
+
+# Survival
+poar_allsites.surv <- poar_allsites %>% 
+  subset(tillerN_t0>0 ) %>%
+  select(year, Code, site, unique.block, Sex, 
+         long.center, long.scaled, 
+         tillerN_t0, surv_t1) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric) %>% 
+  rename( sex   = Sex,
+          block = unique.block ) %>% 
+  mutate( log_size_t0   = log(tillerN_t0),
+          log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
+
+# growth 
+poar_allsites.grow <- poar_allsites %>% 
+  subset( tillerN_t0 > 0 & tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t0, tillerN_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( sex   = Sex,
+          block = unique.block ) %>% 
+  mutate( log_size_t0   = log(tillerN_t0),
+          log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
+
+# flowering
+poar_allsites.flow <- poar_allsites %>% 
+  subset( tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t1, flow_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( sex      = Sex,
+          block    = unique.block ) %>% 
+  mutate( log_size_t1   = log(tillerN_t1),
+          log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
+
+
+# Panicules 
+poar_allsites.panic<- poar_allsites %>% 
+  subset( flowerN_t1 > 0 & tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t1, flowerN_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( panic_t1 = flowerN_t1,
+          sex      = Sex,
+          block    = unique.block ) %>% 
+  mutate( log_size_t1   = log(tillerN_t1),
+          log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
+
+
+# data for model
+data_allsites_all <- list( n_sites    = poar_allsites.surv$site %>% n_distinct,
+                  n_sources  = poar_allsites.surv$source %>% n_distinct(),
+                  
+                  # survival data
+                  n_blocks_s = poar_allsites.surv$block %>% n_distinct,
+                  site_s     = poar_allsites.surv$site,
+                  source_s =  poar_allsites.surv$source,
+                  block_s    = poar_allsites.surv$block,
+                  site_block_s = data.frame( site_i  = poar_allsites.surv$site,
+                                             block_i = poar_allsites.surv$block ) %>% 
+                    unique %>% .$site_i,
+                  male_s     = poar_allsites.surv$sex-1,
+                  long_s     = poar_allsites.surv$long.center,
+                  size_s     = poar_allsites.surv$log_size_t0,
+                  y_s        = poar_allsites.surv$surv_t1,
+                  n_s        = poar_allsites.surv$surv_t1 %>% length,
+                  
+                  # growth data
+                  n_blocks_g = poar_allsites.grow$block %>% n_distinct,
+                  site_g     = poar_allsites.grow$site,
+                  source_g =  poar_allsites.grow$source,
+                  block_g    = poar_allsites.grow$block,
+                  site_block_g = data.frame( site_i  = poar_allsites.grow$site,
+                                             block_i = poar_allsites.grow$block ) %>% 
+                    unique %>% .$site_i,
+                  male_g   = poar_allsites.grow$sex-1,
+                  long_g   = poar_allsites.grow$long.center,
+                  size_g   = poar_allsites.grow$log_size_t0,
+                  y_g      = poar_allsites.grow$tillerN_t1,
+                  n_g      = nrow(poar_allsites.grow),
+                  
+                  # flowering data
+                  n_blocks_f = poar_allsites.flow$block %>% n_distinct,
+                  site_f   = poar_allsites.flow$site,
+                  source_f =  poar_allsites.flow$source,
+                  block_f  = poar_allsites.flow$block,
+                  site_block_f = data.frame( site_i  = poar_allsites.flow$site,
+                                             block_i = poar_allsites.flow$block ) %>% 
+                    unique %>% .$site_i,
+                  male_f   = poar_allsites.flow$sex-1,
+                  long_f   = poar_allsites.flow$long.center,
+                  size_f   = poar_allsites.flow$log_size_t1,
+                  y_f      = poar_allsites.flow$flow_t1,
+                  n_f      = nrow(poar_allsites.flow),
+                  
+                  # panicle data
+                  n_blocks_p = poar_allsites.panic$block %>% n_distinct,
+                  site_p   = poar_allsites.panic$site,
+                  source_p =  poar_allsites.panic$source,
+                  block_p  = poar_allsites.panic$block,
+                  site_block_p = data.frame( site_i  = poar_allsites.panic$site,
+                                             block_i = poar_allsites.panic$block ) %>% 
+                    unique %>% .$site_i,
+                  male_p   = poar_allsites.panic$sex-1,
+                  long_p   = poar_allsites.panic$long.center,
+                  size_p   = poar_allsites.panic$log_size_t1,
+                  y_p      = poar_allsites.panic$panic_t1,
+                  n_p      = nrow(poar_allsites.panic),
+                  
+                  # viability
+                  n_v       = nrow(viab),
+                  y_v       = viab$y_viab,
+                  tot_seeds_v = viab$tot_seeds_viab,
+                  SR_v        = viab$SR,
+                  
+                  # germination
+                  n_m       = nrow(germ),
+                  y_m       = germ$y_germ,
+                  tot_seeds_m = germ$tot_seeds_germ,
+                  SR_m        = germ$SR    )
+
+# fit the "big" model 
+fit_allsites_full <- stan(
+  file = 'code/stan/poar_full.stan',
+  data = data_allsites_all,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+
+saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+#fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
