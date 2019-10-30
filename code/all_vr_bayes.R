@@ -10,7 +10,8 @@ library(tidyverse)
 #library(loo)
 #library(bayesplot)
 #library(gtools)
-#library(countreg)
+library(countreg)
+#library(actuar)
 library(rmutil)
 #options( stringsAsFactors = T)
 #source('code/format/plot_binned_prop.R')
@@ -539,3 +540,39 @@ fit_allsites_full <- stan(
 
 saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+
+# Posterior predictive checks ---------------------------------------------
+## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
+predS <- rstan::extract(fit_allsites_full, pars = c("predS"))$predS
+predG <- rstan::extract(fit_allsites_full, pars = c("predG"))$predG
+phi_G <- rstan::extract(fit_allsites_full, pars = c("phi_g"))$phi_g
+predF <- rstan::extract(fit_allsites_full, pars = c("predF"))$predF
+predP <- rstan::extract(fit_allsites_full, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
+predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
+predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predS)[1], n_post_draws)
+
+y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
+y_g_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
+y_f_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_f))
+y_p_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_p))
+y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
+y_m_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_m))
+
+for(i in 1:n_post_draws){
+  ## sample survival data (bernoulli)
+  y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
+  ## sample growth data (zero-truncated NB)
+  y_g_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_g), mu = exp(predG[i,]), size=phi_G[i])
+  ## sample flowering data (bernoulli)
+  y_f_sim[i,] <- rbinom(n=length(data_allsites_all$y_f), size=1, prob = invlogit(predF[i,]))
+  ## sample panicle data (zero-truncated NB)
+  y_p_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
+  ## sample viability data (binomial)
+  y_v_sim[i,] <- rbinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, prob = predV[i,])
+  ## sample germination data (binomial)
+  y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
+}
