@@ -1,7 +1,18 @@
+library(tidyverse)
 library(scales)
-## Load the Stan output for full vital rate model
-source('code/all_vr_bayes.R') ## <- need to update to accommodate both analysis versions
+library(bayesplot)
 
+## read data
+poar_dropsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+poar_allsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
+viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+
+## Load the Stan output for full vital rate model
+fit_dropsites_full <- readRDS('C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
+fit_allsites_full <- readRDS('C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+
+## read in the site latlong file to un-scale longitude
+latlong <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/data/SiteLatLong.csv")
 
 # Posterior predictive checks ---------------------------------------------
 ppc_dens_overlay(data_all$y_s, y_s_sim)
@@ -15,12 +26,31 @@ ppc_dens_overlay(data_all$y_m, y_m_sim) ## maybe need beta-binomial?
 # Core vital rates --------------------------------------------------------
 # estimate sex- and longitude-specific vital rates for small, medium, and large plants
 
+##set which dataset to use
+poar <- poar_dropsites #poar <- poar_allsites
+fit_full <- fit_dropsites_full #fit_full <- fit_allsites_full
+
 # first bin size groups
 size_bin_num <- 3
 sex_cols <- c("red","blue")
 bin_shapes <- 15:17
 
 ## Survival
+poar.surv <- poar %>% 
+  subset(tillerN_t0>0 ) %>%
+  select(year, Code, site, unique.block, Sex, 
+         long.center, long.scaled, 
+         tillerN_t0, surv_t1) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric) %>% 
+  rename( sex   = Sex,
+          block = unique.block ) %>% 
+  mutate( log_size_t0   = log(tillerN_t0),
+          log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
+
 poar_surv_binned <- poar.surv %>% 
   mutate(size_bin = as.integer(cut_number(log_size_t0,size_bin_num))) %>% 
   group_by(site,sex,size_bin) %>% 
@@ -34,7 +64,7 @@ surv_mean_sizes <- poar_surv_binned %>% group_by(sex,size_bin) %>% summarise(siz
 surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                                         bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
                                                         blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
-long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1)
+long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1) + mean(latlong$Longitude)
 
 mcmc_intervals(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
 mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
@@ -43,34 +73,118 @@ mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                           blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
 
 win.graph()
-par(mfrow=c(4,3))
+par(mfrow=c(4,3),mar=c(5,5,1,1))
+
 with(poar_surv_binned,{
   for(i in 1:size_bin_num){
     plot(long[size_bin==i],mean_surv[size_bin==i],type="n",ylim=c(0,1))
     for(s in 1:2){
       points(long[sex==s & size_bin==i],mean_surv[sex==s & size_bin==i],
              col=sex_cols[s],pch=16,cex=2)
-      lines(long_seq,
-            invlogit(mean(surv_coef$b0_s) + 
-                       mean(surv_coef$bsize_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                       mean(surv_coef$bsex_s) * (s-1) +
-                       mean(surv_coef$blong_s) * long_seq +
-                       mean(surv_coef$bsizelong_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
-                       mean(surv_coef$bsizesex_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
-                       mean(surv_coef$blongsex_s) * long_seq * (s-1) +
-                       mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                       mean(surv_coef$blong2_s) * (long_seq^2) +
-                       mean(surv_coef$bsizelong2_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
-                       mean(surv_coef$blong2sex_s) * (long_seq^2) * (s-1) +
-                       mean(surv_coef$bsizelong2sex_s)  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
-                       ),
-            col=sex_cols[s],lwd=3)
+      lines(long_seq,invlogit(mean(surv_coef$b0_s) + 
+                                mean(surv_coef$bsize_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                mean(surv_coef$bsex_s) * (s-1) +
+                                mean(surv_coef$blong_s) * long_seq +
+                                mean(surv_coef$bsizelong_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                                mean(surv_coef$bsizesex_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                                mean(surv_coef$blongsex_s) * long_seq * (s-1) +
+                                mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                mean(surv_coef$blong2_s) * (long_seq^2) +
+                                mean(surv_coef$bsizelong2_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                                mean(surv_coef$blong2sex_s) * (long_seq^2) * (s-1) +
+                                mean(surv_coef$bsizelong2sex_s)  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+      ),col=sex_cols[s],lwd=3)
     }
   }
 })
 
-warnings()
+# calculate posterior of sex difference
+n_post_draws <- 500
+post_draws <- sample.int(length(surv_coef$b0_s), n_post_draws)
+surv_sex_diff_post <- array(NA,dim=c(size_bin_num,length(long_seq),n_post_draws))
+
+for(p in 1:n_post_draws){
+    for(i in 1:size_bin_num){
+    
+      s=1;      fem <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
+                 (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                 (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
+                 (surv_coef$blong_s[post_draws[p]]) * long_seq +
+                 (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                 (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                 (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
+                 (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                 (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
+                 (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                 (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
+                 (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+      )
+      
+      s=2;       male <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
+                        (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                        (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
+                        (surv_coef$blong_s[post_draws[p]]) * long_seq +
+                        (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                        (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                        (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
+                        (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                        (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
+                        (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                        (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
+                        (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+      )
+      
+      surv_sex_diff_post[i,,p] <-  fem-male
+  }
+}
+
+sex_diff_surv_mean <- matrix(NA,size_bin_num,length(long_seq))
+sex_diff_surv_95 <- sex_diff_surv_75 <- sex_diff_surv_50 <- sex_diff_surv_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
+for(s in 1:size_bin_num){
+  for(l in 1:length(long_seq)){
+    sex_diff_surv_mean[s,l] <- mean(surv_sex_diff_post[s,l,])
+    sex_diff_surv_95[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.025,0.975))
+    sex_diff_surv_75[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.125,0.875))
+    sex_diff_surv_50[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.25,0.75))
+    sex_diff_surv_25[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.375,0.625))
+  }
+}
+
+for(size in 1:size_bin_num){
+plot(long_seq,sex_diff_surv_mean[size,],type="n",lwd=4,ylim=c(-.5,.5),
+     ylab="Sex difference in survival",xlab="Longitude",cex.lab=1.6)
+polygon(x=c(long_seq,rev(long_seq)),
+        y=c(sex_diff_surv_95[size,,1],rev(sex_diff_surv_95[size,,2])),
+        col=alpha("tomato",0.1),border=NA)
+polygon(x=c(long_seq,rev(long_seq)),
+        y=c(sex_diff_surv_75[size,,1],rev(sex_diff_surv_75[size,,2])),
+        col=alpha("tomato",0.1),border=NA)
+polygon(x=c(long_seq,rev(long_seq)),
+        y=c(sex_diff_surv_50[size,,1],rev(sex_diff_surv_50[size,,2])),
+        col=alpha("tomato",0.1),border=NA)
+polygon(x=c(long_seq,rev(long_seq)),
+        y=c(sex_diff_surv_25[size,,1],rev(sex_diff_surv_25[size,,2])),
+        col=alpha("tomato",0.1),border=NA)
+lines(long_seq,sex_diff_surv_mean[size,],lwd=2,col="tomato")
+abline(h=0,lty=2)
+}
+
 ## Growth
+poar.grow <- poar %>% 
+  subset( tillerN_t0 > 0 & tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t0, tillerN_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( sex   = Sex,
+          block = unique.block ) %>% 
+  mutate( log_size_t0   = log(tillerN_t0),
+          log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
+
 poar_grow_binned <- poar.grow %>% 
   mutate(size_bin = as.integer(cut_number(log_size_t0,size_bin_num))) %>% 
   group_by(site,sex,size_bin) %>% 
@@ -114,6 +228,21 @@ with(poar_grow_binned,{
 })
 
 ## Flowering
+poar.flow <- poar %>% 
+  subset( tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t1, flow_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( sex      = Sex,
+          block    = unique.block ) %>% 
+  mutate( log_size_t1   = log(tillerN_t1),
+          log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
+
 poar_flow_binned <- poar.flow %>% 
   mutate(size_bin = as.integer(cut_number(log_size_t1,size_bin_num))) %>% 
   group_by(site,sex,size_bin) %>% 
@@ -155,6 +284,22 @@ with(poar_flow_binned,{
 
 
 ## Panicles
+poar.panic<- poar %>% 
+  subset( flowerN_t1 > 0 & tillerN_t1 > 0 ) %>%
+  select( year, Code, site, unique.block, Sex, 
+          long.center, long.scaled, 
+          tillerN_t1, flowerN_t1 ) %>% 
+  na.omit %>% 
+  mutate( site         = site %>% as.factor %>% as.numeric,
+          unique.block = unique.block %>% as.factor %>% as.numeric,
+          Sex          = Sex %>% as.factor %>% as.numeric,
+          source = Code %>% as.factor %>% as.numeric ) %>% 
+  rename( panic_t1 = flowerN_t1,
+          sex      = Sex,
+          block    = unique.block ) %>% 
+  mutate( log_size_t1   = log(tillerN_t1),
+          log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
+
 poar_panic_binned <- poar.panic %>% 
   mutate(size_bin = as.integer(cut_number(log_size_t1,size_bin_num))) %>% 
   group_by(site,sex,size_bin) %>% 
