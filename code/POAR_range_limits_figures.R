@@ -1,6 +1,6 @@
 library(scales)
 ## Load the Stan output for full vital rate model
-source('code/all_vr_bayes.R')
+source('code/all_vr_bayes.R') ## <- need to update to accommodate both analysis versions
 
 
 # Posterior predictive checks ---------------------------------------------
