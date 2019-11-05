@@ -31,4 +31,3 @@ data/.csv
 *.out
 *.synctex.gz
 *.tex
-*.pdf
