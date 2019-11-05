@@ -2,19 +2,29 @@ library(tidyverse)
 library(scales)
 library(bayesplot)
 
+dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
+
 ## read data
-poar_dropsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
-poar_allsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
-viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+poar_dropsites <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/demography.csv"), stringsAsFactors = F)
+poar_allsites <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv"), stringsAsFactors = F)
+viabVr <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/viability.csv"))
 
 ## Load the Stan output for full vital rate model
-fit_dropsites_full <- readRDS('C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_full.rds')
-fit_allsites_full <- readRDS('C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+#fit_dropsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_full.rds"))
+fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds"))
 
 ## read in the site latlong file to un-scale longitude
-latlong <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/data/SiteLatLong.csv")
+latlong <- read.csv(paste0(dir,"/Experiment/Demography/data/SiteLatLong.csv"))
 
-# Posterior predictive checks ---------------------------------------------
+## useful functions
+quote_bare <- function( ... ){
+  substitute( alist(...) ) %>% 
+    eval( ) %>% 
+    sapply( deparse )
+}
+invlogit<-function(x){exp(x)/(1+exp(x))}
+
+# Posterior predictive checks and other diagnostics---------------------------------------------
 ppc_dens_overlay(data_all$y_s, y_s_sim)
 ppc_dens_overlay(data_all$y_g, y_g_sim)+xlim(0, 100)
 ppc_dens_overlay(data_all$y_f, y_f_sim)
@@ -22,18 +32,22 @@ ppc_dens_overlay(data_all$y_p, y_p_sim)+xlim(0, 50)
 ppc_dens_overlay(data_all$y_v, y_v_sim) ## maybe need beta-binomial?
 ppc_dens_overlay(data_all$y_m, y_m_sim) ## maybe need beta-binomial?
 
+mcmc_intervals(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
+                                          bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                          blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
 
 # Core vital rates --------------------------------------------------------
 # estimate sex- and longitude-specific vital rates for small, medium, and large plants
 
 ##set which dataset to use
-poar <- poar_dropsites #poar <- poar_allsites
-fit_full <- fit_dropsites_full #fit_full <- fit_allsites_full
+poar <- poar_allsites  #poar <- poar_dropsites #
+fit_full <- fit_allsites_full  #fit_full <- fit_dropsites_full #
 
 # first bin size groups
 size_bin_num <- 3
-sex_cols <- c("red","blue")
-bin_shapes <- 15:17
+
 
 ## Survival
 poar.surv <- poar %>% 
@@ -60,114 +74,6 @@ poar_surv_binned <- poar.surv %>%
             bin_n = n())
 surv_mean_sizes <- poar_surv_binned %>% group_by(sex,size_bin) %>% summarise(size = mean(mean_size))
 
-# pull out stan coefficients
-surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
-                                                        bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
-                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
-long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1) + mean(latlong$Longitude)
-
-mcmc_intervals(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
-mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
-mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
-                                          bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
-                                          blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
-
-win.graph()
-par(mfrow=c(4,3),mar=c(5,5,1,1))
-
-with(poar_surv_binned,{
-  for(i in 1:size_bin_num){
-    plot(long[size_bin==i],mean_surv[size_bin==i],type="n",ylim=c(0,1))
-    for(s in 1:2){
-      points(long[sex==s & size_bin==i],mean_surv[sex==s & size_bin==i],
-             col=sex_cols[s],pch=16,cex=2)
-      lines(long_seq,invlogit(mean(surv_coef$b0_s) + 
-                                mean(surv_coef$bsize_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                                mean(surv_coef$bsex_s) * (s-1) +
-                                mean(surv_coef$blong_s) * long_seq +
-                                mean(surv_coef$bsizelong_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
-                                mean(surv_coef$bsizesex_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
-                                mean(surv_coef$blongsex_s) * long_seq * (s-1) +
-                                mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                                mean(surv_coef$blong2_s) * (long_seq^2) +
-                                mean(surv_coef$bsizelong2_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
-                                mean(surv_coef$blong2sex_s) * (long_seq^2) * (s-1) +
-                                mean(surv_coef$bsizelong2sex_s)  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
-      ),col=sex_cols[s],lwd=3)
-    }
-  }
-})
-
-# calculate posterior of sex difference
-n_post_draws <- 500
-post_draws <- sample.int(length(surv_coef$b0_s), n_post_draws)
-surv_sex_diff_post <- array(NA,dim=c(size_bin_num,length(long_seq),n_post_draws))
-
-for(p in 1:n_post_draws){
-    for(i in 1:size_bin_num){
-    
-      s=1;      fem <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
-                 (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                 (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
-                 (surv_coef$blong_s[post_draws[p]]) * long_seq +
-                 (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
-                 (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
-                 (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
-                 (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                 (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
-                 (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
-                 (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
-                 (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
-      )
-      
-      s=2;       male <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
-                        (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                        (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
-                        (surv_coef$blong_s[post_draws[p]]) * long_seq +
-                        (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
-                        (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
-                        (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
-                        (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
-                        (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
-                        (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
-                        (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
-                        (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
-      )
-      
-      surv_sex_diff_post[i,,p] <-  fem-male
-  }
-}
-
-sex_diff_surv_mean <- matrix(NA,size_bin_num,length(long_seq))
-sex_diff_surv_95 <- sex_diff_surv_75 <- sex_diff_surv_50 <- sex_diff_surv_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
-for(s in 1:size_bin_num){
-  for(l in 1:length(long_seq)){
-    sex_diff_surv_mean[s,l] <- mean(surv_sex_diff_post[s,l,])
-    sex_diff_surv_95[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.025,0.975))
-    sex_diff_surv_75[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.125,0.875))
-    sex_diff_surv_50[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.25,0.75))
-    sex_diff_surv_25[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.375,0.625))
-  }
-}
-
-for(size in 1:size_bin_num){
-plot(long_seq,sex_diff_surv_mean[size,],type="n",lwd=4,ylim=c(-.5,.5),
-     ylab="Sex difference in survival",xlab="Longitude",cex.lab=1.6)
-polygon(x=c(long_seq,rev(long_seq)),
-        y=c(sex_diff_surv_95[size,,1],rev(sex_diff_surv_95[size,,2])),
-        col=alpha("tomato",0.1),border=NA)
-polygon(x=c(long_seq,rev(long_seq)),
-        y=c(sex_diff_surv_75[size,,1],rev(sex_diff_surv_75[size,,2])),
-        col=alpha("tomato",0.1),border=NA)
-polygon(x=c(long_seq,rev(long_seq)),
-        y=c(sex_diff_surv_50[size,,1],rev(sex_diff_surv_50[size,,2])),
-        col=alpha("tomato",0.1),border=NA)
-polygon(x=c(long_seq,rev(long_seq)),
-        y=c(sex_diff_surv_25[size,,1],rev(sex_diff_surv_25[size,,2])),
-        col=alpha("tomato",0.1),border=NA)
-lines(long_seq,sex_diff_surv_mean[size,],lwd=2,col="tomato")
-abline(h=0,lty=2)
-}
 
 ## Growth
 poar.grow <- poar %>% 
@@ -194,39 +100,6 @@ poar_grow_binned <- poar.grow %>%
             bin_n = n())
 grow_mean_sizes <- poar_grow_binned %>% group_by(sex,size_bin) %>% summarise(size = mean(mean_size))
 
-# pull out stan coefficients
-grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
-                                                        bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
-                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
-mcmc_dens_overlay(fit_full,par=quote_bare(b0_g,bsize_g,bsex_g,blong_g,
-                                          bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
-                                          blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
-
-with(poar_grow_binned,{
-  for(i in 1:size_bin_num){
-    plot(long[size_bin==i],mean_grow[size_bin==i],type="n")
-    for(s in 1:2){
-      points(long[sex==s & size_bin==i],mean_grow[sex==s & size_bin==i],
-             col=sex_cols[s],pch=16,cex=2)
-      lines(long_seq,
-            exp(mean(grow_coef$b0_g) + 
-                       mean(grow_coef$bsize_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
-                       mean(grow_coef$bsex_g) * (s-1) +
-                       mean(grow_coef$blong_g) * long_seq +
-                       mean(grow_coef$bsizelong_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * long_seq +
-                       mean(grow_coef$bsizesex_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (s-1) +
-                       mean(grow_coef$blongsex_g) * long_seq * (s-1) +
-                       mean(grow_coef$bsizelongsex_g)  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
-                  mean(grow_coef$blong2_g) * (long_seq^2) +
-                  mean(grow_coef$bsizelong2_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (long_seq^2) +
-                  mean(grow_coef$blong2sex_g) * (long_seq^2) * (s-1) +
-                  mean(grow_coef$bsizelong2sex_g)  * (long_seq^2) * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
-            ),
-            col=sex_cols[s],lwd=3)
-    }
-  }
-})
-
 ## Flowering
 poar.flow <- poar %>% 
   subset( tillerN_t1 > 0 ) %>%
@@ -251,37 +124,6 @@ poar_flow_binned <- poar.flow %>%
             long = unique(long.center),
             bin_n = n())
 flow_mean_sizes <- poar_flow_binned %>% group_by(sex,size_bin) %>% summarise(size = mean(mean_size))
-
-# pull out stan coefficients
-flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
-                                                        bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
-                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f))
-
-with(poar_flow_binned,{
-  for(i in 1:size_bin_num){
-    plot(long[size_bin==i],mean_flow[size_bin==i],type="n",ylim=c(0,1))
-    for(s in 1:2){
-      points(long[sex==s & size_bin==i],mean_flow[sex==s & size_bin==i],
-             col=sex_cols[s],pch=16,cex=2)
-      lines(long_seq,
-            invlogit(mean(flow_coef$b0_f) + 
-                       mean(flow_coef$bsize_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
-                       mean(flow_coef$bsex_f) * (s-1) +
-                       mean(flow_coef$blong_f) * long_seq +
-                       mean(flow_coef$bsizelong_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * long_seq +
-                       mean(flow_coef$bsizesex_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (s-1) +
-                       mean(flow_coef$blongsex_f) * long_seq * (s-1) +
-                       mean(flow_coef$bsizelongsex_f)  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
-                       mean(flow_coef$blong2_f) * (long_seq^2) +
-                       mean(flow_coef$bsizelong2_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (long_seq^2) +
-                       mean(flow_coef$blong2sex_f) * (long_seq^2) * (s-1) +
-                       mean(flow_coef$bsizelong2sex_f)  * (long_seq^2) * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
-            ),
-            col=sex_cols[s],lwd=3)
-    }
-  }
-})
-
 
 ## Panicles
 poar.panic<- poar %>% 
@@ -309,18 +151,353 @@ poar_panic_binned <- poar.panic %>%
             bin_n = n())
 panic_mean_sizes <- poar_panic_binned %>% group_by(sex,size_bin) %>% summarise(size = mean(mean_size))
 
+
+# calculate posterior of sex difference ------------------------------------------------------------------------
+
 # pull out stan coefficients
+surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
+                                                        bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
+
+grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
+                                                        bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
+                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+
+flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
+                                                        bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
+                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f))
+
 panic_coef <- rstan::extract(fit_full, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
-                                                        bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
-                                                        blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p                                                        ))
+                                                         bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
+                                                         blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p                                                        ))
+
+long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1)
+n_post_draws <- 500
+post_draws <- sample.int(length(surv_coef$b0_s), n_post_draws)
+surv_sex_diff_post <- grow_sex_diff_post <- flow_sex_diff_post <- panic_sex_diff_post <- array(NA,dim=c(size_bin_num,length(long_seq),n_post_draws))
+
+for(p in 1:n_post_draws){
+  for(i in 1:size_bin_num){
+    
+    s=1;      
+    fem_s <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
+                                (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
+                                (surv_coef$blong_s[post_draws[p]]) * long_seq +
+                                (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                                (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                                (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
+                                (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
+                                (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                                (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
+                                (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+    )
+    fem_g <- exp((grow_coef$b0_g[post_draws[p]]) + 
+                   (grow_coef$bsize_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                   (grow_coef$bsex_g[post_draws[p]]) * (s-1) +
+                   (grow_coef$blong_g[post_draws[p]]) * long_seq +
+                   (grow_coef$bsizelong_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * long_seq +
+                   (grow_coef$bsizesex_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (s-1) +
+                   (grow_coef$blongsex_g[post_draws[p]]) * long_seq * (s-1) +
+                   (grow_coef$bsizelongsex_g[post_draws[p]])  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                   (grow_coef$blong2_g[post_draws[p]]) * (long_seq^2) +
+                   (grow_coef$bsizelong2_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (long_seq^2) +
+                   (grow_coef$blong2sex_g[post_draws[p]]) * (long_seq^2) * (s-1) +
+                   (grow_coef$bsizelong2sex_g[post_draws[p]])  * (long_seq^2) * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
+    )
+    fem_f <- invlogit((flow_coef$b0_f[post_draws[p]]) + 
+                        (flow_coef$bsize_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                        (flow_coef$bsex_f[post_draws[p]]) * (s-1) +
+                        (flow_coef$blong_f[post_draws[p]]) * long_seq +
+                        (flow_coef$bsizelong_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * long_seq +
+                        (flow_coef$bsizesex_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (s-1) +
+                        (flow_coef$blongsex_f[post_draws[p]]) * long_seq * (s-1) +
+                        (flow_coef$bsizelongsex_f[post_draws[p]])  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                        (flow_coef$blong2_f[post_draws[p]]) * (long_seq^2) +
+                        (flow_coef$bsizelong2_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (long_seq^2) +
+                        (flow_coef$blong2sex_f[post_draws[p]]) * (long_seq^2) * (s-1) +
+                        (flow_coef$bsizelong2sex_f[post_draws[p]])  * (long_seq^2) * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
+    )
+    fem_p <- exp((panic_coef$b0_p[post_draws[p]]) + 
+                   (panic_coef$bsize_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
+                   (panic_coef$bsex_p[post_draws[p]]) * (s-1) +
+                   (panic_coef$blong_p[post_draws[p]]) * long_seq +
+                   (panic_coef$bsizelong_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * long_seq +
+                   (panic_coef$bsizesex_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (s-1) +
+                   (panic_coef$blongsex_p[post_draws[p]]) * long_seq * (s-1) +
+                   (panic_coef$bsizelongsex_p[post_draws[p]])  * long_seq * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
+                   (panic_coef$blong2_p[post_draws[p]]) * (long_seq^2) +
+                   (panic_coef$bsizelong2_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (long_seq^2) +
+                   (panic_coef$blong2sex_p[post_draws[p]]) * (long_seq^2) * (s-1) +
+                   (panic_coef$bsizelong2sex_p[post_draws[p]])  * (long_seq^2) * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i]
+    )
+    
+    s=2;       
+    male_s <- invlogit((surv_coef$b0_s[post_draws[p]]) + 
+                                  (surv_coef$bsize_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                  (surv_coef$bsex_s[post_draws[p]]) * (s-1) +
+                                  (surv_coef$blong_s[post_draws[p]]) * long_seq +
+                                  (surv_coef$bsizelong_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                                  (surv_coef$bsizesex_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                                  (surv_coef$blongsex_s[post_draws[p]]) * long_seq * (s-1) +
+                                  (surv_coef$bsizelongsex_s[post_draws[p]])  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                  (surv_coef$blong2_s[post_draws[p]]) * (long_seq^2) +
+                                  (surv_coef$bsizelong2_s[post_draws[p]]) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                                  (surv_coef$blong2sex_s[post_draws[p]]) * (long_seq^2) * (s-1) +
+                                  (surv_coef$bsizelong2sex_s[post_draws[p]])  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+    )
+    male_g <- exp((grow_coef$b0_g[post_draws[p]]) + 
+                   (grow_coef$bsize_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                   (grow_coef$bsex_g[post_draws[p]]) * (s-1) +
+                   (grow_coef$blong_g[post_draws[p]]) * long_seq +
+                   (grow_coef$bsizelong_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * long_seq +
+                   (grow_coef$bsizesex_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (s-1) +
+                   (grow_coef$blongsex_g[post_draws[p]]) * long_seq * (s-1) +
+                   (grow_coef$bsizelongsex_g[post_draws[p]])  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                   (grow_coef$blong2_g[post_draws[p]]) * (long_seq^2) +
+                   (grow_coef$bsizelong2_g[post_draws[p]]) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (long_seq^2) +
+                   (grow_coef$blong2sex_g[post_draws[p]]) * (long_seq^2) * (s-1) +
+                   (grow_coef$bsizelong2sex_g[post_draws[p]])  * (long_seq^2) * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
+    )
+    male_f <- invlogit((flow_coef$b0_f[post_draws[p]]) + 
+                        (flow_coef$bsize_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                        (flow_coef$bsex_f[post_draws[p]]) * (s-1) +
+                        (flow_coef$blong_f[post_draws[p]]) * long_seq +
+                        (flow_coef$bsizelong_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * long_seq +
+                        (flow_coef$bsizesex_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (s-1) +
+                        (flow_coef$blongsex_f[post_draws[p]]) * long_seq * (s-1) +
+                        (flow_coef$bsizelongsex_f[post_draws[p]])  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                        (flow_coef$blong2_f[post_draws[p]]) * (long_seq^2) +
+                        (flow_coef$bsizelong2_f[post_draws[p]]) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (long_seq^2) +
+                        (flow_coef$blong2sex_f[post_draws[p]]) * (long_seq^2) * (s-1) +
+                        (flow_coef$bsizelong2sex_f[post_draws[p]])  * (long_seq^2) * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
+    )
+    male_p <- exp((panic_coef$b0_p[post_draws[p]]) + 
+                   (panic_coef$bsize_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
+                   (panic_coef$bsex_p[post_draws[p]]) * (s-1) +
+                   (panic_coef$blong_p[post_draws[p]]) * long_seq +
+                   (panic_coef$bsizelong_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * long_seq +
+                   (panic_coef$bsizesex_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (s-1) +
+                   (panic_coef$blongsex_p[post_draws[p]]) * long_seq * (s-1) +
+                   (panic_coef$bsizelongsex_p[post_draws[p]])  * long_seq * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
+                   (panic_coef$blong2_p[post_draws[p]]) * (long_seq^2) +
+                   (panic_coef$bsizelong2_p[post_draws[p]]) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (long_seq^2) +
+                   (panic_coef$blong2sex_p[post_draws[p]]) * (long_seq^2) * (s-1) +
+                   (panic_coef$bsizelong2sex_p[post_draws[p]])  * (long_seq^2) * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i]
+    )
+    
+    surv_sex_diff_post[i,,p] <-  fem_s-male_s
+    grow_sex_diff_post[i,,p] <-  fem_g-male_g
+    flow_sex_diff_post[i,,p] <-  fem_f-male_f
+    panic_sex_diff_post[i,,p] <-  fem_p-male_p
+  }
+}
+
+sex_diff_surv_mean <- sex_diff_grow_mean <- sex_diff_flow_mean <- sex_diff_panic_mean <- matrix(NA,size_bin_num,length(long_seq))
+sex_diff_surv_95 <- sex_diff_surv_75 <- sex_diff_surv_50 <- sex_diff_surv_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
+sex_diff_grow_95 <- sex_diff_grow_75 <- sex_diff_grow_50 <- sex_diff_grow_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
+sex_diff_flow_95 <- sex_diff_flow_75 <- sex_diff_flow_50 <- sex_diff_flow_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
+sex_diff_panic_95 <- sex_diff_panic_75 <- sex_diff_panic_50 <- sex_diff_panic_25 <- array(NA,dim=c(size_bin_num,length(long_seq),2))
+
+for(s in 1:size_bin_num){
+  for(l in 1:length(long_seq)){
+    sex_diff_surv_mean[s,l] <- mean(surv_sex_diff_post[s,l,])
+    sex_diff_surv_95[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.025,0.975))
+    sex_diff_surv_75[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.125,0.875))
+    sex_diff_surv_50[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.25,0.75))
+    sex_diff_surv_25[s,l,] <- quantile(surv_sex_diff_post[s,l,],probs=c(0.375,0.625))
+    
+    sex_diff_grow_mean[s,l] <- mean(grow_sex_diff_post[s,l,])
+    sex_diff_grow_95[s,l,] <- quantile(grow_sex_diff_post[s,l,],probs=c(0.025,0.975))
+    sex_diff_grow_75[s,l,] <- quantile(grow_sex_diff_post[s,l,],probs=c(0.125,0.875))
+    sex_diff_grow_50[s,l,] <- quantile(grow_sex_diff_post[s,l,],probs=c(0.25,0.75))
+    sex_diff_grow_25[s,l,] <- quantile(grow_sex_diff_post[s,l,],probs=c(0.375,0.625))
+    
+    sex_diff_flow_mean[s,l] <- mean(flow_sex_diff_post[s,l,])
+    sex_diff_flow_95[s,l,] <- quantile(flow_sex_diff_post[s,l,],probs=c(0.025,0.975))
+    sex_diff_flow_75[s,l,] <- quantile(flow_sex_diff_post[s,l,],probs=c(0.125,0.875))
+    sex_diff_flow_50[s,l,] <- quantile(flow_sex_diff_post[s,l,],probs=c(0.25,0.75))
+    sex_diff_flow_25[s,l,] <- quantile(flow_sex_diff_post[s,l,],probs=c(0.375,0.625))
+    
+    sex_diff_panic_mean[s,l] <- mean(panic_sex_diff_post[s,l,])
+    sex_diff_panic_95[s,l,] <- quantile(panic_sex_diff_post[s,l,],probs=c(0.025,0.975))
+    sex_diff_panic_75[s,l,] <- quantile(panic_sex_diff_post[s,l,],probs=c(0.125,0.875))
+    sex_diff_panic_50[s,l,] <- quantile(panic_sex_diff_post[s,l,],probs=c(0.25,0.75))
+    sex_diff_panic_25[s,l,] <- quantile(panic_sex_diff_post[s,l,],probs=c(0.375,0.625))
+    
+  }
+}
+
+
+# Mega combo figure -------------------------------------------------------
+sex_cols <- c("black","white")
+sex_lty <- c(1,2)
+bin_shapes <- 15:17
+diff_col <- "tomato"#"dodgerblue"#"black"
+diff_alpha <- 0.15
+
+layout.matrix <- rbind(matrix(1:6, nrow = 2, ncol = 3, byrow = F),
+                       matrix(7:12, nrow = 2, ncol = 3, byrow = F),
+                       matrix(13:18, nrow = 2, ncol = 3, byrow = F),
+                       matrix(19:24, nrow = 2, ncol = 3, byrow = F))
+pdf("Manuscript/Figures/vital_rates.pdf",height = 10,width = 8,useDingbats = F)
+layout(mat = layout.matrix,
+       heights = rep(c(2, 1),4), # Heights of the two rows
+       widths = c(2, 2, 2))
+#layout.show(24)
+
+par(oma=c(3,1,0.5,0.5))
+with(poar_surv_binned,{
+  for(i in 1:size_bin_num){
+    par(mar=c(0,4,1,0))
+    plot(long[size_bin==i] + mean(latlong$Longitude),mean_surv[size_bin==i],type="n",ylim=c(0,1),
+         xlab=" ",ylab=" ",xaxt="n");box()
+    if(i==1){mtext("Pr(survival)",side=2,line=3)}
+    title(LETTERS[i],adj=0)
+    for(s in 1:2){
+      points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_surv[sex==s & size_bin==i],
+             bg=sex_cols[s],pch=21,cex=5*(bin_n/max(bin_n)),lwd=2)
+      lines(long_seq + mean(latlong$Longitude),invlogit(mean(surv_coef$b0_s) + 
+                                mean(surv_coef$bsize_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                mean(surv_coef$bsex_s) * (s-1) +
+                                mean(surv_coef$blong_s) * long_seq +
+                                mean(surv_coef$bsizelong_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * long_seq +
+                                mean(surv_coef$bsizesex_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (s-1) +
+                                mean(surv_coef$blongsex_s) * long_seq * (s-1) +
+                                mean(surv_coef$bsizelongsex_s)  * long_seq * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] +
+                                mean(surv_coef$blong2_s) * (long_seq^2) +
+                                mean(surv_coef$bsizelong2_s) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i] * (long_seq^2) +
+                                mean(surv_coef$blong2sex_s) * (long_seq^2) * (s-1) +
+                                mean(surv_coef$bsizelong2sex_s)  * (long_seq^2) * (s-1) * surv_mean_sizes$size[surv_mean_sizes$sex==s & surv_mean_sizes$size_bin==i]
+      ),lty=sex_lty[s],lwd=3)
+    }
+    par(mar=c(2,4,0.5,0))
+    plot(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],type="n",lwd=4,
+         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_surv_95[i,,1]),max(sex_diff_surv_95[i,,2])))
+    if(i==1){mtext(expression(Delta),side=2,line=3)}
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_surv_95[i,,1],rev(sex_diff_surv_95[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_surv_75[i,,1],rev(sex_diff_surv_75[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_surv_50[i,,1],rev(sex_diff_surv_50[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_surv_25[i,,1],rev(sex_diff_surv_25[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],lwd=2,col=diff_col)
+    abline(h=0,lty=2)
+  }
+})
+
+with(poar_grow_binned,{
+  for(i in 1:size_bin_num){
+    par(mar=c(0,4,1,0))
+    plot(long[size_bin==i] + mean(latlong$Longitude),mean_grow[size_bin==i],type="n",
+         xlab=" ",ylab=" ",xaxt="n");box()    
+    if(i==1){mtext("#tillers",side=2,line=3)}
+    title(LETTERS[i+3],adj=0)    
+    for(s in 1:2){
+      points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_grow[sex==s & size_bin==i],
+             bg=sex_cols[s],pch=21,cex=5*(bin_n/max(bin_n)),lwd=2)
+      lines(long_seq + mean(latlong$Longitude),
+            exp(mean(grow_coef$b0_g) + 
+                  mean(grow_coef$bsize_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                  mean(grow_coef$bsex_g) * (s-1) +
+                  mean(grow_coef$blong_g) * long_seq +
+                  mean(grow_coef$bsizelong_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * long_seq +
+                  mean(grow_coef$bsizesex_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (s-1) +
+                  mean(grow_coef$blongsex_g) * long_seq * (s-1) +
+                  mean(grow_coef$bsizelongsex_g)  * long_seq * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] +
+                  mean(grow_coef$blong2_g) * (long_seq^2) +
+                  mean(grow_coef$bsizelong2_g) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i] * (long_seq^2) +
+                  mean(grow_coef$blong2sex_g) * (long_seq^2) * (s-1) +
+                  mean(grow_coef$bsizelong2sex_g)  * (long_seq^2) * (s-1) * grow_mean_sizes$size[grow_mean_sizes$sex==s & grow_mean_sizes$size_bin==i]
+            ),lty=sex_lty[s],lwd=3)
+    }
+    par(mar=c(2,4,0.5,0))
+    plot(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],type="n",lwd=4,
+         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_grow_95[i,,1]),max(sex_diff_grow_95[i,,2])))
+    if(i==1){mtext(expression(Delta),side=2,line=3)}
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_grow_95[i,,1],rev(sex_diff_grow_95[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_grow_75[i,,1],rev(sex_diff_grow_75[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_grow_50[i,,1],rev(sex_diff_grow_50[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_grow_25[i,,1],rev(sex_diff_grow_25[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],lwd=2,col=diff_col)
+    abline(h=0,lty=2)
+  }
+})
+
+
+with(poar_flow_binned,{
+  for(i in 1:size_bin_num){
+    par(mar=c(0,4,1,0))
+    plot(long[size_bin==i] + mean(latlong$Longitude),mean_flow[size_bin==i],type="n",
+         xlab=" ",ylab=" ",xaxt="n");box()
+    if(i==1){mtext("Pr(flower)",side=2,line=3)}
+    title(LETTERS[i+6],adj=0)    
+    for(s in 1:2){
+      points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_flow[sex==s & size_bin==i],
+             bg=sex_cols[s],pch=21,cex=5*(bin_n/max(bin_n)),lwd=2)
+      lines(long_seq + mean(latlong$Longitude),
+            invlogit(mean(flow_coef$b0_f) + 
+                       mean(flow_coef$bsize_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                       mean(flow_coef$bsex_f) * (s-1) +
+                       mean(flow_coef$blong_f) * long_seq +
+                       mean(flow_coef$bsizelong_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * long_seq +
+                       mean(flow_coef$bsizesex_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (s-1) +
+                       mean(flow_coef$blongsex_f) * long_seq * (s-1) +
+                       mean(flow_coef$bsizelongsex_f)  * long_seq * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] +
+                       mean(flow_coef$blong2_f) * (long_seq^2) +
+                       mean(flow_coef$bsizelong2_f) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i] * (long_seq^2) +
+                       mean(flow_coef$blong2sex_f) * (long_seq^2) * (s-1) +
+                       mean(flow_coef$bsizelong2sex_f)  * (long_seq^2) * (s-1) * flow_mean_sizes$size[flow_mean_sizes$sex==s & flow_mean_sizes$size_bin==i]
+            ),lty=sex_lty[s],lwd=3)
+    }
+    par(mar=c(2,4,0.5,0))
+    plot(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],type="n",lwd=4,
+         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_flow_95[i,,1]),max(sex_diff_flow_95[i,,2])))
+    if(i==1){mtext(expression(Delta),side=2,line=3)}
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_flow_95[i,,1],rev(sex_diff_flow_95[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_flow_75[i,,1],rev(sex_diff_flow_75[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_flow_50[i,,1],rev(sex_diff_flow_50[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_flow_25[i,,1],rev(sex_diff_flow_25[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],lwd=2,col=diff_col)
+    abline(h=0,lty=2)
+  }
+})
+
 
 with(poar_panic_binned,{
   for(i in 1:size_bin_num){
-    plot(long[size_bin==i],mean_panic[size_bin==i],type="n")
+    par(mar=c(0,4,1,0))
+    plot(long[size_bin==i] + mean(latlong$Longitude),mean_panic[size_bin==i],type="n",
+         xlab=" ",ylab=" ",xaxt="n",ylim=c(0,max(mean_panic[size_bin==i])));box()    
+    if(i==1){mtext("#panicles",side=2,line=3)}
+    title(LETTERS[i+9],adj=0)    
     for(s in 1:2){
-      points(long[sex==s & size_bin==i],mean_panic[sex==s & size_bin==i],
-             col=sex_cols[s],pch=16,cex=2)
-      lines(long_seq,
+      points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_panic[sex==s & size_bin==i],
+             bg=sex_cols[s],pch=21,cex=7*(bin_n/max(bin_n)),lwd=2)
+      lines(long_seq + mean(latlong$Longitude),
             exp(mean(panic_coef$b0_p) + 
                   mean(panic_coef$bsize_p) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] +
                   mean(panic_coef$bsex_p) * (s-1) +
@@ -333,20 +510,55 @@ with(poar_panic_binned,{
                   mean(panic_coef$bsizelong2_p) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i] * (long_seq^2) +
                   mean(panic_coef$blong2sex_p) * (long_seq^2) * (s-1) +
                   mean(panic_coef$bsizelong2sex_p)  * (long_seq^2) * (s-1) * panic_mean_sizes$size[panic_mean_sizes$sex==s & panic_mean_sizes$size_bin==i]
-            ),
-            col=sex_cols[s],lwd=3)
+            ),lty=sex_lty[s],lwd=3)
     }
+    par(mar=c(2,4,0.5,0))
+    plot(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],type="n",lwd=4,
+         cex.lab=1.6,xlab=" ",ylab=" ",ylim=c(min(sex_diff_panic_95[i,,1]),max(sex_diff_panic_95[i,,2])))
+    if(i==1){mtext(expression(Delta),side=2,line=3)}
+    mtext("Longitude",side=1,line=3)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_panic_95[i,,1],rev(sex_diff_panic_95[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_panic_75[i,,1],rev(sex_diff_panic_75[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_panic_50[i,,1],rev(sex_diff_panic_50[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+            y=c(sex_diff_panic_25[i,,1],rev(sex_diff_panic_25[i,,2])),
+            col=alpha(diff_col,diff_alpha),border=NA)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],lwd=2,col=diff_col)
+    abline(h=0,lty=2)
   }
 })
+dev.off()
 
 # Seed viability ----------------------------------------------------------
-viab_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
+viab   <- viabVr %>% 
+  select( plot, totS, yesMaybe, sr_f ) %>% 
+  rename( SR        = sr_f,
+          y_viab = yesMaybe,
+          tot_seeds_viab = totS) %>% 
+  select(y_viab, tot_seeds_viab, SR ) %>% 
+  na.omit
 
-plot(data_all$SR_v,(data_all$y_v / data_all$tot_seeds_v),
-     cex = 3 * (data_all$tot_seeds_v / max(data_all$tot_seeds_v)))
-lines(seq(0,1,0.01),
-      viab_pars["v0"] * (1 - seq(0,1,0.01) ^ viab_pars["a_v"]))
+#viab_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
+viab_pars <- rstan::extract(fit_full, pars = quote_bare(v0,a_v))
 
+pdf("Manuscript/Figures/seed_viability.pdf",useDingbats = F)
+plot(jitter(viab$SR,75),jitter((viab$y_viab / viab$tot_seeds_viab),75),
+     type="n",xlab="Operational sex ratio (fraction female panicles)",
+     ylab="Seed viability",cex.lab=1.4)
+for(p in 1:n_post_draws){
+  lines(seq(0,1,0.01),
+        viab_pars$v0[post_draws[p]] * (1 - seq(0,1,0.01) ^ viab_pars$a_v[post_draws[p]]),
+        col=alpha("darkgrey",0.1))
+}
+points(jitter(viab$SR,75),jitter((viab$y_viab / viab$tot_seeds_viab),75),
+       cex = 5 * (viab$tot_seeds_viab / max(viab$tot_seeds_viab)),lwd=2)
+dev.off()
 
 # Site climate variation --------------------------------------------------
 library(SPEI)
@@ -406,14 +618,14 @@ allsites <- full_join(
 ggplot(allsites)+
   geom_point(aes(x=long,y=spei,color=as.factor(transition_year)))
 
-
+pdf("Manuscript/Figures/site_precip.pdf",useDingbats = F)
 plot(allsites$long,allsites$ppt,type="n",ylab="Annual precipitation (mm)",xlab="Longitude",cex.lab=1.4)
 points(allsites$long[allsites$transition_year==2014],allsites$ppt[allsites$transition_year==2014],cex=2,pch=1)
 points(allsites$long[allsites$transition_year==2015],allsites$ppt[allsites$transition_year==2015],cex=2,pch=2)
 points(allsites$long[allsites$transition_year==2016],allsites$ppt[allsites$transition_year==2016],cex=2,pch=3)
 legend("topleft",legend=c(2014:2016),bty="n",pch=1:3,cex=1.2)
 ## add 30-year normals
-
+dev.off()
 
 # Natural population survey -----------------------------------------------
 ## The data manipulation steps here come from the script 'POAR_population_preproposal_figure.R', which is a 
@@ -490,3 +702,26 @@ for(i in 1:n_post){
 points(survey_dat$longit + mean(POAR$Longitude),
        survey_dat$y/survey_dat$n_trials,
        cex=3*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
+
+
+# MS quantities -----------------------------------------------------------
+
+n_survey_pops <- POAR %>% select(Population,year) %>% group_by(year) %>% summarise(n=n())
+
+survey_site_table <- POAR %>% select(Population,Latitude,Longitude) %>% remove_rownames()
+
+n_sites <- poar %>% select(site) %>% n_distinct()
+
+n_sources <- poar %>% select(Code) %>% n_distinct()
+
+source_plants <- poar %>% select(Code,ID) %>% unique() %>% group_by(Code) %>% summarise(n = n_distinct(ID))
+
+poar_ms_quantities <- list(
+  n_survey_pops=n_survey_pops,
+  survey_site_table=survey_site_table,
+  n_sites=n_sites,
+  n_sources=n_sources,
+  source_plants=source_plants
+)
+
+write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
