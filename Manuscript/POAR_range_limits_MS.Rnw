@@ -19,7 +19,8 @@
 <<setup,echo=F, message=F, warning=F>>=
 knitr::opts_chunk$set(fig.pos = 'H')
 library(tidyverse)
-setwd("C:/Users/tm9/Dropbox/git projects/POAR-range-limits")
+library(xtable)
+poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits/Manuscript/poar_ms_quantities.rds")
 @
 
 %-------------------------------------------------------------------------
@@ -70,13 +71,13 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 \textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
-Individuals grow via rhizomes to form patches up to \textbf{quantity} in area. 
+Individuals grow via rhizomes to form patches that may be as large as $50 m^2$ in area. 
 Sex is genetically based in \textit{P. arachnifera} \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
-We surveyed \textbf{number} \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
-We visited \textbf{number} populations in spring 2012 and \textbf{number} populations in spring 2013. 
-Survey locations are shown in \textbf{map} and coordinates and dates are provided in Table \textbf{number}. 
+We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
+We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013. 
+Survey locations are shown in \textbf{map} and coordinates are provided in Table \ref{tab:survey}. 
 At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
 We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
 Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
@@ -85,11 +86,11 @@ This statistical model and all those that follow were fit in a Bayesian statisti
 \subsection*{Common garden experiment}
 
 \subsubsection*{Source material and experimental sites}
-We established a common garden experiment at \textbf{N} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (MAP).
-Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude, averaging over latitudes. 
-During the three years of this experiment, total precipitation at each site closely tracked longitude (figure correlating precip and longitude), as expected based on longer-term climate trends (map).
-Source material for this experiment came from \textbf{N} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
-At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \textbf{N} per sex, range: \textbf{N} -- \textbf{N} ). 
+We established a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (MAP).
+Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude. 
+During the three years of this experiment, total precipitation at each site closely tracked longitude (Fig. \ref{fig:site_precip}), as expected based on longer-term climate trends (map).
+Source material for this experiment came from \Sexpr{poar_ms_quantities$n_sources} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
+At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \Sexpr{round(mean(poar_ms_quantities$source_plants$n),1)} individuals per site, range: \Sexpr{min(poar_ms_quantities$source_plants$n)}--\Sexpr{max(poar_ms_quantities$source_plants$n)}). 
 These were brought back to the Rice University greenhouse, where they were clonally propagated in cylidrical cone-tainers with ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
 
 Common gardens were set up in Fall (October--December) 2014. 
@@ -112,6 +113,26 @@ For each individual in each year, we recorded survival status (alive or dead), s
 %--------------------------------------------------------------------
 \section*{Results}
 
+
+\newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=1\linewidth]{Figures/vital_rates}
+  \caption{Caption.}
+  \label{fig:vital_rates}
+  \end{center}
+\end{figure}
+ 
+ 
+ \newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/seed_viability}
+  \caption{Caption.}
+  \label{fig:seed_viability}
+  \end{center}
+\end{figure}
+ 
 %--------------------------------------------------------------------
 \section*{Discussion}
 %--------------------------------------------------------------------
@@ -132,5 +153,17 @@ For each individual in each year, we recorded survival status (alive or dead), s
 \renewcommand{\thetable}{A\arabic{table}}\setcounter{table}{0}
 \renewcommand{\theequation}{A\arabic{equation}}\setcounter{equation}{0}
 
+<<survey_table,echo=F, message=F, warning=F, results = 'asis'>>=
+print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural population surveys corresponding to Figure", label = "tab:survey",include.rownames=F))
+@
 
+\newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/site_precip}
+  \caption{Caption.}
+  \label{fig:site_precip}
+  \end{center}
+\end{figure}
+ 
 \end{document}
