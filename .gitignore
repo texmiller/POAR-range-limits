@@ -31,3 +31,4 @@ data/.csv
 *.out
 *.synctex.gz
 *.tex
+*.rds
