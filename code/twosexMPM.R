@@ -1,6 +1,6 @@
+library(tidyverse)
 
-
-# vital rate functions ---------------------------------------------------
+# vital rate and megamatrix functions ---------------------------------------------------
 
 #SURVIVAL AT SIZE X.
 sx<-function(x,params,long,rfx){
@@ -73,11 +73,57 @@ fertx_F<-function(x,params,rfx,long,twosex,OSR=NULL){
 }
 
 ##Male offspring
-fertx_M<-function(x,params,long,twosex,OSR=NULL){
+fertx_M<-function(x,params,rfx,long,twosex,OSR=NULL){
   seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*(1-params$PSR)
   return(seedlings)
 }
 
+## Put it all together
+megamatrix<-function(F.params,M.params,long,twosex,SR=NULL,proc_err=F,rand_seed=NULL){  
+  
+  ## draw random effects for site, block, source
+  rfx <- tibble(site = rep(0,4),
+                block = rep(0,4),
+                source = rep(0,4))
+  rownames(rfx) <- c("surv","grow","flow","panic")
+  if(proc_err==T){
+    set.seed(rand_seed)
+    rfx["surv",] <- rnorm(3,0,c(F.params$site_sd_s,F.params$block_sd_s,F.params$source_sd_s))
+    rfx["grow",] <- rnorm(3,0,c(F.params$site_sd_g,F.params$block_sd_g,F.params$source_sd_g))
+    rfx["flow",] <- rnorm(3,0,c(F.params$site_sd_f,F.params$block_sd_f,F.params$source_sd_f))
+    rfx["panic",] <- rnorm(3,0,c(F.params$site_sd_p,F.params$block_sd_p,F.params$source_sd_p))
+  }
+
+  matdim<-F.params$max_size         
+  y<-1:F.params$max_size
+  
+  ## stopped here 11/6/2019
+  
+  ## F-to-F growth/survival transition
+  F.Tmat<-matrix(0,matdim,matdim)
+  F.Tmat[1:matdim,1:matdim]<-t(outer(y,y,pxy,params=F.params,long=long))
+  # F-to-F Fertility transition
+  F.Fmat<-matrix(0,matdim,matdim)
+  F.Fmat[1,1:matdim]<-Fertx.F(x=y,params=F.params,long=long,twosex,SR=SR) 
+  
+  ## M-to-M growth/survival transition
+  M.Tmat<-matrix(0,matdim,matdim)
+  M.Tmat[1:matdim,1:matdim]<-t(outer(y,y,pxy,params=M.params,long=long))
+  # F-to-M Fertility transition
+  M.Fmat<-matrix(0,matdim,matdim)
+  M.Fmat[1,1:matdim]<-Fertx.M(x=y,params=F.params,long=long,twosex,SR=SR) 
+  
+  #M-to-F
+  zero.mat<-matrix(0,matdim,matdim)
+  
+  # Put it all together
+  MEGAmat<-cbind(rbind(F.Tmat+F.Fmat,  ##Female growth/survival + recruitment[1,1]
+                       M.Fmat), ##Male recruitment [2,1]
+                 rbind(zero.mat,   ##Females from males [1,2]
+                       M.Tmat))   ##Male growth/survival
+  
+  return(list(MEGAmat=MEGAmat))
+}
 # demographic parameters --------------------------------------------------
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
 dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
