@@ -716,12 +716,18 @@ n_sources <- poar %>% select(Code) %>% n_distinct()
 
 source_plants <- poar %>% select(Code,ID) %>% unique() %>% group_by(Code) %>% summarise(n = n_distinct(ID))
 
+n_block <- poar %>% select(Block) %>% n_distinct()
+
+n_plants_per_block <- poar %>% filter(year==2015) %>% select(unique.block,ID) %>% group_by(unique.block) %>% summarise(n=n())
+
 poar_ms_quantities <- list(
   n_survey_pops=n_survey_pops,
   survey_site_table=survey_site_table,
   n_sites=n_sites,
   n_sources=n_sources,
-  source_plants=source_plants
+  source_plants=source_plants,
+  n_block=n_block,
+  n_plants_per_block=n_plants_per_block$n[1]
 )
 
 write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
