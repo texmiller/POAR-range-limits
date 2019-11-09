@@ -69,42 +69,82 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 
 \subsection*{Study system and natural population surveys}
 \textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
+Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
 Individuals grow via rhizomes to form patches that may be as large as $50 m^2$ in area. 
-Sex is genetically based in \textit{P. arachnifera} \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
+Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
 We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
 We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013. 
 Survey locations are shown in \textbf{map} and coordinates are provided in Table \ref{tab:survey}. 
 At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
+
+\subsubsection{Statistical analysis of natural population surveys}
 We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
 Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
-This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters. 
+This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters.
+In all cases, model fit was assessed with posterior predictive checks \citep{conn2018guide}. 
 
 \subsection*{Common garden experiment}
 
-\subsubsection*{Source material and experimental sites}
+\subsubsection*{Source material and experimental design}
 We established a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (MAP).
 Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude. 
 During the three years of this experiment, total precipitation at each site closely tracked longitude (Fig. \ref{fig:site_precip}), as expected based on longer-term climate trends (map).
 Source material for this experiment came from \Sexpr{poar_ms_quantities$n_sources} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
 At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \Sexpr{round(mean(poar_ms_quantities$source_plants$n),1)} individuals per site, range: \Sexpr{min(poar_ms_quantities$source_plants$n)}--\Sexpr{max(poar_ms_quantities$source_plants$n)}). 
-These were brought back to the Rice University greenhouse, where they were clonally propagated in cylidrical cone-tainers with ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
+These were brought back to the Rice University greenhouse, where they were clonally propagated in ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
 
 Common gardens were set up in Fall (October--December) 2014. 
-At each site, we established \textbf{N} experimental blocks, which typically corresponded to a tree or woodland edge, providing partial shade that mimics this species' natural micro-environment. 
-We planted \textbf{N} females and \textbf{N} males in each block, for a total of \textbf{N} individuals per sex per site and \textbf{N} total plants across sites. 
+At each site, we established \Sexpr{poar_ms_quantities$n_block} experimental blocks, which typically corresponded to a tree or woodland edge, providing partial shade that mimics this species' natural micro-environment. 
+We planted \Sexpr{poar_ms_quantities$n_plants_per_block/2} females and \Sexpr{poar_ms_quantities$n_plants_per_block/2} males in each block, for a total of \Sexpr{(poar_ms_quantities$n_plants_per_block/2) * poar_ms_quantities$n_block} individuals per sex per site and \Sexpr{poar_ms_quantities$n_sites * poar_ms_quantities$n_block * poar_ms_quantities$n_plants_per_block} total plants across sites, with all source collections represented at all sites. 
+Individuals were spaced within blocks to allow space for rhizomatous growth that could be clearly attributed to individual transplants. 
 To promote establishment, we cleared vegetation immediately surrounding transplants and provided ca. $1$ L of water at the time of transplanting but provided no subsequent watering, fertilization, or competitor removal. 
 
-\subsubsection*{Data collection}
 We visited each site during May of 2015, 2016, and 2017. 
-For each individual in each year, we recorded survival status (alive or dead), size (number of tillers), flowering status (reproductive or vegetative), the number of panicles produced by flowering plants, and panicle length, which is proportional to production of seeds (in females) and pollen (in males). 
+For each individual in each year, we recorded data for four demographic vital rates: survival status (alive or dead), size (number of tillers), flowering status (reproductive or vegetative), the number of panicles produced by flowering plants. %, and panicle length, which is proportional to production of seeds (in females) and pollen (in males). 
 
-\subsection*{Pollination experiment}
+\subsubsection*{Statistical analysis of common garden experiment}
+We analyzed the demographic vital rates with generalized linear mixed models in a hierarchical Bayesian framework. 
+All the vital rates shared a common linear predictor for the expected value that included fixed effects of size, sex, linear and quadratic terms for longitude, and all 2- and 3-way interactions.
+We included quadratic effects of longitude to account for the possibility of non-monotonic responses, following the hypothesis that fitness may peak in the center of the range. 
+The linear predictor also included random effects of site, block, and source population of the transplant; the corresponding variance terms were used in the demographic model (below) to capture process error in demography.  
+We pooled all three years of observations for analysis so we do not explicitly model temporal variation but our results are implicitly averaged over years. 
 
-\subsection*{Mechanistic model of range limits}
+The survival and flowering data were Bernoulli distributed, and these models applied the logit link function. 
+We modeled tiller and panicle counts as zero-truncated negative binomial using the log link. 
+For flowering and panicle production in year $t$, the size covariate was the natural logarithm of tiller number in year $t$. 
+For survival and size  in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
+Code for these analyses is available at \url{https://github.com/texmiller/POAR-range-limits}.
+
+\subsection*{Sex ratio experiment}
+At one site near the center of the range (Lake Lewisville Environmental Learning Area: star in MAP), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
+Details of this experiment, which was conducted in 2014--2015, are described in Compagnoni et al. \citeyear{compagnoni2017can}. 
+Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates each of 34 density-sex ratio combinations. 
+The experiment was established ca. 1 km from a natural population at this site and plots were situated with a minimum of 15 m spacing, a buffer that was intended to limit pollen movement between plots (pilot data indicated that $\geq 90\%$ of wind pollination occurred within $13 m$). 
+We measured female reproductive success in different density and sex ratio environments by collecting panicles from a subset of females in each plot at the end of the reproductive season.
+In the lab, we counted the total number of seeds on each panicle and assessed seed viability with tetrazolium assays of 25 seeds per panicle.
+We also conducted germination trials in the greenhouse (17--57 seeds per panicle, mode: 30). 
+
+\subsubsection*{Statistical analysis of sex ratio experiment}
+Our previous study examined how interactions between density and frequency (sex ratio) dependence contributed to female reproductive success \citep{compagnoni2017can}. 
+Here we focus solely on sex ratio variation, averaging over variation in density. 
+Our goal was to estimate a `mating function' that defines how availability of male panicles affects the viability of seeds on female panicles.
+We modeled the seed viability data with a binomial distribution where the probability of viability ($p$) was given by:
+
+\begin{align}\label{eq:viab_fn}
+p = v_{0} * (1 - OSR^{\alpha})
+\end{align}
+
+\noindent where $OSR$ is the operational sex ratio (fraction of panicles that were female) in our population populations. 
+This function has the properties, supported by our previous work, that seed viability is maximized at $v_{0}$ as $OSR$ approaches zero and goes to zero as $OSR$ approaches $1$.
+Parameter $\alpha$ controls how viability declines with increasing female bias. 
+
+%add germination
+
+\subsection*{Demographic model of range limits}
 
 \subsubsection*{Statistical modeling}
 
