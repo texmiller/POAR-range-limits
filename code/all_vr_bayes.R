@@ -335,8 +335,8 @@ data_all <- list( n_sites    = poar.surv$site %>% n_distinct,
 
 # simulation parameters
 sim_pars <- list(
-  warmup = 2000, 
-  iter = 25000, 
+  warmup = 5000, 
+  iter = 30000, 
   thin = 3, 
   chains = 3
 )
