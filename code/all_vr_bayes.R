@@ -179,6 +179,11 @@ germ   <- viabVr %>%
   select(y_germ, tot_seeds_germ, SR ) %>% 
   na.omit
 
+# seeds per panicle
+seeds   <- viabVr %>% 
+  select(SeedN)  %>% 
+  na.omit
+
 
 # # Viab - Germ test --------------------------------------------------------
 # viab   <- viabVr %>% 
@@ -527,7 +532,11 @@ data_allsites_all <- list( n_sites    = poar_allsites.surv$site %>% n_distinct,
                   n_m       = nrow(germ),
                   y_m       = germ$y_germ,
                   tot_seeds_m = germ$tot_seeds_germ,
-                  SR_m        = germ$SR    )
+                  SR_m        = germ$SR,
+                  
+                  # seeds per panicle
+                  n_d = nrow(seeds),
+                  y_d = seeds$SeedN)
 
 # fit the "big" model 
 fit_allsites_full <- stan(

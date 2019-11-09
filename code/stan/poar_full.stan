@@ -59,6 +59,9 @@ data {
   int<lower=0> tot_seeds_m[n_m]; // number of trials
   real SR_m[n_m]; // Sex ratio (proportion female?)
   
+  // data for seed count
+  int<lower=0> n_d;   // data points
+  int<lower=0> y_d[n_d];  // total number of seeds per panicle 
 }
 
 parameters {
@@ -158,7 +161,9 @@ parameters {
   real<lower=0.1> phi_v;             
   // Germination rate
   real<lower=0,upper=1> m;
-  real<lower=0.1> phi_m;             
+  real<lower=0.1> phi_m;  
+  // Seed count
+  real<lower=0> lambda_d;
   }
 
 transformed parameters{
@@ -391,6 +396,7 @@ model {
   phi_v ~ pareto(0.1,1.5);
   m  ~ beta(10,1);  // intercept viability model
   phi_m ~ pareto(0.1,1.5);
+  lambda_d ~ inv_gamma(0.001, 0.001);
   
   // sampling
   for (i in 1:n_s) {
@@ -413,6 +419,10 @@ model {
   for (i in 1:n_m) {
   y_m[i] ~ beta_binomial(tot_seeds_m[i], alpha_m[i], beta_m[i]);
   }
+  for (i in 1:n_d){
+  y_d[i] ~ poisson(lambda_d);  
+  }
+  
 }
 
 
