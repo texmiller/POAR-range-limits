@@ -114,8 +114,8 @@ megamatrix<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
 # this needs to be done by simulation
 
 lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
-  matdim<-F.params$max_size         
-  y<-1:F.params$max_size
+  matdim<-F_params$max_size         
+  y<-1:F_params$max_size
   lambdatracker      <- rep(0,max.yrs)
   OSRtracker   <- rep(0,max.yrs)
   SRtracker   <- rep(0,max.yrs)
@@ -124,13 +124,13 @@ lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
   for(t in 1:max.yrs){
     ##Estimate panicle SR
     flowering_females<-n0[1:matdim]*pfx(x=y,param=F_params,long=long,rfx=rfx) ## scalar multiplication to weight females by flowering prob
-    F_panicles<-flowering_females%*%nfx(x=y,param=F_params,long=long,rfx=rfx,rfx=rfx) ##Vector operation to sum female panicles
-    flowering_males<-n0[(matdim+1):(matdim*2)]*pfx(x=y,param=M_params,long=long)
+    F_panicles<-flowering_females%*%nfx(x=y,param=F_params,long=long,rfx=rfx) ##Vector operation to sum female panicles
+    flowering_males<-n0[(matdim+1):(matdim*2)]*pfx(x=y,param=M_params,long=long,rfx=rfx)
     M_panicles<-flowering_males%*%nfx(x=y,param=M_params,long=long,rfx=rfx)
     OSRtracker[t]<-F_panicles/(F_panicles+M_panicles) ##Panicle sex ratio (proportion female)
     SRtracker[t]<-sum(n0[1:matdim])
     #assmble matrix
-    MEGAmat<-megamatrix(F.params=F_params,M_params=M.params,long=long,twosex=T,OSR=OSRtracker[t],rfx=rfx)$MEGAmat
+    MEGAmat<-megamatrix(F_params=F_params,M_params=M_params,long=long,twosex=T,OSR=OSRtracker[t],rfx=rfx)$MEGAmat
     n0 <- MEGAmat[,] %*% n0
     N  <- sum(n0)
     lambdatracker[t]<-N
