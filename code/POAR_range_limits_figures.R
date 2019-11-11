@@ -24,7 +24,42 @@ quote_bare <- function( ... ){
 }
 invlogit<-function(x){exp(x)/(1+exp(x))}
 
-# Posterior predictive checks and other diagnostics---------------------------------------------
+# Posterior predictive checks ---------------------------------------------
+## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
+predS <- rstan::extract(fit_allsites_full, pars = c("predS"))$predS
+predG <- rstan::extract(fit_allsites_full, pars = c("predG"))$predG
+phi_G <- rstan::extract(fit_allsites_full, pars = c("phi_g"))$phi_g
+predF <- rstan::extract(fit_allsites_full, pars = c("predF"))$predF
+predP <- rstan::extract(fit_allsites_full, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
+predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
+predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predS)[1], n_post_draws)
+
+y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
+y_g_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
+y_f_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_f))
+y_p_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_p))
+y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
+y_m_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_m))
+
+for(i in 1:n_post_draws){
+  ## sample survival data (bernoulli)
+  y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
+  ## sample growth data (zero-truncated NB)
+  y_g_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_g), mu = exp(predG[i,]), size=phi_G[i])
+  ## sample flowering data (bernoulli)
+  y_f_sim[i,] <- rbinom(n=length(data_allsites_all$y_f), size=1, prob = invlogit(predF[i,]))
+  ## sample panicle data (zero-truncated NB)
+  y_p_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
+  ## sample viability data (binomial)
+  y_v_sim[i,] <- rbinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, prob = predV[i,])
+  ## sample germination data (binomial)
+  y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
+}
+
 ppc_dens_overlay(data_all$y_s, y_s_sim)
 ppc_dens_overlay(data_all$y_g, y_g_sim)+xlim(0, 100)
 ppc_dens_overlay(data_all$y_f, y_f_sim)
@@ -545,7 +580,7 @@ viab   <- viabVr %>%
   na.omit
 
 #viab_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
-viab_pars <- rstan::extract(fit_full, pars = quote_bare(v0,a_v))
+viab_pars <- rstan::extract(fit_full, pars = quote_bare(v0,a_v,m,lambda_d))
 
 pdf("Manuscript/Figures/seed_viability.pdf",useDingbats = F)
 plot(jitter(viab$SR,75),jitter((viab$y_viab / viab$tot_seeds_viab),75),
@@ -702,6 +737,96 @@ for(i in 1:n_post){
 points(survey_dat$longit + mean(POAR$Longitude),
        survey_dat$y/survey_dat$n_trials,
        cex=3*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
+
+
+# Lambda-Longitude --------------------------------------------------------
+source("code/twosexMPM.R")
+
+## set up output matrix
+lambda_long <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+
+for(p in 1:n_post_draws){
+  #set up param vectors
+  F_params <- M_params <- c()
+  ## survival
+  F_params$surv_mu <- surv_coef$b0_s[post_draws[p]] 
+  F_params$surv_size <- surv_coef$bsize_s[post_draws[p]] 
+  F_params$surv_long <- surv_coef$blong_s[post_draws[p]] 
+  F_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] 
+  F_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] 
+  F_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] 
+  M_params$surv_mu <- surv_coef$b0_s[post_draws[p]] + surv_coef$bsex_s[post_draws[p]]
+  M_params$surv_size <- surv_coef$bsize_s[post_draws[p]] + surv_coef$bsizesex_s[post_draws[p]]
+  M_params$surv_long <- surv_coef$blong_s[post_draws[p]] + surv_coef$blongsex_s[post_draws[p]]
+  M_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] + surv_coef$bsizelongsex_s[post_draws[p]]
+  M_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] + surv_coef$blong2sex_s[post_draws[p]]
+  M_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] + surv_coef$bsizelong2sex_s[post_draws[p]]
+  ## growth
+  F_params$grow_mu <- grow_coef$b0_g[post_draws[p]] 
+  F_params$grow_size <- grow_coef$bsize_g[post_draws[p]] 
+  F_params$grow_long <- grow_coef$blong_g[post_draws[p]] 
+  F_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] 
+  F_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] 
+  F_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] 
+  M_params$grow_mu <- grow_coef$b0_g[post_draws[p]] + grow_coef$bsex_g[post_draws[p]]
+  M_params$grow_size <- grow_coef$bsize_g[post_draws[p]] + grow_coef$bsizesex_g[post_draws[p]]
+  M_params$grow_long <- grow_coef$blong_g[post_draws[p]] + grow_coef$blongsex_g[post_draws[p]]
+  M_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] + grow_coef$bsizelongsex_g[post_draws[p]]
+  M_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] + grow_coef$blong2sex_g[post_draws[p]]
+  M_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] + grow_coef$bsizelong2sex_g[post_draws[p]]
+  ## flowering
+  F_params$flow_mu <- flow_coef$b0_f[post_draws[p]] 
+  F_params$flow_size <- flow_coef$bsize_f[post_draws[p]] 
+  F_params$flow_long <- flow_coef$blong_f[post_draws[p]] 
+  F_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] 
+  F_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] 
+  F_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] 
+  M_params$flow_mu <- flow_coef$b0_f[post_draws[p]] + flow_coef$bsex_f[post_draws[p]]
+  M_params$flow_size <- flow_coef$bsize_f[post_draws[p]] + flow_coef$bsizesex_f[post_draws[p]]
+  M_params$flow_long <- flow_coef$blong_f[post_draws[p]] + flow_coef$blongsex_f[post_draws[p]]
+  M_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] + flow_coef$bsizelongsex_f[post_draws[p]]
+  M_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] + flow_coef$blong2sex_f[post_draws[p]]
+  M_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] + flow_coef$bsizelong2sex_f[post_draws[p]]
+  ## panicles
+  F_params$panic_mu <- panic_coef$b0_p[post_draws[p]] 
+  F_params$panic_size <- panic_coef$bsize_p[post_draws[p]] 
+  F_params$panic_long <- panic_coef$blong_p[post_draws[p]] 
+  F_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] 
+  F_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] 
+  F_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] 
+  M_params$panic_mu <- panic_coef$b0_p[post_draws[p]] + panic_coef$bsex_p[post_draws[p]]
+  M_params$panic_size <- panic_coef$bsize_p[post_draws[p]] + panic_coef$bsizesex_p[post_draws[p]]
+  M_params$panic_long <- panic_coef$blong_p[post_draws[p]] + panic_coef$blongsex_p[post_draws[p]]
+  M_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] + panic_coef$bsizelongsex_p[post_draws[p]]
+  M_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] + panic_coef$blong2sex_p[post_draws[p]]
+  M_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] + panic_coef$bsizelong2sex_p[post_draws[p]]
+  ## seed viability and misc fertility params
+  F_params$v0 <- viab_pars$v0[post_draws[p]] 
+  F_params$a_v <- viab_pars$a_v[post_draws[p]] 
+  F_params$ov_per_inf <- viab_pars$lambda_d[post_draws[p]] 
+  F_params$germ <- viab_pars$m[post_draws[p]] 
+  F_params$PSR <- 0.5
+  F_params$max_size <-max(na.omit(poar$tillerN_t0))
+  
+  ## draw random effects for site, block, source
+  rfx <- tibble(site = rep(0,4),
+                block = rep(0,4),
+                source = rep(0,4))
+  
+}
+
+
+ 
+
+rownames(rfx) <- c("surv","grow","flow","panic")
+if(proc_err==T){
+  set.seed(rand_seed)
+  rfx["surv",] <- rnorm(3,0,c(F.params$site_sd_s,F.params$block_sd_s,F.params$source_tau_s))
+  rfx["grow",] <- rnorm(3,0,c(F.params$site_sd_g,F.params$block_sd_g,F.params$source_tau_g))
+  rfx["flow",] <- rnorm(3,0,c(F.params$site_sd_f,F.params$block_sd_f,F.params$source_tau_f))
+  rfx["panic",] <- rnorm(3,0,c(F.params$site_sd_p,F.params$block_sd_p,F.params$source_tau_p))
+}
+
 
 
 # MS quantities -----------------------------------------------------------
