@@ -132,23 +132,53 @@ We also conducted germination trials in the greenhouse (17--57 seeds per panicle
 Our previous study examined how interactions between density and frequency (sex ratio) dependence contributed to female reproductive success \citep{compagnoni2017can}. 
 Here we focus solely on sex ratio variation, averaging over variation in density. 
 Our goal was to estimate a `mating function' that defines how availability of male panicles affects the viability of seeds on female panicles.
-We modeled the seed viability data with a binomial distribution where the probability of viability ($p$) was given by:
+We modeled the seed viability data with a binomial distribution where the probability of viability ($p_{v}$) was given by:
 
 \begin{align}\label{eq:viab_fn}
-p = v_{0} * (1 - OSR^{\alpha})
+v = v_{0} * (1 - OSR^{\alpha})
 \end{align}
 
-\noindent where $OSR$ is the operational sex ratio (fraction of panicles that were female) in our population populations. 
+\noindent where $OSR$ is the operational sex ratio (fraction of panicles that were female) in our experimental populations. 
 This function has the properties, supported by our previous work, that seed viability is maximized at $v_{0}$ as $OSR$ approaches zero and goes to zero as $OSR$ approaches $1$.
 Parameter $\alpha$ controls how viability declines with increasing female bias. 
 
-%add germination
+We modeled germination data from greenhouse trials similarly, where counts of germinants were modeled as binomial successes.
+Since germination was conditional on seed viability, the probability of success was given by the product $v*g$, where $v$ is a function of $OSR$ (Eq. \ref{eq:viab_fn}) and $g$ is assumed to be constant. 
+The germination trials alone do not provide enough information to independently estimate $v$ and $g$ but the combination of viability and germination data allowed us to do so. 
+For both viability and germination, we found that accounting for overdispersion with a beta-binomial response distribution improved model fit. 
 
 \subsection*{Demographic model of range limits}
+The statistical models for the common garden and sex ratio experiments provided the backbone of the full demograhpic model, a matrix projection model (MPM) structured by size (tiller number) and sex. 
+Following the statistical modeling, the MPM accommodates longitude as a predictor variable, allowing us to identify the longitudinal limits of population viability ($\lambda \geq 1$) and investigate the underlying drivers of population decline at range limits. 
+For a given longitude, let $F_{x,t}$ and $M_{x,t}$ be the number of female and male plants of size $x$ in year $t$, where $x \in \{1,2,...,U\}$ and $U$ is the maximum number of tillers a plant can attain (assumed to be the same for females and males). 
+For a pre-breeding census, the coupled dynamics of both sexes are are given by:
 
-\subsubsection*{Statistical modeling}
+\begin{align}\label{eq:dynamics}
+F_{y,t+1} = \sum_{x=1}^{U} 	[ \, s^{F}(x) \cdot g^{F}(y,x) + r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) \cdot \rho \cdot e(y) 	] \, F_{x,t}
+\\
+M_{y,t+1} = \sum_{x=1}^{U} 	[ \,  s^{M}(x) \cdot g^{M}(y,x) ] \, M_{x,t} + [ \, r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) \cdot (1 - \rho) \cdot e(y) ] \, F_{x,t}
+\end{align}
 
-\subsubsection*{Demographic modeling}
+\noindent $s$ and $g$ give the probabilities of surviving at size $x$ and growing from sizes $x$ to $y$, respectively, and superscripts indicate that these functions may be unique to females ($F$) and males ($M$). 
+$r^{F}$ gives fertility of size-$x$ females (number of new recruits per female per year) and is dependent on population structure (the $U \times 1$ vectors $\mathbf{F_{t}}$ and $\mathbf{M_{t}}$). 
+Parameter $\rho$ is the primary sex ratio (proportion of recruits that are female) and $e(y)$ is the probability distribution of recruit size. 
+We assume that all recruits first appear in the population at $1$ tiller in size regardless of sex, so $e(y=1)=1$ and $e(y>1)=0$. 
+The female fertility function is further defined as:
+
+\begin{align}\label{eq:fert}
+r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) = p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g
+\end{align}
+
+\noindent where $p$ and $c$ are flowering probability and panicle production for females of size $x$, $d$ is the number of seeds (fertilized or unfertilized) per female panicle, $v$ is the probability that a seed a fertilized, and $g$ is the probability that a fertilized seed germinates.
+Lastly, and following Eq. \ref{eq:viab_fn}, seed fertilization depends on the OSR according to:
+
+\begin{align}\label{eq:viab_MPM}
+v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t}}{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t} + p^{M}(x) c^{M}(x) M_{x,t}} \right) ^{\alpha}\right]
+\end{align}
+
+% add a bit about analysis by simulation
+
+% add LTRE
 
 %--------------------------------------------------------------------
 \section*{Results}
