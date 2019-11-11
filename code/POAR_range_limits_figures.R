@@ -1,8 +1,10 @@
 library(tidyverse)
 library(scales)
 library(bayesplot)
+library(popbio)
 
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
+dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
 
 ## read data
 poar_dropsites <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/demography.csv"), stringsAsFactors = F)
@@ -192,19 +194,24 @@ panic_mean_sizes <- poar_panic_binned %>% group_by(sex,size_bin) %>% summarise(s
 # pull out stan coefficients
 surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                                         bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
-                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
+                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s,
+                                                        site_tau_s,block_tau_s,source_tau_s))
 
 grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
                                                         bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
-                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
+                                                        site_tau_g,block_tau_g,source_tau_g,
+                                                        phi_g))
 
 flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
                                                         bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
-                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f))
+                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f,
+                                                        site_tau_f,block_tau_f,source_tau_f))
 
 panic_coef <- rstan::extract(fit_full, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
                                                          bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
-                                                         blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p                                                        ))
+                                                         blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p,
+                                                         site_tau_p,block_tau_p,source_tau_p))
 
 long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1)
 n_post_draws <- 500
@@ -742,91 +749,133 @@ points(survey_dat$longit + mean(POAR$Longitude),
 # Lambda-Longitude --------------------------------------------------------
 source("code/twosexMPM.R")
 
-## set up output matrix
-lambda_long <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+## set up output matrices
+lambda_long_post <- Fdom_lambda_long_post <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+max_yrs <- 100
+## set rfx to zero, so this loop is parameter uncertainty only
+rfx <- data.frame(site = rep(0,4),
+                  block = rep(0,4),
+                  source = rep(0,4))
+rownames(rfx) <- c("surv","grow","flow","panic")
 
+F_params <- M_params <- list()
 for(p in 1:n_post_draws){
   #set up param vectors
-  F_params <- M_params <- c()
   ## survival
-  F_params$surv_mu <- surv_coef$b0_s[post_draws[p]] 
-  F_params$surv_size <- surv_coef$bsize_s[post_draws[p]] 
-  F_params$surv_long <- surv_coef$blong_s[post_draws[p]] 
-  F_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] 
-  F_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] 
-  F_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] 
-  M_params$surv_mu <- surv_coef$b0_s[post_draws[p]] + surv_coef$bsex_s[post_draws[p]]
-  M_params$surv_size <- surv_coef$bsize_s[post_draws[p]] + surv_coef$bsizesex_s[post_draws[p]]
-  M_params$surv_long <- surv_coef$blong_s[post_draws[p]] + surv_coef$blongsex_s[post_draws[p]]
-  M_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] + surv_coef$bsizelongsex_s[post_draws[p]]
-  M_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] + surv_coef$blong2sex_s[post_draws[p]]
-  M_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] + surv_coef$bsizelong2sex_s[post_draws[p]]
+  F_params$surv_mu[p] <- surv_coef$b0_s[post_draws[p]] 
+  F_params$surv_size[p] <- surv_coef$bsize_s[post_draws[p]] 
+  F_params$surv_long[p] <- surv_coef$blong_s[post_draws[p]] 
+  F_params$surv_size_long[p] <- surv_coef$bsizelong_s[post_draws[p]] 
+  F_params$surv_long2[p] <- surv_coef$blong2_s[post_draws[p]] 
+  F_params$surv_size_long2[p] <- surv_coef$bsizelong2_s[post_draws[p]] 
+  M_params$surv_mu[p] <- surv_coef$b0_s[post_draws[p]] + surv_coef$bsex_s[post_draws[p]]
+  M_params$surv_size[p] <- surv_coef$bsize_s[post_draws[p]] + surv_coef$bsizesex_s[post_draws[p]]
+  M_params$surv_long[p] <- surv_coef$blong_s[post_draws[p]] + surv_coef$blongsex_s[post_draws[p]]
+  M_params$surv_size_long[p] <- surv_coef$bsizelong_s[post_draws[p]] + surv_coef$bsizelongsex_s[post_draws[p]]
+  M_params$surv_long2[p] <- surv_coef$blong2_s[post_draws[p]] + surv_coef$blong2sex_s[post_draws[p]]
+  M_params$surv_size_long2[p] <- surv_coef$bsizelong2_s[post_draws[p]] + surv_coef$bsizelong2sex_s[post_draws[p]]
   ## growth
-  F_params$grow_mu <- grow_coef$b0_g[post_draws[p]] 
-  F_params$grow_size <- grow_coef$bsize_g[post_draws[p]] 
-  F_params$grow_long <- grow_coef$blong_g[post_draws[p]] 
-  F_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] 
-  F_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] 
-  F_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] 
-  M_params$grow_mu <- grow_coef$b0_g[post_draws[p]] + grow_coef$bsex_g[post_draws[p]]
-  M_params$grow_size <- grow_coef$bsize_g[post_draws[p]] + grow_coef$bsizesex_g[post_draws[p]]
-  M_params$grow_long <- grow_coef$blong_g[post_draws[p]] + grow_coef$blongsex_g[post_draws[p]]
-  M_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] + grow_coef$bsizelongsex_g[post_draws[p]]
-  M_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] + grow_coef$blong2sex_g[post_draws[p]]
-  M_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] + grow_coef$bsizelong2sex_g[post_draws[p]]
+  F_params$grow_mu[p] <- grow_coef$b0_g[post_draws[p]] 
+  F_params$grow_size[p] <- grow_coef$bsize_g[post_draws[p]] 
+  F_params$grow_long[p] <- grow_coef$blong_g[post_draws[p]] 
+  F_params$grow_size_long[p] <- grow_coef$bsizelong_g[post_draws[p]] 
+  F_params$grow_long2[p] <- grow_coef$blong2_g[post_draws[p]] 
+  F_params$grow_size_long2[p] <- grow_coef$bsizelong2_g[post_draws[p]] 
+  F_params$phi_g[p] <- grow_coef$phi_g[post_draws[p]] 
+  M_params$grow_mu[p] <- grow_coef$b0_g[post_draws[p]] + grow_coef$bsex_g[post_draws[p]]
+  M_params$grow_size[p] <- grow_coef$bsize_g[post_draws[p]] + grow_coef$bsizesex_g[post_draws[p]]
+  M_params$grow_long[p] <- grow_coef$blong_g[post_draws[p]] + grow_coef$blongsex_g[post_draws[p]]
+  M_params$grow_size_long[p] <- grow_coef$bsizelong_g[post_draws[p]] + grow_coef$bsizelongsex_g[post_draws[p]]
+  M_params$grow_long2[p] <- grow_coef$blong2_g[post_draws[p]] + grow_coef$blong2sex_g[post_draws[p]]
+  M_params$grow_size_long2[p] <- grow_coef$bsizelong2_g[post_draws[p]] + grow_coef$bsizelong2sex_g[post_draws[p]]
+  M_params$phi_g[p] <- grow_coef$phi_g[post_draws[p]] 
   ## flowering
-  F_params$flow_mu <- flow_coef$b0_f[post_draws[p]] 
-  F_params$flow_size <- flow_coef$bsize_f[post_draws[p]] 
-  F_params$flow_long <- flow_coef$blong_f[post_draws[p]] 
-  F_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] 
-  F_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] 
-  F_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] 
-  M_params$flow_mu <- flow_coef$b0_f[post_draws[p]] + flow_coef$bsex_f[post_draws[p]]
-  M_params$flow_size <- flow_coef$bsize_f[post_draws[p]] + flow_coef$bsizesex_f[post_draws[p]]
-  M_params$flow_long <- flow_coef$blong_f[post_draws[p]] + flow_coef$blongsex_f[post_draws[p]]
-  M_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] + flow_coef$bsizelongsex_f[post_draws[p]]
-  M_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] + flow_coef$blong2sex_f[post_draws[p]]
-  M_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] + flow_coef$bsizelong2sex_f[post_draws[p]]
+  F_params$flow_mu[p] <- flow_coef$b0_f[post_draws[p]] 
+  F_params$flow_size[p] <- flow_coef$bsize_f[post_draws[p]] 
+  F_params$flow_long[p] <- flow_coef$blong_f[post_draws[p]] 
+  F_params$flow_size_long[p] <- flow_coef$bsizelong_f[post_draws[p]] 
+  F_params$flow_long2[p] <- flow_coef$blong2_f[post_draws[p]] 
+  F_params$flow_size_long2[p] <- flow_coef$bsizelong2_f[post_draws[p]] 
+  M_params$flow_mu[p] <- flow_coef$b0_f[post_draws[p]] + flow_coef$bsex_f[post_draws[p]]
+  M_params$flow_size[p] <- flow_coef$bsize_f[post_draws[p]] + flow_coef$bsizesex_f[post_draws[p]]
+  M_params$flow_long[p] <- flow_coef$blong_f[post_draws[p]] + flow_coef$blongsex_f[post_draws[p]]
+  M_params$flow_size_long[p] <- flow_coef$bsizelong_f[post_draws[p]] + flow_coef$bsizelongsex_f[post_draws[p]]
+  M_params$flow_long2[p] <- flow_coef$blong2_f[post_draws[p]] + flow_coef$blong2sex_f[post_draws[p]]
+  M_params$flow_size_long2[p] <- flow_coef$bsizelong2_f[post_draws[p]] + flow_coef$bsizelong2sex_f[post_draws[p]]
   ## panicles
-  F_params$panic_mu <- panic_coef$b0_p[post_draws[p]] 
-  F_params$panic_size <- panic_coef$bsize_p[post_draws[p]] 
-  F_params$panic_long <- panic_coef$blong_p[post_draws[p]] 
-  F_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] 
-  F_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] 
-  F_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] 
-  M_params$panic_mu <- panic_coef$b0_p[post_draws[p]] + panic_coef$bsex_p[post_draws[p]]
-  M_params$panic_size <- panic_coef$bsize_p[post_draws[p]] + panic_coef$bsizesex_p[post_draws[p]]
-  M_params$panic_long <- panic_coef$blong_p[post_draws[p]] + panic_coef$blongsex_p[post_draws[p]]
-  M_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] + panic_coef$bsizelongsex_p[post_draws[p]]
-  M_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] + panic_coef$blong2sex_p[post_draws[p]]
-  M_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] + panic_coef$bsizelong2sex_p[post_draws[p]]
+  F_params$panic_mu[p] <- panic_coef$b0_p[post_draws[p]] 
+  F_params$panic_size[p] <- panic_coef$bsize_p[post_draws[p]] 
+  F_params$panic_long[p] <- panic_coef$blong_p[post_draws[p]] 
+  F_params$panic_size_long[p] <- panic_coef$bsizelong_p[post_draws[p]] 
+  F_params$panic_long2[p] <- panic_coef$blong2_p[post_draws[p]] 
+  F_params$panic_size_long2[p] <- panic_coef$bsizelong2_p[post_draws[p]] 
+  M_params$panic_mu[p] <- panic_coef$b0_p[post_draws[p]] + panic_coef$bsex_p[post_draws[p]]
+  M_params$panic_size[p] <- panic_coef$bsize_p[post_draws[p]] + panic_coef$bsizesex_p[post_draws[p]]
+  M_params$panic_long[p] <- panic_coef$blong_p[post_draws[p]] + panic_coef$blongsex_p[post_draws[p]]
+  M_params$panic_size_long[p] <- panic_coef$bsizelong_p[post_draws[p]] + panic_coef$bsizelongsex_p[post_draws[p]]
+  M_params$panic_long2[p] <- panic_coef$blong2_p[post_draws[p]] + panic_coef$blong2sex_p[post_draws[p]]
+  M_params$panic_size_long2[p] <- panic_coef$bsizelong2_p[post_draws[p]] + panic_coef$bsizelong2sex_p[post_draws[p]]
   ## seed viability and misc fertility params
-  F_params$v0 <- viab_pars$v0[post_draws[p]] 
-  F_params$a_v <- viab_pars$a_v[post_draws[p]] 
-  F_params$ov_per_inf <- viab_pars$lambda_d[post_draws[p]] 
-  F_params$germ <- viab_pars$m[post_draws[p]] 
+  F_params$v0[p] <- viab_pars$v0[post_draws[p]] 
+  F_params$a_v[p] <- viab_pars$a_v[post_draws[p]] 
+  F_params$ov_per_inf[p] <- viab_pars$lambda_d[post_draws[p]] 
+  F_params$germ[p] <- viab_pars$m[post_draws[p]] 
   F_params$PSR <- 0.5
-  F_params$max_size <-max(na.omit(poar$tillerN_t0))
-  
-  ## draw random effects for site, block, source
-  rfx <- tibble(site = rep(0,4),
-                block = rep(0,4),
-                source = rep(0,4))
+  ## set max size equal between the sexes
+  F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
+  M_params$max_size <- F_params$max_size
   
 }
 
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
 
- 
 
+lambda_long_post <- Fdom_lambda_long_post <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+
+  for(l in 1:length(long_seq)){
+    Fdom_lambda_long[l] <- lambda(A = megamatrix(F_params=lapply(F_params,getmode),M_params=lapply(M_params,getmode),long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
+    lambda_run <- lambdaSim(F_params=lapply(F_params,getmode),M_params=lapply(M_params,getmode),long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
+    lambda_long[l] <- lambda_run$lambdatracker[max_yrs]
+    SR_long[l] <- lambda_run$SRtracker[max_yrs]
+    OSR_long[l] <- lambda_run$OSRtracker[max_yrs]
+    print(l)
+  }
+
+plot(long_seq,Fdom_lambda_long,lwd=3,main="mode")
+lines(long_seq,lambda_long,lwd=3,lty=2)
+
+
+## draw random effects for site, block, source
+#rfx <- data.frame(site = rnorm(4,0,c(surv_coef$site_tau_s,grow_coef$site_tau_g,flow_coef$site_tau_f,panic_coef$site_tau_p)),
+#                  block = rnorm(4,0,c(surv_coef$block_tau_s,grow_coef$block_tau_g,flow_coef$block_tau_f,panic_coef$block_tau_p)),
+#                  source = rnorm(4,0,c(surv_coef$source_tau_s,grow_coef$source_tau_g,flow_coef$source_tau_f,panic_coef$source_tau_p)))
+#rownames(rfx) <- c("surv","grow","flow","panic")
+
+
+plot(long_seq,Fdom_lambda_long[1,],type="n",ylim=c(0,10))
+for(i in 1:44){
+  lines(long_seq,Fdom_lambda_long[i,],col=alpha("black",0.2))
+} 
+
+plot(long_seq,lambda_long[1,],type="n",ylim=c(0,10))
+for(i in 1:44){
+  lines(long_seq,lambda_long[i,],col=alpha("black",0.2))
+} 
+
+plot((poar$tillerN_t0),poar$tillerN_t1)
+
+
+F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
+M_params$max_size <- F_params$max_size
+rfx <- data.frame(site = rep(0,4),
+                  block = rep(0,4),
+                  source = rep(0,4))
 rownames(rfx) <- c("surv","grow","flow","panic")
-if(proc_err==T){
-  set.seed(rand_seed)
-  rfx["surv",] <- rnorm(3,0,c(F.params$site_sd_s,F.params$block_sd_s,F.params$source_tau_s))
-  rfx["grow",] <- rnorm(3,0,c(F.params$site_sd_g,F.params$block_sd_g,F.params$source_tau_g))
-  rfx["flow",] <- rnorm(3,0,c(F.params$site_sd_f,F.params$block_sd_f,F.params$source_tau_f))
-  rfx["panic",] <- rnorm(3,0,c(F.params$site_sd_p,F.params$block_sd_p,F.params$source_tau_p))
-}
-
+lambda(megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],
+                  rfx=rfx,twosex=F)$MEGAmat)
 
 
 # MS quantities -----------------------------------------------------------
