@@ -394,6 +394,7 @@ for(i in 1:n_post_draws){
 # Now include "bad" sites -------------------------------------------------
 
 poar_allsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
+poar_allsites <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
 
 # Survival
 poar_allsites.surv <- poar_allsites %>% 
