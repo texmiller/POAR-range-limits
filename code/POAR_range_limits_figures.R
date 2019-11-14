@@ -748,105 +748,170 @@ points(survey_dat$longit + mean(POAR$Longitude),
 
 # Lambda-Longitude --------------------------------------------------------
 source("code/twosexMPM.R")
+rfx_fun <- function(site_tau_s=0,block_tau_s=0,source_tau_s=0,
+                    site_tau_g=0,block_tau_g=0,source_tau_g=0,
+                    site_tau_f=0,block_tau_f=0,source_tau_f=0,
+                    site_tau_p=0,block_tau_p=0,source_tau_p=0){
+  rfx <- data.frame(site = rnorm(4,0,c(site_tau_s,site_tau_g,site_tau_f,site_tau_p)),
+                    block = rnorm(4,0,c(block_tau_s,block_tau_g,block_tau_f,block_tau_p)),
+                    source = rnorm(4,0,c(source_tau_s,source_tau_g,source_tau_f,source_tau_p)))
+  rownames(rfx) <- c("surv","grow","flow","panic")
+  return(rfx)
+}
 
 ## set up output matrices
-lambda_long_post <- Fdom_lambda_long_post <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+lambda_long_post <- Fdom_lambda_long <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+lambda_long_post_rfx <- Fdom_lambda_long_rfx <- SR_long_post_rfx <- OSR_long_post_rfx <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
 max_yrs <- 100
-## set rfx to zero, so this loop is parameter uncertainty only
-rfx <- data.frame(site = rep(0,4),
-                  block = rep(0,4),
-                  source = rep(0,4))
-rownames(rfx) <- c("surv","grow","flow","panic")
 
 F_params <- M_params <- list()
 for(p in 1:n_post_draws){
   #set up param vectors
   ## survival
-  F_params$surv_mu[p] <- surv_coef$b0_s[post_draws[p]] 
-  F_params$surv_size[p] <- surv_coef$bsize_s[post_draws[p]] 
-  F_params$surv_long[p] <- surv_coef$blong_s[post_draws[p]] 
-  F_params$surv_size_long[p] <- surv_coef$bsizelong_s[post_draws[p]] 
-  F_params$surv_long2[p] <- surv_coef$blong2_s[post_draws[p]] 
-  F_params$surv_size_long2[p] <- surv_coef$bsizelong2_s[post_draws[p]] 
-  M_params$surv_mu[p] <- surv_coef$b0_s[post_draws[p]] + surv_coef$bsex_s[post_draws[p]]
-  M_params$surv_size[p] <- surv_coef$bsize_s[post_draws[p]] + surv_coef$bsizesex_s[post_draws[p]]
-  M_params$surv_long[p] <- surv_coef$blong_s[post_draws[p]] + surv_coef$blongsex_s[post_draws[p]]
-  M_params$surv_size_long[p] <- surv_coef$bsizelong_s[post_draws[p]] + surv_coef$bsizelongsex_s[post_draws[p]]
-  M_params$surv_long2[p] <- surv_coef$blong2_s[post_draws[p]] + surv_coef$blong2sex_s[post_draws[p]]
-  M_params$surv_size_long2[p] <- surv_coef$bsizelong2_s[post_draws[p]] + surv_coef$bsizelong2sex_s[post_draws[p]]
+  F_params$surv_mu <- surv_coef$b0_s[post_draws[p]] 
+  F_params$surv_size <- surv_coef$bsize_s[post_draws[p]] 
+  F_params$surv_long <- surv_coef$blong_s[post_draws[p]] 
+  F_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] 
+  F_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] 
+  F_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] 
+  M_params$surv_mu <- surv_coef$b0_s[post_draws[p]] + surv_coef$bsex_s[post_draws[p]]
+  M_params$surv_size <- surv_coef$bsize_s[post_draws[p]] + surv_coef$bsizesex_s[post_draws[p]]
+  M_params$surv_long <- surv_coef$blong_s[post_draws[p]] + surv_coef$blongsex_s[post_draws[p]]
+  M_params$surv_size_long <- surv_coef$bsizelong_s[post_draws[p]] + surv_coef$bsizelongsex_s[post_draws[p]]
+  M_params$surv_long2 <- surv_coef$blong2_s[post_draws[p]] + surv_coef$blong2sex_s[post_draws[p]]
+  M_params$surv_size_long2 <- surv_coef$bsizelong2_s[post_draws[p]] + surv_coef$bsizelong2sex_s[post_draws[p]]
   ## growth
-  F_params$grow_mu[p] <- grow_coef$b0_g[post_draws[p]] 
-  F_params$grow_size[p] <- grow_coef$bsize_g[post_draws[p]] 
-  F_params$grow_long[p] <- grow_coef$blong_g[post_draws[p]] 
-  F_params$grow_size_long[p] <- grow_coef$bsizelong_g[post_draws[p]] 
-  F_params$grow_long2[p] <- grow_coef$blong2_g[post_draws[p]] 
-  F_params$grow_size_long2[p] <- grow_coef$bsizelong2_g[post_draws[p]] 
-  F_params$phi_g[p] <- grow_coef$phi_g[post_draws[p]] 
-  M_params$grow_mu[p] <- grow_coef$b0_g[post_draws[p]] + grow_coef$bsex_g[post_draws[p]]
-  M_params$grow_size[p] <- grow_coef$bsize_g[post_draws[p]] + grow_coef$bsizesex_g[post_draws[p]]
-  M_params$grow_long[p] <- grow_coef$blong_g[post_draws[p]] + grow_coef$blongsex_g[post_draws[p]]
-  M_params$grow_size_long[p] <- grow_coef$bsizelong_g[post_draws[p]] + grow_coef$bsizelongsex_g[post_draws[p]]
-  M_params$grow_long2[p] <- grow_coef$blong2_g[post_draws[p]] + grow_coef$blong2sex_g[post_draws[p]]
-  M_params$grow_size_long2[p] <- grow_coef$bsizelong2_g[post_draws[p]] + grow_coef$bsizelong2sex_g[post_draws[p]]
-  M_params$phi_g[p] <- grow_coef$phi_g[post_draws[p]] 
+  F_params$grow_mu <- grow_coef$b0_g[post_draws[p]] 
+  F_params$grow_size <- grow_coef$bsize_g[post_draws[p]] 
+  F_params$grow_long <- grow_coef$blong_g[post_draws[p]] 
+  F_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] 
+  F_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] 
+  F_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] 
+  F_params$phi_g <- grow_coef$phi_g[post_draws[p]] 
+  M_params$grow_mu <- grow_coef$b0_g[post_draws[p]] + grow_coef$bsex_g[post_draws[p]]
+  M_params$grow_size <- grow_coef$bsize_g[post_draws[p]] + grow_coef$bsizesex_g[post_draws[p]]
+  M_params$grow_long <- grow_coef$blong_g[post_draws[p]] + grow_coef$blongsex_g[post_draws[p]]
+  M_params$grow_size_long <- grow_coef$bsizelong_g[post_draws[p]] + grow_coef$bsizelongsex_g[post_draws[p]]
+  M_params$grow_long2 <- grow_coef$blong2_g[post_draws[p]] + grow_coef$blong2sex_g[post_draws[p]]
+  M_params$grow_size_long2 <- grow_coef$bsizelong2_g[post_draws[p]] + grow_coef$bsizelong2sex_g[post_draws[p]]
+  M_params$phi_g <- grow_coef$phi_g[post_draws[p]] 
   ## flowering
-  F_params$flow_mu[p] <- flow_coef$b0_f[post_draws[p]] 
-  F_params$flow_size[p] <- flow_coef$bsize_f[post_draws[p]] 
-  F_params$flow_long[p] <- flow_coef$blong_f[post_draws[p]] 
-  F_params$flow_size_long[p] <- flow_coef$bsizelong_f[post_draws[p]] 
-  F_params$flow_long2[p] <- flow_coef$blong2_f[post_draws[p]] 
-  F_params$flow_size_long2[p] <- flow_coef$bsizelong2_f[post_draws[p]] 
-  M_params$flow_mu[p] <- flow_coef$b0_f[post_draws[p]] + flow_coef$bsex_f[post_draws[p]]
-  M_params$flow_size[p] <- flow_coef$bsize_f[post_draws[p]] + flow_coef$bsizesex_f[post_draws[p]]
-  M_params$flow_long[p] <- flow_coef$blong_f[post_draws[p]] + flow_coef$blongsex_f[post_draws[p]]
-  M_params$flow_size_long[p] <- flow_coef$bsizelong_f[post_draws[p]] + flow_coef$bsizelongsex_f[post_draws[p]]
-  M_params$flow_long2[p] <- flow_coef$blong2_f[post_draws[p]] + flow_coef$blong2sex_f[post_draws[p]]
-  M_params$flow_size_long2[p] <- flow_coef$bsizelong2_f[post_draws[p]] + flow_coef$bsizelong2sex_f[post_draws[p]]
+  F_params$flow_mu <- flow_coef$b0_f[post_draws[p]] 
+  F_params$flow_size <- flow_coef$bsize_f[post_draws[p]] 
+  F_params$flow_long <- flow_coef$blong_f[post_draws[p]] 
+  F_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] 
+  F_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] 
+  F_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] 
+  M_params$flow_mu <- flow_coef$b0_f[post_draws[p]] + flow_coef$bsex_f[post_draws[p]]
+  M_params$flow_size <- flow_coef$bsize_f[post_draws[p]] + flow_coef$bsizesex_f[post_draws[p]]
+  M_params$flow_long <- flow_coef$blong_f[post_draws[p]] + flow_coef$blongsex_f[post_draws[p]]
+  M_params$flow_size_long <- flow_coef$bsizelong_f[post_draws[p]] + flow_coef$bsizelongsex_f[post_draws[p]]
+  M_params$flow_long2 <- flow_coef$blong2_f[post_draws[p]] + flow_coef$blong2sex_f[post_draws[p]]
+  M_params$flow_size_long2 <- flow_coef$bsizelong2_f[post_draws[p]] + flow_coef$bsizelong2sex_f[post_draws[p]]
   ## panicles
-  F_params$panic_mu[p] <- panic_coef$b0_p[post_draws[p]] 
-  F_params$panic_size[p] <- panic_coef$bsize_p[post_draws[p]] 
-  F_params$panic_long[p] <- panic_coef$blong_p[post_draws[p]] 
-  F_params$panic_size_long[p] <- panic_coef$bsizelong_p[post_draws[p]] 
-  F_params$panic_long2[p] <- panic_coef$blong2_p[post_draws[p]] 
-  F_params$panic_size_long2[p] <- panic_coef$bsizelong2_p[post_draws[p]] 
-  M_params$panic_mu[p] <- panic_coef$b0_p[post_draws[p]] + panic_coef$bsex_p[post_draws[p]]
-  M_params$panic_size[p] <- panic_coef$bsize_p[post_draws[p]] + panic_coef$bsizesex_p[post_draws[p]]
-  M_params$panic_long[p] <- panic_coef$blong_p[post_draws[p]] + panic_coef$blongsex_p[post_draws[p]]
-  M_params$panic_size_long[p] <- panic_coef$bsizelong_p[post_draws[p]] + panic_coef$bsizelongsex_p[post_draws[p]]
-  M_params$panic_long2[p] <- panic_coef$blong2_p[post_draws[p]] + panic_coef$blong2sex_p[post_draws[p]]
-  M_params$panic_size_long2[p] <- panic_coef$bsizelong2_p[post_draws[p]] + panic_coef$bsizelong2sex_p[post_draws[p]]
+  F_params$panic_mu <- panic_coef$b0_p[post_draws[p]] 
+  F_params$panic_size <- panic_coef$bsize_p[post_draws[p]] 
+  F_params$panic_long <- panic_coef$blong_p[post_draws[p]] 
+  F_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] 
+  F_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] 
+  F_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] 
+  M_params$panic_mu <- panic_coef$b0_p[post_draws[p]] + panic_coef$bsex_p[post_draws[p]]
+  M_params$panic_size <- panic_coef$bsize_p[post_draws[p]] + panic_coef$bsizesex_p[post_draws[p]]
+  M_params$panic_long <- panic_coef$blong_p[post_draws[p]] + panic_coef$blongsex_p[post_draws[p]]
+  M_params$panic_size_long <- panic_coef$bsizelong_p[post_draws[p]] + panic_coef$bsizelongsex_p[post_draws[p]]
+  M_params$panic_long2 <- panic_coef$blong2_p[post_draws[p]] + panic_coef$blong2sex_p[post_draws[p]]
+  M_params$panic_size_long2 <- panic_coef$bsizelong2_p[post_draws[p]] + panic_coef$bsizelong2sex_p[post_draws[p]]
   ## seed viability and misc fertility params
-  F_params$v0[p] <- viab_pars$v0[post_draws[p]] 
-  F_params$a_v[p] <- viab_pars$a_v[post_draws[p]] 
-  F_params$ov_per_inf[p] <- viab_pars$lambda_d[post_draws[p]] 
-  F_params$germ[p] <- viab_pars$m[post_draws[p]] 
+  F_params$v0 <- viab_pars$v0[post_draws[p]] 
+  F_params$a_v <- viab_pars$a_v[post_draws[p]] 
+  F_params$ov_per_inf <- viab_pars$lambda_d[post_draws[p]] 
+  F_params$germ <- viab_pars$m[post_draws[p]] 
   F_params$PSR <- 0.5
   ## set max size equal between the sexes
-  F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
+  F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
   M_params$max_size <- F_params$max_size
+  ## pull out the rfx variances
+  rfx <- rfx_fun(site_tau_s = surv_coef$site_tau_s[post_draws[p]],
+                   block_tau_s = surv_coef$block_tau_s[post_draws[p]],
+                   source_tau_s = surv_coef$source_tau_s[post_draws[p]],
+                   site_tau_g = grow_coef$site_tau_g[post_draws[p]],
+                   block_tau_g = grow_coef$block_tau_g[post_draws[p]],
+                   source_tau_g = grow_coef$source_tau_g[post_draws[p]],
+                   site_tau_f = flow_coef$site_tau_f[post_draws[p]],
+                   block_tau_f = flow_coef$block_tau_f[post_draws[p]],
+                   source_tau_f = flow_coef$source_tau_f[post_draws[p]],
+                   site_tau_p = panic_coef$site_tau_p[post_draws[p]],
+                   block_tau_p = panic_coef$block_tau_p[post_draws[p]],
+                   source_tau_p = panic_coef$source_tau_p[post_draws[p]])
   
-}
-
-getmode <- function(v) {
-  uniqv <- unique(v)
-  uniqv[which.max(tabulate(match(v, uniqv)))]
-}
-
-
-lambda_long_post <- Fdom_lambda_long_post <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
-
   for(l in 1:length(long_seq)){
-    Fdom_lambda_long[l] <- lambda(A = megamatrix(F_params=lapply(F_params,getmode),M_params=lapply(M_params,getmode),long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
-    lambda_run <- lambdaSim(F_params=lapply(F_params,getmode),M_params=lapply(M_params,getmode),long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
-    lambda_long[l] <- lambda_run$lambdatracker[max_yrs]
-    SR_long[l] <- lambda_run$SRtracker[max_yrs]
-    OSR_long[l] <- lambda_run$OSRtracker[max_yrs]
-    print(l)
+    Fdom_lambda_long[p,l] <- lambda(A = megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
+    lambda_run <- lambdaSim(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+    lambda_long_post[p,l] <- lambda_run$lambdatracker[max_yrs]
+    SR_long_post[p,l] <- lambda_run$SRtracker[max_yrs]
+    OSR_long_post[p,l] <- lambda_run$OSRtracker[max_yrs]
+
+    #pick up here
+    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
+    lambda_run_rfx <- lambdaSim(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
+    lambda_long_post_rfx[p,l] <- lambda_run_rfx$lambdatracker[max_yrs]
+    SR_long_post_rfx[p,l] <- lambda_run_rfx$SRtracker[max_yrs]
+    OSR_long_post_rfx[p,l] <- lambda_run_rfx$OSRtracker[max_yrs]
+    print(c(p,l))
+  }
+}
+
+## write output as a list
+lambda_long_post_list <- list(Fdom_lambda_long=Fdom_lambda_long,lambda_long_post=lambda_long_post,SR_long_post=SR_long_post,OSR_long_post=OSR_long_post,
+                              Fdom_lambda_long_rfx=Fdom_lambda_long_rfx,lambda_long_post_rfx=lambda_long_post_rfx,SR_long_post_rfx=SR_long_post_rfx,OSR_long_post_rfx=OSR_long_post_rfx)
+write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
+
+## visualize results
+lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- matrix(NA,2,length(long_seq))
+lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- matrix(NA,2,length(long_seq))
+lambda_long_mean <- lambda_long_rfx_mean <- c()
+  for(l in 1:length(long_seq)){
+    lambda_long_q95[,l] <- quantile(lambda_long_post[,l],probs=c(0.025,0.975))
+    lambda_long_q75[,l] <- quantile(lambda_long_post[,l],probs=c(0.125,0.875))
+    lambda_long_q50[,l] <- quantile(lambda_long_post[,l],probs=c(0.25,0.75))
+    lambda_long_q25[,l] <- quantile(lambda_long_post[,l],probs=c(0.375,0.625))
+    lambda_long_mean[l] <- mean(lambda_long_post[,l])
+    
+    lambda_long_rfx_q95[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.025,0.975))
+    lambda_long_rfx_q75[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.125,0.875))
+    lambda_long_rfx_q50[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.25,0.75))
+    lambda_long_rfx_q25[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.375,0.625))
+    lambda_long_rfx_mean[l] <- mean(lambda_long_post_rfx[,l])
   }
 
-plot(long_seq,Fdom_lambda_long,lwd=3,main="mode")
-lines(long_seq,lambda_long,lwd=3,lty=2)
+plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0,30))
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_q75[1,],rev(lambda_long_q75[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_q50[1,],rev(lambda_long_q50[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
+        col=alpha("red",0.2),border=NA)
 
+
+plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0,30))
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q95[1,],rev(lambda_long_rfx_q95[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q75[1,],rev(lambda_long_rfx_q75[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q50[1,],rev(lambda_long_rfx_q50[2,])),
+        col=alpha("red",0.2),border=NA)
+polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q25[1,],rev(lambda_long_rfx_q25[2,])),
+        col=alpha("red",0.2),border=NA)
 
 ## draw random effects for site, block, source
 #rfx <- data.frame(site = rnorm(4,0,c(surv_coef$site_tau_s,grow_coef$site_tau_g,flow_coef$site_tau_f,panic_coef$site_tau_p)),
