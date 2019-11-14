@@ -2,6 +2,7 @@ library(tidyverse)
 library(scales)
 library(bayesplot)
 library(popbio)
+library(countreg)
 
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
 dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
@@ -37,7 +38,7 @@ phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
 predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
 predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
 
-n_post_draws <- 500
+n_post_draws <- 100
 post_draws <- sample.int(dim(predS)[1], n_post_draws)
 
 y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
@@ -62,14 +63,14 @@ for(i in 1:n_post_draws){
   y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
 }
 
-ppc_dens_overlay(data_all$y_s, y_s_sim)
-ppc_dens_overlay(data_all$y_g, y_g_sim)+xlim(0, 100)
-ppc_dens_overlay(data_all$y_f, y_f_sim)
-ppc_dens_overlay(data_all$y_p, y_p_sim)+xlim(0, 50)
-ppc_dens_overlay(data_all$y_v, y_v_sim) ## maybe need beta-binomial?
-ppc_dens_overlay(data_all$y_m, y_m_sim) ## maybe need beta-binomial?
+ppc_dens_overlay(data_allsites_all$y_s, y_s_sim)
+ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 100)
+ppc_dens_overlay(data_allsites_all$y_f, y_f_sim)
+ppc_dens_overlay(data_allsites_all$y_p, y_p_sim)+xlim(0, 50)
+ppc_dens_overlay(data_allsites_all$y_v, y_v_sim) ## maybe need beta-binomial?
+ppc_dens_overlay(data_allsites_all$y_m, y_m_sim) ## maybe need beta-binomial?
 
-mcmc_intervals(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_dens_overlay(fit_allsites_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,phi_g))
 mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
 mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                           bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
