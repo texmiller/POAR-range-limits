@@ -541,7 +541,7 @@ data_allsites_all <- list( n_sites    = poar_allsites.surv$site %>% n_distinct,
 
 # fit the "big" model 
 fit_allsites_full <- stan(
-  file = 'code/stan/poar_full.stan',
+  file = 'code/stan/poar_full_noLong2intx.stan',#'code/stan/poar_full.stan',
   data = data_allsites_all,
   warmup = sim_pars$warmup,
   iter = sim_pars$iter,
