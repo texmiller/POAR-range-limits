@@ -164,3 +164,122 @@ with(poar_grow_binned,{
 
   }
 })
+
+
+# Re-fit panicles alone ---------------------------------------------------
+
+
+# data for model
+data_panicles <- list( n_sites    = poar_allsites.panic$site %>% n_distinct,
+                           n_sources  = poar_allsites.panic$source %>% n_distinct(),
+                           
+                          # panicle data
+                           n_blocks_p = poar_allsites.panic$block %>% n_distinct,
+                           site_p   = poar_allsites.panic$site,
+                           source_p =  poar_allsites.panic$source,
+                           block_p  = poar_allsites.panic$block,
+                           site_block_p = data.frame( site_i  = poar_allsites.panic$site,
+                                                      block_i = poar_allsites.panic$block ) %>% 
+                             unique %>% .$site_i,
+                           male_p   = poar_allsites.panic$sex-1,
+                           long_p   = poar_allsites.panic$long.center,
+                           size_p   = poar_allsites.panic$log_size_t1,
+                           y_p      = poar_allsites.panic$panic_t1,
+                           n_p      = nrow(poar_allsites.panic)
+                          )
+# simulation parameters
+sim_pars <- list(
+  warmup = 2000, 
+  iter = 10000, 
+  thin = 3, 
+  chains = 3
+)
+# fit the "big" model 
+fit_panicles_noZT <- stan(
+  file = 'code/stan/panicle_noZT.stan',
+  data = data_panicles,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+
+predP <- rstan::extract(fit_panicles_noZT, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_panicles_noZT, pars = c("phi_p"))$phi_p
+n_post_draws <- 100
+post_draws <- sample.int(dim(predP)[1], n_post_draws)
+
+y_p_sim1 <- y_p_sim2 <- matrix(NA,n_post_draws,length(data_panicles$y_p))
+
+for(i in 1:n_post_draws){
+  mu_i <- exp(predP[i,])
+  ## sample panicle data (zero-truncated NB)
+  ##y_p_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
+  y_p_sim1[i,] <- rnbinom(n=length(data_panicles$y_p), mu = mu_i, size=phi_P[i])
+  ## this is adjusting the mean according to: https://data.princeton.edu/wws509/notes/countmoments
+  y_p_sim2[i,] <- rnbinom(n=length(data_panicles$y_p), mu = mu_i / (1 - (1+mu_i*phi_P[i])^(-1/phi_P[i])), size=phi_P[i])
+}
+
+ppc_dens_overlay(data_panicles$y_p, y_p_sim1)+xlim(0, 50)
+ppc_dens_overlay(data_panicles$y_p, y_p_sim2)+xlim(0, 50)
+
+mean_panicle_coef <- lapply(rstan::extract(fit_panicles_noZT, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
+                                                               bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
+                                                               blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p))
+                    ,mean)
+test_params<-c()
+test_params$panic_mu <- mean_panicle_coef$b0_p 
+test_params$panic_size <- mean_panicle_coef$bsize_p 
+test_params$panic_long <- mean_panicle_coef$blong_p 
+test_params$panic_size_long <- mean_panicle_coef$bsizelong_p 
+test_params$panic_long2 <- mean_panicle_coef$blong2_p 
+test_params$panic_size_long2 <- mean_panicle_coef$bsizelong2_p 
+
+plot(long_seq,nfx(x=F_params$max_size,params=test_params,long=long_seq,rfx=rfx_fun()),type="n",ylim=c(0,5))
+for(i in 1:length(sizes)){
+  lines(long_seq,nfx(x=sizes[i],params=test_params,long=long_seq,rfx=rfx_fun()))
+}
+
+
+# No long2 interactions ---------------------------------------------------
+
+fit_panicles_noLong2intx <- stan(
+  file = 'code/stan/panicle_noLong2interactions.stan',
+  data = data_panicles,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+
+predP <- rstan::extract(fit_panicles_noLong2intx, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_panicles_noLong2intx, pars = c("phi_p"))$phi_p
+n_post_draws <- 100
+post_draws <- sample.int(dim(predP)[1], n_post_draws)
+
+y_p_sim <- matrix(NA,n_post_draws,length(data_panicles$y_p))
+
+for(i in 1:n_post_draws){
+  mu_i <- exp(predP[i,])
+  ## sample panicle data (zero-truncated NB)
+  ##y_p_sim[i,] <- rztnbinom(n=length(data_allsites_all$y_p), mu = exp(predP[i,]), size=phi_P[i])
+  y_p_sim[i,] <- rnbinom(n=length(data_panicles$y_p), mu = mu_i, size=phi_P[i])
+}
+
+ppc_dens_overlay(data_panicles$y_p, y_p_sim)+xlim(0, 50)
+
+mean_panicle_coef <- lapply(rstan::extract(fit_panicles_noLong2intx, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
+                                                                                bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
+                                                                                blong2_p))
+                            ,mean)
+test_params<-c()
+test_params$panic_mu <- mean_panicle_coef$b0_p 
+test_params$panic_size <- mean_panicle_coef$bsize_p 
+test_params$panic_long <- mean_panicle_coef$blong_p 
+test_params$panic_size_long <- mean_panicle_coef$bsizelong_p 
+test_params$panic_long2 <- mean_panicle_coef$blong2_p 
+test_params$panic_size_long2 <- 0 
+
+plot(long_seq,nfx(x=F_params$max_size,params=test_params,long=long_seq,rfx=rfx_fun()),type="n",ylim=c(0,5))
+for(i in 1:length(sizes)){
+  lines(long_seq,nfx(x=sizes[i],params=test_params,long=long_seq,rfx=rfx_fun()))
+}
+
