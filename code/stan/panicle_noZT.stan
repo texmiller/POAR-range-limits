@@ -29,9 +29,7 @@ parameters {
   real blongsex_p;
   real bsizelongsex_p;
   real blong2_p;  
-  real bsizelong2_p;
-  real blong2sex_p;
-  real bsizelong2sex_p;
+
   //random effects
   real<lower=0> site_tau_p; 
   real site_rfx_p[n_sites];
@@ -59,9 +57,6 @@ transformed parameters{
                 bsizelongsex_p * size_p[ipan] * long_p[ipan] * male_p[ipan] +
                 //quadratic longitude effects
                 blong2_p * pow(long_p[ipan],2) + 
-                bsizelong2_p * size_p[ipan] * pow(long_p[ipan],2) +
-                blong2sex_p * pow(long_p[ipan],2) * male_p[ipan] +
-                bsizelong2sex_p * size_p[ipan] * pow(long_p[ipan],2) * male_p[ipan] +
                 //random effects
                 site_rfx_p[site_p[ipan]] +
                 block_rfx_p[block_p[ipan]] +
@@ -86,9 +81,7 @@ model {
   blongsex_p ~ normal(0, 100);   
   bsizelongsex_p ~ normal(0, 100);   
   blong2_p ~ normal(0, 100);   
-  bsizelong2_p ~ normal(0, 100);   
-  blong2sex_p ~ normal(0, 100);   
-  bsizelong2sex_p ~ normal(0, 100);  
+  
   site_tau_p ~ inv_gamma(0.001, 0.001);
   for (i in 1:n_sites){
     site_rfx_p[i] ~ normal(0, site_tau_p);
@@ -104,31 +97,12 @@ model {
   
   
   // sampling
-  //for (i in 1:n_s) {
-  //y_s[i] ~ bernoulli_logit(predS[i]);
-  //}
-  //for (i in 1:n_g) {
-  //y_g[i] ~ neg_binomial_2_log(predG[i], phi_g);
-  //target += - log1m(neg_binomial_2_log_lpmf(0 | predG[i], phi_g)); // manually zero-truncating
-  //}
-  //for (i in 1:n_f) {
-  //y_f[i] ~ bernoulli_logit(predF[i]);
-  //}
-  //for (i in 1:n_p) {
-  //y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
-  //target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); // manually zero-truncating
-  //}
-  //for (i in 1:n_v) {
-  //y_v[i] ~ beta_binomial(tot_seeds_v[i], alpha_v[i], beta_v[i]);
-  //}
-  //for (i in 1:n_m) {
-  //y_m[i] ~ beta_binomial(tot_seeds_m[i], alpha_m[i], beta_m[i]);
-  //}
-  //for (i in 1:n_d){
-  //y_d[i] ~ poisson(lambda_d);  
-  //}
 
-  y_p ~ neg_binomial_2_log(predP, phi_p);
+  for (i in 1:n_p) {
+  y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
+  target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); // manually zero-truncating
+  }
+
 
   
 }
