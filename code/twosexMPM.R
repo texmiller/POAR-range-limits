@@ -67,13 +67,13 @@ viab<-function(params,twosex,OSR=NULL){
 #FERTILITY--returns number of recruits
 ##Female offspring
 fertx_F<-function(x,params,rfx,long,twosex,OSR=NULL){
-  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*params$PSR *0.5
+  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*params$PSR
   return(seedlings)
 }
 
 ##Male offspring
 fertx_M<-function(x,params,rfx,long,twosex,OSR=NULL){
-  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*(1-params$PSR) *0.5
+  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*(1-params$PSR)
   return(seedlings)
 }
 
@@ -175,7 +175,7 @@ lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
   return(list(lambdatracker=lambdatracker,SRtracker=SRtracker,OSRtracker=OSRtracker,n0=n0))
 }
 
-lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
+lambdaSim_delay<-function(F_params,M_params,long,rfx,max.yrs){
   matdim<-F_params$max_size       
   y<-1:F_params$max_size
   lambdatracker      <- rep(0,max.yrs)

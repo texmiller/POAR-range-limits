@@ -388,7 +388,7 @@ long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
 lambda_long_mean<-SR_long_mean<-OSR_long_mean<-c()
 n0<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
 for(l in 1:length(long_seq)){
-  lambda_run <- lambdaSim(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+  lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
   lambda_long_mean[l] <- lambda_run$lambdatracker[max_yrs]
   SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
   OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
@@ -400,4 +400,4 @@ plot(long_seq,lambda_long_mean,type="b",main=F_params$max_size)
 plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
-barplot(n0[1:F_params$max_size,12])
+barplot(n0[1:(F_params$max_size+1),12])
