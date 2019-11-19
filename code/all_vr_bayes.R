@@ -548,6 +548,7 @@ fit_allsites_full <- stan(
   thin = sim_pars$thin,
   chains = sim_pars$chains )
 
-#saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+#saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+#fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
 

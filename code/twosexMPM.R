@@ -67,13 +67,13 @@ viab<-function(params,twosex,OSR=NULL){
 #FERTILITY--returns number of recruits
 ##Female offspring
 fertx_F<-function(x,params,rfx,long,twosex,OSR=NULL){
-  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*params$PSR
+  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*params$PSR *0.5
   return(seedlings)
 }
 
 ##Male offspring
 fertx_M<-function(x,params,rfx,long,twosex,OSR=NULL){
-  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*(1-params$PSR)
+  seedlings<-pfx(x,params,long,rfx)*nfx(x,params,long,rfx)*params$ov_per_inf*viab(params,twosex,OSR)*params$germ*(1-params$PSR) *0.5
   return(seedlings)
 }
 
@@ -107,7 +107,43 @@ megamatrix<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
                  rbind(zero.mat,   ##Females from males [1,2]
                        M.Tmat))   ##Male growth/survival
   
-  return(list(MEGAmat=MEGAmat,y=y))
+  return(list(MEGAmat=MEGAmat,F.Tmat=F.Tmat,M.Tmat=M.Tmat,y=y))
+}
+
+megamatrix_delay<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){  
+  matdim<-F_params$max_size       
+  y<-1:F_params$max_size
+  
+  ## F-to-F (growth/survival transition)
+  F.Tmat<-matrix(0,matdim+1,matdim+1)
+  F.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=F_params,long=long,rfx=rfx))
+  # surviving seedlings emerge in continuous population
+  F.Tmat[2:(matdim+1),1] <- pxy(x=1,y=y,params=F_params,long=long,rfx=rfx)
+  
+  # F-to-F Fertility transition
+  F.Fmat<-matrix(0,matdim+1,matdim+1)
+  # seedlings in top row
+  F.Fmat[1,2:(matdim+1)]<-fertx_F(x=y,params=F_params,rfx=rfx,long=long,twosex=twosex,OSR=OSR) 
+  
+  ## M-to-M (growth/survival transition)
+  M.Tmat<-matrix(0,matdim+1,matdim+1)
+  M.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=M_params,long=long,rfx=rfx))
+  M.Tmat[2:(matdim+1),1] <- pxy(x=1,y=y,params=M_params,long=long,rfx=rfx)
+  
+  # F-to-M Fertility transition
+  M.Fmat<-matrix(0,matdim+1,matdim+1)
+  M.Fmat[1,2:(matdim+1)]<-fertx_M(x=y,params=F_params,rfx=rfx,long=long,twosex=twosex,OSR=OSR) 
+  
+  #M-to-F
+  zero.mat<-matrix(0,matdim+1,matdim+1)
+  
+  # Put it all together as a megamatrix
+  MEGAmat<-cbind(rbind(F.Tmat+F.Fmat,  ##Female growth/survival + recruitment[1,1]
+                       M.Fmat), ##Male recruitment [2,1]
+                 rbind(zero.mat,   ##Females from males [1,2]
+                       M.Tmat))   ##Male growth/survival
+  
+  return(list(MEGAmat=MEGAmat,F.Tmat=F.Tmat,M.Tmat=M.Tmat,y=y))
 }
 
 # Analysis of 2sex model --------------------------------------------------
@@ -136,9 +172,34 @@ lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
     lambdatracker[t]<-N
     n0 <-n0/N
   }
-  return(list(lambdatracker=lambdatracker,SRtracker=SRtracker,OSRtracker=OSRtracker))
+  return(list(lambdatracker=lambdatracker,SRtracker=SRtracker,OSRtracker=OSRtracker,n0=n0))
 }
 
+lambdaSim<-function(F_params,M_params,long,rfx,max.yrs){
+  matdim<-F_params$max_size       
+  y<-1:F_params$max_size
+  lambdatracker      <- rep(0,max.yrs)
+  OSRtracker   <- rep(0,max.yrs)
+  SRtracker   <- rep(0,max.yrs)
+  n0            <- rep(1/((matdim+1)*2),((matdim+1)*2))
+  
+  for(t in 1:max.yrs){
+    ##Estimate panicle SR
+    flowering_females<-n0[2:(matdim+1)]*pfx(x=y,param=F_params,long=long,rfx=rfx) ## scalar multiplication to weight females by flowering prob
+    F_panicles<-flowering_females%*%nfx(x=y,param=F_params,long=long,rfx=rfx) ##Vector operation to sum female panicles
+    flowering_males<-n0[(matdim+3):((matdim+1)*2)]*pfx(x=y,param=M_params,long=long,rfx=rfx)
+    M_panicles<-flowering_males%*%nfx(x=y,param=M_params,long=long,rfx=rfx)
+    OSRtracker[t]<-F_panicles/(F_panicles+M_panicles) ##Panicle sex ratio (proportion female)
+    SRtracker[t]<-sum(n0[1:matdim])
+    #assmble matrix
+    MEGAmat<-megamatrix_delay(F_params=F_params,M_params=M_params,long=long,twosex=T,OSR=OSRtracker[t],rfx=rfx)$MEGAmat
+    n0 <- MEGAmat[,] %*% n0
+    N  <- sum(n0)
+    lambdatracker[t]<-N
+    n0 <-n0/N
+  }
+  return(list(lambdatracker=lambdatracker,SRtracker=SRtracker,OSRtracker=OSRtracker,n0=n0))
+}
 
 # LTRE function -----------------------------------------------------------
 ## store LTRE output in a matrix of columns for longitude and rows for parameters
