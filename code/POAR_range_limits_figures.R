@@ -398,7 +398,7 @@ layout.matrix <- rbind(matrix(1:6, nrow = 2, ncol = 3, byrow = F),
                        matrix(7:12, nrow = 2, ncol = 3, byrow = F),
                        matrix(13:18, nrow = 2, ncol = 3, byrow = F),
                        matrix(19:24, nrow = 2, ncol = 3, byrow = F))
-#pdf("Manuscript/Figures/vital_rates.pdf",height = 10,width = 8,useDingbats = F)
+pdf("Manuscript/Figures/vital_rates_noLong2intx.pdf",height = 10,width = 8,useDingbats = F)
 layout(mat = layout.matrix,
        heights = rep(c(2, 1),4), # Heights of the two rows
        widths = c(2, 2, 2))
@@ -590,7 +590,7 @@ with(poar_panic_binned,{
     abline(h=0,lty=2)
   }
 })
-#dev.off()
+dev.off()
 
 # Seed viability ----------------------------------------------------------
 viab   <- viabVr %>% 
