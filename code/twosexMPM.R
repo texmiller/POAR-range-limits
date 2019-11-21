@@ -118,7 +118,7 @@ megamatrix_delay<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
   F.Tmat<-matrix(0,matdim+1,matdim+1)
   F.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=F_params,long=long,rfx=rfx))
   # surviving seedlings emerge in continuous population
-  F.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=F_params,long=long,rfx=rfx) * M_params$surv_1yo
+  F.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=F_params,long=long,rfx=rfx) * M_params$sdlg_surv
   
   # F-to-F Fertility transition
   F.Fmat<-matrix(0,matdim+1,matdim+1)
@@ -128,7 +128,7 @@ megamatrix_delay<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
   ## M-to-M (growth/survival transition)
   M.Tmat<-matrix(0,matdim+1,matdim+1)
   M.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=M_params,long=long,rfx=rfx))
-  M.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=M_params,long=long,rfx=rfx) * M_params$surv_1yo
+  M.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=M_params,long=long,rfx=rfx) * M_params$sdlg_surv
   
   # F-to-M Fertility transition
   M.Fmat<-matrix(0,matdim+1,matdim+1)
@@ -199,6 +199,20 @@ lambdaSim_delay<-function(F_params,M_params,long,rfx,max.yrs){
     n0 <-n0/N
   }
   return(list(lambdatracker=lambdatracker,SRtracker=SRtracker,OSRtracker=OSRtracker,n0=n0))
+}
+
+
+# RFX fun -----------------------------------------------------------------
+
+rfx_fun <- function(site_tau_s=0,block_tau_s=0,source_tau_s=0,
+                    site_tau_g=0,block_tau_g=0,source_tau_g=0,
+                    site_tau_f=0,block_tau_f=0,source_tau_f=0,
+                    site_tau_p=0,block_tau_p=0,source_tau_p=0){
+  rfx <- data.frame(site = rnorm(4,0,c(site_tau_s,site_tau_g,site_tau_f,site_tau_p)),
+                    block = rnorm(4,0,c(block_tau_s,block_tau_g,block_tau_f,block_tau_p)),
+                    source = rnorm(4,0,c(source_tau_s,source_tau_g,source_tau_f,source_tau_p)))
+  rownames(rfx) <- c("surv","grow","flow","panic")
+  return(rfx)
 }
 
 # LTRE function -----------------------------------------------------------
