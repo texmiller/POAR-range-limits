@@ -17,10 +17,10 @@ viabVr <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/via
 #fit_dropsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_full.rds"))
 
 #this model includes the three bad sites
-#fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds"))
+fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds"))
 
 #this model includes the three bad sites but drops the long^2 interactions terms (but keeps long^2)
-fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds"))
+#fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds"))
 
 
 ## read in the site latlong file to un-scale longitude
@@ -209,23 +209,23 @@ panic_mean_sizes <- poar_panic_binned %>% group_by(sex,size_bin) %>% summarise(s
 # pull out stan coefficients
 surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                                         bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
-                                                        blong2_s,#bsizelong2_s,blong2sex_s,bsizelong2sex_s,
+                                                        blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s,
                                                         site_tau_s,block_tau_s,source_tau_s))
 
 grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
                                                         bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
-                                                        blong2_g,#bsizelong2_g,blong2sex_g,bsizelong2sex_g,
+                                                        blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
                                                         site_tau_g,block_tau_g,source_tau_g,
                                                         phi_g))
 
 flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
                                                         bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
-                                                        blong2_f,#bsizelong2_f,blong2sex_f,bsizelong2sex_f,
+                                                        blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f,
                                                         site_tau_f,block_tau_f,source_tau_f))
 
 panic_coef <- rstan::extract(fit_full, pars = quote_bare(b0_p,bsize_p,bsex_p,blong_p,
                                                          bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
-                                                         blong2_p,#bsizelong2_p,blong2sex_p,bsizelong2sex_p,
+                                                         blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p,
                                                          site_tau_p,block_tau_p,source_tau_p))
 
 long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.1)
@@ -761,23 +761,135 @@ points(survey_dat$longit + mean(POAR$Longitude),
        cex=3*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
 
 
-# Lambda-Longitude --------------------------------------------------------
+# Lambda-Longitude mean --------------------------------------------------------
+## load functions
+source("code/twosexMPM.R")
+
 # find the seedling survival rate from our POAU data
 POAU <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/POAU.csv"))
-sdlg_surv <- POAU %>% filter(year_recruit==year_t) %>% summarise(sdlg_surv = mean(spring_survival_t1,na.rm=T))
+sdlg_surv <- POAU %>% filter(year_recruit==year_t,year_t %in% 2014:2016) %>% summarise(sdlg_surv = mean(spring_survival_t1,na.rm=T))
 
+# pull out stan coefficients
+mean_coef <- lapply(rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blong_s,
+                                                               bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                                               blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s,
+                                                               site_tau_s,block_tau_s,source_tau_s,
+                                                               
+                                                               b0_g,bsize_g,bsex_g,blong_g,
+                                                               bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
+                                                               blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
+                                                               site_tau_g,block_tau_g,source_tau_g,
+                                                               phi_g,
+                                                               
+                                                               b0_f,bsize_f,bsex_f,blong_f,
+                                                               bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
+                                                               blong2_f,bsizelong2_f,blong2sex_f,bsizelong2sex_f,
+                                                               site_tau_f,block_tau_f,source_tau_f,
+                                                               
+                                                               b0_p,bsize_p,bsex_p,blong_p,
+                                                               bsizesex_p, bsizelong_p,blongsex_p,bsizelongsex_p,
+                                                               blong2_p,bsizelong2_p,blong2sex_p,bsizelong2sex_p,
+                                                               site_tau_p,block_tau_p,source_tau_p,
+                                                               
+                                                               v0,a_v,m,lambda_d))
+                    ,mean)
 
-source("code/twosexMPM.R")
-rfx_fun <- function(site_tau_s=0,block_tau_s=0,source_tau_s=0,
-                    site_tau_g=0,block_tau_g=0,source_tau_g=0,
-                    site_tau_f=0,block_tau_f=0,source_tau_f=0,
-                    site_tau_p=0,block_tau_p=0,source_tau_p=0){
-  rfx <- data.frame(site = rnorm(4,0,c(site_tau_s,site_tau_g,site_tau_f,site_tau_p)),
-                    block = rnorm(4,0,c(block_tau_s,block_tau_g,block_tau_f,block_tau_p)),
-                    source = rnorm(4,0,c(source_tau_s,source_tau_g,source_tau_f,source_tau_p)))
-  rownames(rfx) <- c("surv","grow","flow","panic")
-  return(rfx)
+F_params <- M_params <- list()
+## survival
+F_params$surv_mu <- mean_coef$b0_s
+F_params$surv_size <- mean_coef$bsize_s
+F_params$surv_long <- mean_coef$blong_s 
+F_params$surv_size_long <- mean_coef$bsizelong_s 
+F_params$surv_long2 <- mean_coef$blong2_s 
+F_params$surv_size_long2 <- mean_coef$bsizelong2_s  #0
+M_params$surv_mu <- mean_coef$b0_s + mean_coef$bsex_s  
+M_params$surv_size <- mean_coef$bsize_s + mean_coef$bsizesex_s 
+M_params$surv_long <- mean_coef$blong_s + mean_coef$blongsex_s 
+M_params$surv_size_long <- mean_coef$bsizelong_s + mean_coef$bsizelongsex_s 
+M_params$surv_long2 <- mean_coef$blong2_s + mean_coef$blong2sex_s #
+M_params$surv_size_long2 <- mean_coef$bsizelong2_s + mean_coef$bsizelong2sex_s  #0#
+## growth
+F_params$grow_mu <- mean_coef$b0_g #+4
+F_params$grow_size <- mean_coef$bsize_g 
+F_params$grow_long <- mean_coef$blong_g 
+F_params$grow_size_long <- mean_coef$bsizelong_g 
+F_params$grow_long2 <- mean_coef$blong2_g 
+F_params$grow_size_long2 <- mean_coef$bsizelong2_g #0#
+F_params$phi_g <- mean_coef$phi_g 
+M_params$grow_mu <- mean_coef$b0_g + mean_coef$bsex_g #+4
+M_params$grow_size <- mean_coef$bsize_g + mean_coef$bsizesex_g 
+M_params$grow_long <- mean_coef$blong_g + mean_coef$blongsex_g 
+M_params$grow_size_long <- mean_coef$bsizelong_g + mean_coef$bsizelongsex_g 
+M_params$grow_long2 <- mean_coef$blong2_g + mean_coef$blong2sex_g #0#
+M_params$grow_size_long2 <- mean_coef$bsizelong2_g + mean_coef$bsizelong2sex_g #0#
+M_params$phi_g <- mean_coef$phi_g 
+## flowering
+F_params$flow_mu <- mean_coef$b0_f 
+F_params$flow_size <- mean_coef$bsize_f 
+F_params$flow_long <- mean_coef$blong_f 
+F_params$flow_size_long <- mean_coef$bsizelong_f 
+F_params$flow_long2 <- mean_coef$blong2_f 
+F_params$flow_size_long2 <- mean_coef$bsizelong2_f  #0#
+M_params$flow_mu <- mean_coef$b0_f + mean_coef$bsex_f 
+M_params$flow_size <- mean_coef$bsize_f + mean_coef$bsizesex_f 
+M_params$flow_long <- mean_coef$blong_f + mean_coef$blongsex_f 
+M_params$flow_size_long <- mean_coef$bsizelong_f + mean_coef$bsizelongsex_f 
+M_params$flow_long2 <- mean_coef$blong2_f + mean_coef$blong2sex_f #0#
+M_params$flow_size_long2 <- mean_coef$bsizelong2_f + mean_coef$bsizelong2sex_f #0#
+## panicles
+F_params$panic_mu <- mean_coef$b0_p 
+F_params$panic_size <- mean_coef$bsize_p 
+F_params$panic_long <- mean_coef$blong_p 
+F_params$panic_size_long <- mean_coef$bsizelong_p 
+F_params$panic_long2 <- mean_coef$blong2_p 
+F_params$panic_size_long2 <- mean_coef$bsizelong2_p #0#
+M_params$panic_mu <- mean_coef$b0_p + mean_coef$bsex_p 
+M_params$panic_size <- mean_coef$bsize_p + mean_coef$bsizesex_p 
+M_params$panic_long <- mean_coef$blong_p + mean_coef$blongsex_p 
+M_params$panic_size_long <- mean_coef$bsizelong_p + mean_coef$bsizelongsex_p 
+M_params$panic_long2 <- mean_coef$blong2_p + mean_coef$blong2sex_p #0#
+M_params$panic_size_long2 <- mean_coef$bsizelong2_p + mean_coef$bsizelong2sex_p #0#
+## seed viability and misc fertility params
+F_params$v0 <- mean_coef$v0 
+F_params$a_v <- mean_coef$a_v 
+F_params$ov_per_inf <- mean_coef$lambda_d 
+F_params$germ <- mean_coef$m 
+F_params$PSR <- 0.5
+## use POAU seedling survival for females and males
+F_params$sdlg_surv <- M_params$sdlg_surv <- 0.1 #sdlg_surv$sdlg_surv
+## set max size equal between the sexes
+F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
+
+long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
+lambda_long_mean<-SR_long_mean<-OSR_long_mean<-c()
+n0<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
+for(l in 1:length(long_seq)){
+  lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+  lambda_long_mean[l] <- lambda_run$lambdatracker[max_yrs]
+  SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
+  OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
+  n0[,l] <- lambda_run$n0
+  #mat <- megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat
+  #lambda_long_mean[l] <- lambda(mat)
+  #ssd <- stable.stage(mat)
+  #SR_long_mean[l] <- sum(ssd[1:(F_params$max_size+1)])
+  #n0[,l] <- ssd
+  #fem_panic <- ssd[2:(F_params$max_size+1)] %*% 
+  #  (pfx(x=1:F_params$max_size,param=F_params,long=long_seq[l],rfx=rfx_fun()) *
+  #     nfx(x=1:F_params$max_size,param=F_params,long=long_seq[l],rfx=rfx_fun()))
+  #male_panic <- ssd[(M_params$max_size+3):((M_params$max_size+1)*2)] %*% 
+  #  (pfx(x=1:M_params$max_size,param=M_params,long=long_seq[l],rfx=rfx_fun()) *
+  #     nfx(x=1:M_params$max_size,param=M_params,long=long_seq[l],rfx=rfx_fun()))
+  #OSR_long_mean[l] <- fem_panic / (fem_panic + male_panic)
 }
+
+par(mfrow=c(3,1))
+plot(long_seq,lambda_long_mean,type="b",main=F_params$max_size)
+plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+
+
+# Lambda-Longitude posterior sampling --------------------------------------------------------
 
 ## set up output matrices
 lambda_long_post <- Fdom_lambda_long <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
@@ -867,15 +979,15 @@ for(p in 1:n_post_draws){
                    source_tau_p = panic_coef$source_tau_p[post_draws[p]])
   
   for(l in 1:length(long_seq)){
-    Fdom_lambda_long[p,l] <- lambda(A = megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
-    lambda_run <- lambdaSim(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+    Fdom_lambda_long[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
+    lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
     lambda_long_post[p,l] <- lambda_run$lambdatracker[max_yrs]
     SR_long_post[p,l] <- lambda_run$SRtracker[max_yrs]
     OSR_long_post[p,l] <- lambda_run$OSRtracker[max_yrs]
 
     #pick up here
-    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
-    lambda_run_rfx <- lambdaSim(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
+    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
+    lambda_run_rfx <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
     lambda_long_post_rfx[p,l] <- lambda_run_rfx$lambdatracker[max_yrs]
     SR_long_post_rfx[p,l] <- lambda_run_rfx$SRtracker[max_yrs]
     OSR_long_post_rfx[p,l] <- lambda_run_rfx$OSRtracker[max_yrs]
