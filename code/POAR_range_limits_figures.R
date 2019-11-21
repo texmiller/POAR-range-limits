@@ -762,6 +762,11 @@ points(survey_dat$longit + mean(POAR$Longitude),
 
 
 # Lambda-Longitude --------------------------------------------------------
+# find the seedling survival rate from our POAU data
+POAU <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/POAU.csv"))
+sdlg_surv <- POAU %>% filter(year_recruit==year_t) %>% summarise(sdlg_surv = mean(spring_survival_t1,na.rm=T))
+
+
 source("code/twosexMPM.R")
 rfx_fun <- function(site_tau_s=0,block_tau_s=0,source_tau_s=0,
                     site_tau_g=0,block_tau_g=0,source_tau_g=0,
@@ -842,10 +847,12 @@ for(p in 1:n_post_draws){
   F_params$ov_per_inf <- viab_pars$lambda_d[post_draws[p]] 
   F_params$germ <- viab_pars$m[post_draws[p]] 
   F_params$PSR <- 0.5
+  ## use POAU seedling survival for females and males
+  F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
   ## set max size equal between the sexes
-  F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
-  M_params$max_size <- F_params$max_size
-  ## pull out the rfx variances
+  F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
+
+    ## pull out the rfx variances
   rfx <- rfx_fun(site_tau_s = surv_coef$site_tau_s[post_draws[p]],
                    block_tau_s = surv_coef$block_tau_s[post_draws[p]],
                    source_tau_s = surv_coef$source_tau_s[post_draws[p]],
