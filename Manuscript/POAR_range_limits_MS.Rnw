@@ -54,9 +54,17 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 \newpage
 \section*{Introduction}
 
-P1: importance of understanding range limits in basic and applied ecology, theory for proximate causes of range limits, demographic failure at range edges and the idea that range limits are niche limits
+Understanding the processes that generate species' distributional limits is a foundational objective of ecology.
+The niche concept is central to theory for range limits \citep{Hutchinson1958}, and available evidence suggests that geographic distributions may commonly be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
+Species distribution modeling (or ``environmental niche modeling'') has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence across environmental variables.
+In contrast, there is growing interest in process-based models of range limits, where individual-level demographic responses to environmental variation inform predictions about the ecological niche and environmental limits of population viability (i.e., at least replacement-level population growth, $\lambda \geq 1$) \citep{merow2014using,merow2017climate,diez2014probabilistic}. 
+The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change \citep{evans2016towards,ehrlen2015predicting}. 
 
-P2: The idea that range limits are niche limits intersects awkwardly with another prevalent concept in ecology: intraspecific niche heterogeneity. If a species' range limits reflect its niche limits, and a single species contains many niches, then whose niche is it that determines the geographic distribution.
+The widespread idea that range limits reflect niche limits intersects awkwardly with another pervasive concept in ecology: intra-specific niche heterogeneity. 
+This refers to the fact that individuals within a population or species may differ in their interactions with and responses to the biotic and / or abiotic environment \citep{bolnick2002ecology,araujo2011ecological,holt2009bringing}. 
+Intra-specific niche differences may be based on demographic state variables such as life stage, size class or other, unmeasured aspects of individual identity. 
+If range limits are a geographic manifestation of niche limits, but a single population or species may be comprised of many niches, then whose niche is it that determines the geographic distribution and how would we know?
+
 
 P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
 
