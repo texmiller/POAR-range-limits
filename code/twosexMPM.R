@@ -118,7 +118,7 @@ megamatrix_delay<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
   F.Tmat<-matrix(0,matdim+1,matdim+1)
   F.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=F_params,long=long,rfx=rfx))
   # surviving seedlings emerge in continuous population
-  F.Tmat[2:(matdim+1),1] <- pxy(x=1,y=y,params=F_params,long=long,rfx=rfx)
+  F.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=F_params,long=long,rfx=rfx) * M_params$surv_1yo
   
   # F-to-F Fertility transition
   F.Fmat<-matrix(0,matdim+1,matdim+1)
@@ -128,7 +128,7 @@ megamatrix_delay<-function(F_params,M_params,long,twosex,OSR=NULL,rfx){
   ## M-to-M (growth/survival transition)
   M.Tmat<-matrix(0,matdim+1,matdim+1)
   M.Tmat[2:(matdim+1),2:(matdim+1)]<-t(outer(y,y,pxy,params=M_params,long=long,rfx=rfx))
-  M.Tmat[2:(matdim+1),1] <- pxy(x=1,y=y,params=M_params,long=long,rfx=rfx)
+  M.Tmat[2:(matdim+1),1] <- gxy(x=1,y=y,params=M_params,long=long,rfx=rfx) * M_params$surv_1yo
   
   # F-to-M Fertility transition
   M.Fmat<-matrix(0,matdim+1,matdim+1)
