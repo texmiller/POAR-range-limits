@@ -856,11 +856,13 @@ F_params$ov_per_inf <- mean_coef$lambda_d
 F_params$germ <- mean_coef$m 
 F_params$PSR <- 0.5
 ## use POAU seedling survival for females and males
-F_params$sdlg_surv <- M_params$sdlg_surv <- 0.1 #sdlg_surv$sdlg_surv
+F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
 ## set max size equal between the sexes
 F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
 
-long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
+## long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
+## extend the longitude to bounds and beyond of observed distribution
+long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.2)
 lambda_long_mean<-SR_long_mean<-OSR_long_mean<-c()
 n0<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
 for(l in 1:length(long_seq)){
@@ -884,7 +886,8 @@ for(l in 1:length(long_seq)){
 }
 
 par(mfrow=c(3,1))
-plot(long_seq,lambda_long_mean,type="b",main=F_params$max_size)
+plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="b",main=F_params$max_size)
+abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county 
 plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
@@ -1018,7 +1021,8 @@ lambda_long_mean <- lambda_long_rfx_mean <- c()
     lambda_long_rfx_mean[l] <- mean(lambda_long_post_rfx[,l])
   }
 
-plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0,30))
+par(mfrow=c(2,1))
+plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0.5,2.5),lwd=4)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
         col=alpha("red",0.2),border=NA)
@@ -1031,9 +1035,11 @@ polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longi
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
         col=alpha("red",0.2),border=NA)
+abline(h=1,col="darkgrey")
+-103.252677 # brewster county
+-95.445907
 
-
-plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0,30))
+plot(long_seq + mean(latlong$Longitude),lambda_long_rfx_mean,type="l",ylim=c(0,3),lwd=4)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q95[1,],rev(lambda_long_rfx_q95[2,])),
         col=alpha("red",0.2),border=NA)
