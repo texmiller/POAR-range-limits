@@ -65,6 +65,12 @@ This refers to the fact that individuals within a population or species may diff
 Intra-specific niche differences may be based on demographic state variables such as life stage, size class or other, unmeasured aspects of individual identity. 
 If range limits are a geographic manifestation of niche limits, but a single population or species may be comprised of many niches, then whose niche is it that determines the geographic distribution and how would we know?
 
+Sexual niche differentiation is a common form of intra-specific niche heterogeneity \citep{bolnick2002ecology} and has been widely documented in animals (the vast majority of which are dioecious) and plants (ca. 6\% of angiosperms are dioecious: \citealt{renner1995dioecy}). 
+The prevalence of sexual niche differentiation was recognized by Darwin (\citeyear{darwin2019descent}), who described ``different habits of life, not related...to the reproductive functions'' of females and males.
+There are numerous examples of sex differences in trophic position \citep{pekar2011intersexual}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate, differences that may or may not be accompanied by sexual dimorphism. 
+It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes (cite).
+In an ecological context, 
+
 
 P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
 
@@ -76,7 +82,8 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 \section*{Materials and methods}
 
 \subsection*{Study system and natural population surveys}
-\textit{Poa arachnifera} is a perennial, cool-season grass native to the southern Great Plains (Fig). 
+\textit{Poa arachnifera} is a perennial, cool-season grass endemic to the southern Great Plains. 
+This species occurs almost exclusively in central Texas, Oklahoma, and Kansas (Fig. \ref{fig:map}) though there are occasional records of adventive populations in other state\footnote{http://bonap.net/Napa/TaxonMaps/Genus/County/Poa}.
 Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
@@ -88,8 +95,16 @@ We surveyed \textit{P. arachnifera} across its range to establish whether natura
 We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013. 
 Survey locations are shown in \textbf{map} and coordinates are provided in Table \ref{tab:survey}. 
 At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
+\newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=1\linewidth]{Figures/map}
+  \caption{Caption.}
+  \label{fig:map}
+  \end{center}
+\end{figure}
 
-\subsubsection{Statistical analysis of natural population surveys}
+\subsubsection*{Statistical analysis of natural population surveys}
 We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
 Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
 This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters.
