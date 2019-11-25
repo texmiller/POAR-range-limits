@@ -748,6 +748,7 @@ x_long <- seq(min(survey_dat$longit),max(survey_dat$longit),length = 100)
 
 n_post <-500
 sample_post <- sample.int(length(coef_surv$b0),n_post)
+pdf("Manuscript/Figures/pop_survey.pdf",useDingbats = F)
 plot(survey_dat$longit + mean(POAR$Longitude),
      survey_dat$y/survey_dat$n_trials,type="n",
      xlab="Longitude",ylab="Proportion female inflorescences",cex.lab=1.4)
@@ -758,8 +759,8 @@ for(i in 1:n_post){
 }
 points(survey_dat$longit + mean(POAR$Longitude),
        survey_dat$y/survey_dat$n_trials,
-       cex=3*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
-
+       cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
+dev.off()
 
 # Lambda-Longitude mean --------------------------------------------------------
 ## load functions
@@ -1001,43 +1002,48 @@ for(p in 1:n_post_draws){
 ## write output as a list
 lambda_long_post_list <- list(Fdom_lambda_long=Fdom_lambda_long,lambda_long_post=lambda_long_post,SR_long_post=SR_long_post,OSR_long_post=OSR_long_post,
                               Fdom_lambda_long_rfx=Fdom_lambda_long_rfx,lambda_long_post_rfx=lambda_long_post_rfx,SR_long_post_rfx=SR_long_post_rfx,OSR_long_post_rfx=OSR_long_post_rfx)
-write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
+#write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
+lambda_long_post_list <- read_rds(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
 
 ## visualize results
 lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- matrix(NA,2,length(long_seq))
 lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- matrix(NA,2,length(long_seq))
 lambda_long_mean <- lambda_long_rfx_mean <- c()
   for(l in 1:length(long_seq)){
-    lambda_long_q95[,l] <- quantile(lambda_long_post[,l],probs=c(0.025,0.975))
-    lambda_long_q75[,l] <- quantile(lambda_long_post[,l],probs=c(0.125,0.875))
-    lambda_long_q50[,l] <- quantile(lambda_long_post[,l],probs=c(0.25,0.75))
-    lambda_long_q25[,l] <- quantile(lambda_long_post[,l],probs=c(0.375,0.625))
-    lambda_long_mean[l] <- mean(lambda_long_post[,l])
+    lambda_long_q95[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.025,0.975),na.rm = T)
+    lambda_long_q75[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.125,0.875),na.rm = T)
+    lambda_long_q50[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.25,0.75),na.rm = T)
+    lambda_long_q25[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.375,0.625),na.rm = T)
+    lambda_long_mean[l] <- mean(lambda_long_post_list$lambda_long_post[,l],na.rm = T)
     
-    lambda_long_rfx_q95[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.025,0.975))
-    lambda_long_rfx_q75[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.125,0.875))
-    lambda_long_rfx_q50[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.25,0.75))
-    lambda_long_rfx_q25[,l] <- quantile(lambda_long_post_rfx[,l],probs=c(0.375,0.625))
-    lambda_long_rfx_mean[l] <- mean(lambda_long_post_rfx[,l])
+    lambda_long_rfx_q95[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.025,0.975),na.rm = T)
+    lambda_long_rfx_q75[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.125,0.875),na.rm = T)
+    lambda_long_rfx_q50[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.25,0.75),na.rm = T)
+    lambda_long_rfx_q25[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.375,0.625),na.rm = T)
+    lambda_long_rfx_mean[l] <- mean(lambda_long_post_list$lambda_long_post_rfx[,l],na.rm = T)
   }
 
-par(mfrow=c(2,1))
-plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="l",ylim=c(0.5,2.5),lwd=4)
+polygon_col <- "darkgrey"
+polygon_alpha <- 0.35
+pdf("Manuscript/Figures/lambda_long.pdf",useDingbats = F)
+par(mar=c(5,5,1,1))
+plot(long_seq + mean(latlong$Longitude),lambda_long_mean,type="n",ylim=c(0,4),lwd=4,
+     xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
-        col=alpha("red",0.2),border=NA)
+        col=alpha(polygon_col,polygon_alpha),border=NA)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q75[1,],rev(lambda_long_q75[2,])),
-        col=alpha("red",0.2),border=NA)
+        col=alpha(polygon_col,polygon_alpha),border=NA)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q50[1,],rev(lambda_long_q50[2,])),
-        col=alpha("red",0.2),border=NA)
+        col=alpha(polygon_col,polygon_alpha),border=NA)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
-        col=alpha("red",0.2),border=NA)
-abline(h=1,col="darkgrey")
--103.252677 # brewster county
--95.445907
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+abline(h=1,lty=3)
+abline(v=c(-103.252677,-95.445907),lwd=2) # brewster and brazoria county
+dev.off()
 
 plot(long_seq + mean(latlong$Longitude),lambda_long_rfx_mean,type="l",ylim=c(0,3),lwd=4)
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
@@ -1052,6 +1058,7 @@ polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longi
 polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q25[1,],rev(lambda_long_rfx_q25[2,])),
         col=alpha("red",0.2),border=NA)
+abline(h=1,col="darkgrey")
 
 ## draw random effects for site, block, source
 #rfx <- data.frame(site = rnorm(4,0,c(surv_coef$site_tau_s,grow_coef$site_tau_g,flow_coef$site_tau_f,panic_coef$site_tau_p)),
@@ -1087,7 +1094,15 @@ lambda(megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],
 
 n_survey_pops <- POAR %>% select(Population,year) %>% group_by(year) %>% summarise(n=n())
 
-survey_site_table <- POAR %>% select(Population,Latitude,Longitude) %>% remove_rownames()
+survey_site_table <- POAR %>% select(Population,Latitude,Longitude,year) %>% remove_rownames() %>% 
+  rename(Year_visited = year) %>% 
+  mutate(Experimental_source = ifelse(Population=="CooperWMA"|
+                                        Population=="Copper Breaks"|
+                                        Population=="Quartz_Mountain"|
+                                        Population=="Horn_Hill_Cemetery"|
+                                        Population=="Lake Arrowhead"|
+                                        Population=="South_Llano"|
+                                        Population=="Sulfur_Springs","yes","no"))
 
 n_sites <- poar %>% select(site) %>% n_distinct()
 
