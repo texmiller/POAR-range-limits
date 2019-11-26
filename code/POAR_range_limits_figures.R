@@ -794,7 +794,7 @@ mean_coef <- lapply(rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex
                                                                v0,a_v,m,lambda_d))
                     ,mean)
 
-F_params <- M_params <- list()
+F_params <- M_params <- c()
 ## survival
 F_params$surv_mu <- mean_coef$b0_s
 F_params$surv_size <- mean_coef$bsize_s
@@ -862,17 +862,17 @@ F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),prob
 
 ## long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
 ## extend the longitude to bounds and beyond of observed distribution
-long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.2)
+long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.4)
 lambda_long_mean<-SR_long_mean<-OSR_long_mean<-c()
 n0<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
 for(l in 1:length(long_seq)){
-  lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
-  lambda_long_mean[l] <- lambda_run$lambdatracker[max_yrs]
-  SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
-  OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
-  n0[,l] <- lambda_run$n0
-  #mat <- megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat
-  #lambda_long_mean[l] <- lambda(mat)
+  #lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+  #lambda_long_mean[l] <- lambda_run$lambdatracker[max_yrs]
+  #SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
+  #OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
+  #n0[,l] <- lambda_run$n0
+  mat <- megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat
+  lambda_long_mean[l] <- lambda(mat)
   #ssd <- stable.stage(mat)
   #SR_long_mean[l] <- sum(ssd[1:(F_params$max_size+1)])
   #n0[,l] <- ssd
@@ -891,6 +891,74 @@ abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county
 plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
+## LTRE analysis using mean params
+
+## LTRE parameters:
+# these are the intercepts and slopes
+LTRE_params <- c(F_params[c("surv_mu","surv_size","grow_mu","grow_size","flow_mu","flow_size","panic_mu","panic_size")],
+                 M_params[c("surv_mu","surv_size","grow_mu","grow_size","flow_mu","flow_size","panic_mu","panic_size")])
+# these are the effects of longitude on the intercepts and slopes
+betas_long <- c(F_params[c("surv_long","surv_size_long","grow_long","grow_size_long","flow_long","flow_size_long","panic_long","panic_size_long")],
+                M_params[c("surv_long","surv_size_long","grow_long","grow_size_long","flow_long","flow_size_long","panic_long","panic_size_long")])
+# these are the effects of longitude^2 on the intercepts and slopes
+betas_long2 <- c(F_params[c("surv_long2","surv_size_long2","grow_long2","grow_size_long2","flow_long2","flow_size_long2","panic_long2","panic_size_long2")],
+                M_params[c("surv_long2","surv_size_long2","grow_long2","grow_size_long2","flow_long2","flow_size_long2","panic_long2","panic_size_long2")])
+
+## Sensitivity of parameters to longitude -- this is just the derivative of a second-order polynomial
+dp_dlong_fun <- function(beta_long,beta_long2,long){return(beta_long + 2*beta_long2*long)}
+
+## loop over longitudes and calculated dp_dlong and dlambda_dp
+dp_dlong <- dlambda_dp <- matrix(NA,nrow=length(LTRE_params),ncol=length(long_seq))
+lambda_long_mean_perturb <- c()
+perturbation <- 0.01
+for(l in 1:length(long_seq)){
+  lambda_long_mean[l] <- lambda(megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
+  
+    dp_dlong[,l] <- dp_dlong_fun(beta_long = unlist(betas_long), 
+                             beta_long2 = unlist(betas_long2), 
+                             long = long_seq[l])
+    #cannot vectorize this part unfortunately
+    for(p in 1:8){
+      F_params_perturb <- F_params; M_params_perturb <- M_params;  
+      F_params_perturb[p] <- unlist(F_params[p]) + perturbation
+      lambda_long_mean_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
+      dlambda_dp[p,l] <- (lambda_long_mean_perturb - lambda_long_mean[l]) / perturbation
+      #lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+      #dlambda_dp[p,l] <- (lambda_perturb - lambda_long_mean[l]) / perturbation
+    }
+    for(p in 9:16){
+      F_params_perturb <- F_params; M_params_perturb <- M_params;  
+      M_params_perturb[p-8] <- unlist(M_params[p-8]) + perturbation
+      lambda_long_mean_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
+      dlambda_dp[p,l] <- (lambda_long_mean_perturb - lambda_long_mean[l]) / perturbation
+      #lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+      #dlambda_dp[p,l] <- (lambda_perturb - lambda_long_mean[l]) / perturbation
+    }
+  print(l)
+}
+
+# put it all together 
+LTRE_out <- dp_dlong * dlambda_dp
+
+par(mfrow=c(2,1))
+plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="b",main=F_params$max_size)
+
+plot(long_seq+mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4);abline(h=0)
+lines(long_seq[1:47]+mean(latlong$Longitude),
+      (lambda_long_mean[2:48]-lambda_long_mean[1:47])/(long_seq[2] - long_seq[1]),col="red",main=F_params$max_size)
+
+plot(long_seq,colSums(LTRE_out[1:8,]),type="n",lwd=4)
+for(i in 1:nrow(LTRE_out[1:8,])){
+  lines(long_seq,LTRE_out[i,],lty=i)
+}
+plot(long_seq,colSums(LTRE_out[9:16,]),type="n",lwd=4)
+for(i in 1:nrow(LTRE_out[9:16,])){
+  lines(long_seq,LTRE_out[i+8,],lty=i)
+}
+
+plot(long_seq,dp_dlong[2,]);abline(h=0)
+plot(long_seq,
+     F_params$surv_size + F_params$surv_size_long*long_seq + F_params$surv_size_long2*long_seq^2,type="l")
 
 # Lambda-Longitude posterior sampling --------------------------------------------------------
 
