@@ -67,9 +67,23 @@ If range limits are a geographic manifestation of niche limits, but a single pop
 
 Sexual niche differentiation is a common form of intra-specific niche heterogeneity \citep{bolnick2002ecology} and has been widely documented in animals (the vast majority of which are dioecious) and plants (ca. 6\% of angiosperms are dioecious: \citealt{renner1995dioecy}). 
 The prevalence of sexual niche differentiation was recognized by Darwin (\citeyear{darwin2019descent}), who described ``different habits of life, not related...to the reproductive functions'' of females and males.
-There are numerous examples of sex differences in trophic position \citep{pekar2011intersexual}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate, differences that may or may not be accompanied by sexual dimorphism. 
-It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes (cite).
-In an ecological context, 
+There are numerous examples of sex differences in trophic position \citep{pekar2011intersexual}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
+It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bierzychudek1988spatial, bolnick2003sexual} or as a byproduct
+of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}.
+In an ecological context, sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary sex ratio is unbiased \citep{veran2009demographic,shelton2010ecological}.
+Environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex}. 
+At range margins, where environments are extreme relative to the range core,
+demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
+In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species’ ranges tend to be male-biased \citep{field2013ecological}.
+
+Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory provides a straightforward answer. 
+``Female dominance'' is a pervasive feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility. 
+This assumption is, of course, wrong but it may often be a useful approximation when the sex ratio is balanced or does not vary. 
+The female-dominant perspective predicts that female responses to environmental variation should govern range limits. 
+However, females may be male-limited in environments in which they are favored, which could reduce population viability in marginal environmental. 
+This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses. 
+Here we ask whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether the additional role (and especially lack) of males contributes to range boundary formation. 
+
 
 
 P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
@@ -83,7 +97,7 @@ P5: In this study we used a dioecious grass species as a focal species to quanti
 
 \subsection*{Study system and natural population surveys}
 \textit{Poa arachnifera} is a perennial, cool-season grass endemic to the southern Great Plains. 
-This species occurs almost exclusively in central Texas, Oklahoma, and Kansas (Fig. \ref{fig:map}) though there are occasional records of adventive populations in other state\footnote{http://bonap.net/Napa/TaxonMaps/Genus/County/Poa}.
+This species occurs almost exclusively in central Texas, Oklahoma, and Kansas (Fig. \ref{fig:map}) though there are occasional records of adventive populations in other states\footnote{http://bonap.net/Napa/TaxonMaps/Genus/County/Poa}.
 Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
@@ -92,8 +106,7 @@ Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001geneti
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
 We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
-We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013. 
-Survey locations are shown in \textbf{map} and coordinates are provided in Table \ref{tab:survey}. 
+We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013 (Table \ref{tab:survey}). 
 At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
 \newpage
 \begin{figure}[h!]
@@ -117,7 +130,7 @@ We established a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} 
 Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude. 
 During the three years of this experiment, total precipitation at each site closely tracked longitude (Fig. \ref{fig:site_precip}), as expected based on longer-term climate trends (map).
 Source material for this experiment came from \Sexpr{poar_ms_quantities$n_sources} sites, which were of subset of the sites that were visited for the natural population survey (Table). 
-At each of these site visits in 2013 and 2014, we collected tillers from flowering individuals of each sex (mean: \Sexpr{round(mean(poar_ms_quantities$source_plants$n),1)} individuals per site, range: \Sexpr{min(poar_ms_quantities$source_plants$n)}--\Sexpr{max(poar_ms_quantities$source_plants$n)}). 
+For a subset of the natural populations we visited, we collected tillers from flowering individuals of each sex (mean: \Sexpr{round(mean(poar_ms_quantities$source_plants$n),1)} individuals per site, range: \Sexpr{min(poar_ms_quantities$source_plants$n)}--\Sexpr{max(poar_ms_quantities$source_plants$n)}) (Table \ref{tab:survey}). 
 These were brought back to the Rice University greenhouse, where they were clonally propagated in ProMix potting soil and supplemental Osmocote fertilizer at 78--80$^{\circ}$F under natural light. 
 
 Common gardens were set up in Fall (October--December) 2014. 
@@ -206,6 +219,14 @@ v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U
 %--------------------------------------------------------------------
 \section*{Results}
 
+\newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=1\linewidth]{Figures/pop_survey}
+  \caption{Caption.}
+  \label{fig:survey}
+  \end{center}
+\end{figure}
 
 \newpage
 \begin{figure}[h!]
@@ -226,6 +247,15 @@ v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U
   \end{center}
 \end{figure}
  
+  \newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/lambda_long}
+  \caption{Caption.}
+  \label{fig:lambda_long}
+  \end{center}
+\end{figure}
+
 %--------------------------------------------------------------------
 \section*{Discussion}
 %--------------------------------------------------------------------
