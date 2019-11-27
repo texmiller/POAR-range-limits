@@ -14,6 +14,7 @@
 \usepackage{caption}
 \usepackage{multirow}
 \usepackage{hyperref}
+\usepackage{wrapfig}
 \doublespacing
 
 <<setup,echo=F, message=F, warning=F>>=
@@ -55,42 +56,60 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 \section*{Introduction}
 
 Understanding the processes that generate species' distributional limits is a foundational objective of ecology.
-The niche concept is central to theory for range limits \citep{Hutchinson1958}, and available evidence suggests that geographic distributions may commonly be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
-Species distribution modeling (or ``environmental niche modeling'') has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence across environmental variables.
+The niche concept is central to theory for range limits \citep{Hutchinson1958} and available evidence suggests that geographic distributions may commonly be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
+Species distribution modeling (or ``environmental niche modeling'') has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence and environmental variables.
 In contrast, there is growing interest in process-based models of range limits, where individual-level demographic responses to environmental variation inform predictions about the ecological niche and environmental limits of population viability (i.e., at least replacement-level population growth, $\lambda \geq 1$) \citep{merow2014using,merow2017climate,diez2014probabilistic}. 
 The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change \citep{evans2016towards,ehrlen2015predicting}. 
 
 The widespread idea that range limits reflect niche limits intersects awkwardly with another pervasive concept in ecology: intra-specific niche heterogeneity. 
-This refers to the fact that individuals within a population or species may differ in their interactions with and responses to the biotic and / or abiotic environment \citep{bolnick2002ecology,araujo2011ecological,holt2009bringing}. 
+This refers to the fact that individuals within a population or species may differ in their interactions with, and responses to, the biotic and/or abiotic environment \citep{bolnick2002ecology,araujo2011ecological,holt2009bringing}. 
 Intra-specific niche differences may be based on demographic state variables such as life stage, size class or other, unmeasured aspects of individual identity. 
 If range limits are a geographic manifestation of niche limits, but a single population or species may be comprised of many niches, then whose niche is it that determines the geographic distribution and how would we know?
 
 Sexual niche differentiation is a common form of intra-specific niche heterogeneity \citep{bolnick2002ecology} and has been widely documented in animals (the vast majority of which are dioecious) and plants (ca. 6\% of angiosperms are dioecious: \citealt{renner1995dioecy}). 
 The prevalence of sexual niche differentiation was recognized by Darwin (\citeyear{darwin2019descent}), who described ``different habits of life, not related...to the reproductive functions'' of females and males.
-There are numerous examples of sex differences in trophic position \citep{pekar2011intersexual}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
-It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bierzychudek1988spatial, bolnick2003sexual} or as a byproduct
-of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}.
-In an ecological context, sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary sex ratio is unbiased \citep{veran2009demographic,shelton2010ecological}.
-Environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex}. 
+There are now numerous examples of sex differences in trophic position \citep{pekar2011intersexual,law2018carnivory}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
+It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bierzychudek1988spatial, bolnick2003sexual} or as a byproduct of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}.
+In an ecological context, sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010ecological,eberhart2017sex}.
+Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex}. 
 At range margins, where environments are extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
 In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species’ ranges tend to be male-biased \citep{field2013ecological}.
 
 Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory provides a straightforward answer. 
-``Female dominance'' is a pervasive feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility. 
-This assumption is, of course, wrong but it may often be a useful approximation when the sex ratio is balanced or does not vary. 
-The female-dominant perspective predicts that female responses to environmental variation should govern range limits. 
-However, females may be male-limited in environments in which they are favored, which could reduce population viability in marginal environmental. 
-This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses. 
-Here we ask whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether the additional role (and especially lack) of males contributes to range boundary formation. 
+``Female dominance'' is a pervasive, often implicit feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility \citep{miller2011confronting,rankin2007males,caswell1986two}. 
+This assumption is, of course, wrong but it may often be a convenient approximation when the sex ratio is balanced or does not vary. 
+The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
+However, females may be male-limited in environments in which they are favored, which could reduce population viability in marginal environments. 
+This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses to the environment (Fig. \ref{fig:concept}). 
 
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.95\linewidth]{Figures/conceptual_fig}
+  \caption{Caption.}
+  \label{fig:concept}
+  \end{center}
+\end{figure}
 
+Here we ask, for the first time, whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether the additional role of males determines range boundary formation. 
+As an experimental model, we worked with a dieocious plant species (the grass \textit{Poa arachnifera}) narrowly distributed across the sharp longitudinal aridity gradient in the southern Great Plains, US (Fig. \ref{fig:map}). 
+The environmental isocline governing aridity in this region is expected to shift eastward under climate change \citep{karl2009global}, so understanding how it sets distributional limits may aid in forecasting range future shifts. 
+We hypothesized that sexual niche differentiation with respect to longitudinal variation in aridity may lead to skewed sex ratios approaching range limits, and that mate limitation could cause range boundaries to deviate from female-dominant expectations. 
 
-P3: Sexual niche differentiation in dioecious species is a widespread form of intra-specific niche heterogeneity. Sex-specific responses to environmental drivers can generate geographic clines in operational sex ratio and strongly biased sex ratios especially at range limits. While this pattern is well documented in a variety of taxa, the role of sex ratio bias in limiting species' ranges is poorly understood.
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \centering
+    \includegraphics[width=0.48\textwidth]{Figures/map}
+  \caption{Caption.}
+  \label{fig:map}
+  %\end{center}
+\end{wrapfigure}
 
-P4: Most ecological theory assumes female dominance. In this case, there is a straightforward answer to the question above -- the female niche is the relevant set of constraints for understanding range limits. However, while female dominance is often a reasonable and useful assumption, it may break down under extreme sex ratio bias, where mates may be limiting. If so, this creates an additional, two-sex pathway by which males could limit the position of species ranges. 
-
-P5: In this study we used a dioecious grass species as a focal species to quantify the relative importance of female-dominant and two-sex mechanisms of range limitation. 
+This study was conducted in four parts. 
+First, we conducted surveys to ask whether natural populations exhibit clines in operational sex ratio across longitudinal environmental variation. 
+Second, we conducted a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout the southern Great Plains to quantify sex-specific demography in variable abiotic environments. 
+Third, we conducted a local sex ratio manipulation experiment to quantify how viable seed production by females responds to variation in sex ratio. 
+Finally, we connected sex-specific demography with inter-sexual mating dynamics in a two-sex modeling framework to derive demographically-driven predictions for geographic limits of population viability $\lambda \geq 1$. 
+We analyzed the demographic model to decompose the decline in $\lambda$ approaching range limits into contributions from female-dominant and two-sex pathways (Fig. \ref{fig:concept}).
 
 %--------------------------------------------------------------------
 \section*{Materials and methods}
@@ -101,27 +120,21 @@ This species occurs almost exclusively in central Texas, Oklahoma, and Kansas (F
 Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
-Individuals grow via rhizomes to form patches that may be as large as $50 m^2$ in area. 
+Individuals grow via rhizomes to form ``patches'' that may be as large as $50 m^2$ in area. 
 Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
-We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in sex ratio corresponding to the longitudinal aridity gradient. 
+We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in operational sex ratio corresponding to the longitudinal aridity gradient. 
 We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013 (Table \ref{tab:survey}). 
-At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male inflorescences that we encountered. 
-\newpage
-\begin{figure}[h!]
-  \begin{center}
-    \includegraphics[width=1\linewidth]{Figures/map}
-  \caption{Caption.}
-  \label{fig:map}
-  \end{center}
-\end{figure}
+At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male patches that we encountered and the number of inflorescences on each. 
+To quantify the mating environment, we focus our analyses on the sex ratio of inflorescences rather than patches, since a single patch makes different contributions to the mating pool depending on whether it has few or many inflorescences. 
 
 \subsubsection*{Statistical analysis of natural population surveys}
-We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio (OSR) varied systematically with respect to longitude. 
-Here and in the experiment that follows we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (map figure) but also factors that co-vary with precipitation, such as productivity. 
+We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the operational sex ratio varied systematically with respect to longitude. 
+Here and in the experiments that follow we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (Fig. \ref{fig:map}) but also factors that co-vary with precipitation, such as productivity. 
 This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters.
 In all cases, model fit was assessed with posterior predictive checks \citep{conn2018guide}. 
+All code for statistical and demographic modeling is available at \url{https://github.com/texmiller/POAR-range-limits}.
 
 \subsection*{Common garden experiment}
 
@@ -153,10 +166,9 @@ The survival and flowering data were Bernoulli distributed, and these models app
 We modeled tiller and panicle counts as zero-truncated negative binomial using the log link. 
 For flowering and panicle production in year $t$, the size covariate was the natural logarithm of tiller number in year $t$. 
 For survival and size  in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
-Code for these analyses is available at \url{https://github.com/texmiller/POAR-range-limits}.
 
 \subsection*{Sex ratio experiment}
-At one site near the center of the range (Lake Lewisville Environmental Learning Area: star in MAP), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
+At one site near the center of the range (Lake Lewisville Environmental Learning Area in North-central Texas), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
 Details of this experiment, which was conducted in 2014--2015, are described in Compagnoni et al. \citeyear{compagnoni2017can}. 
 Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates each of 34 density-sex ratio combinations. 
 The experiment was established ca. 1 km from a natural population at this site and plots were situated with a minimum of 15 m spacing, a buffer that was intended to limit pollen movement between plots (pilot data indicated that $\geq 90\%$ of wind pollination occurred within $13 m$). 
@@ -187,12 +199,20 @@ For both viability and germination, we found that accounting for overdispersion 
 The statistical models for the common garden and sex ratio experiments provided the backbone of the full demograhpic model, a matrix projection model (MPM) structured by size (tiller number) and sex. 
 Following the statistical modeling, the MPM accommodates longitude as a predictor variable, allowing us to identify the longitudinal limits of population viability ($\lambda \geq 1$) and investigate the underlying drivers of population decline at range limits. 
 For a given longitude, let $F_{x,t}$ and $M_{x,t}$ be the number of female and male plants of size $x$ in year $t$, where $x \in \{1,2,...,U\}$ and $U$ is the maximum number of tillers a plant can attain (assumed to be the same for females and males). 
-For a pre-breeding census, the coupled dynamics of both sexes are are given by:
+We also include additional state variables for new recruits, $F^{R}_{t}$ and $M^{R}_{t}$, which we assume do not reproduce in their first year.
+For a pre-breeding census, the expected numbers of recruits in year $t+1$ is given by:
+
+\begin{align}\label{eq:recruits}
+F^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g \cdot e(y) \cdot \rho 	] \, F_{x,t}
+\\
+M^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g \cdot e(y) \cdot (1-\rho) 	] \, F_{x,t}
+\end{align}
+
 
 \begin{align}\label{eq:dynamics}
-F_{y,t+1} = \sum_{x=1}^{U} 	[ \, s^{F}(x) \cdot g^{F}(y,x) + r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) \cdot \rho \cdot e(y) 	] \, F_{x,t}
+F_{y,t+1} = \sum_{x=1}^{U} 	[ \, s^{F}(x) \cdot g^{F}(y,x)] \, F_{x,t} + [ \, \sigma \cdot g^{F}(y,1) ] \, F^{R}_{t}
 \\
-M_{y,t+1} = \sum_{x=1}^{U} 	[ \,  s^{M}(x) \cdot g^{M}(y,x) ] \, M_{x,t} + [ \, r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) \cdot (1 - \rho) \cdot e(y) ] \, F_{x,t}
+M_{y,t+1} = \sum_{x=1}^{U} 	[ \,  s^{M}(x) \cdot g^{M}(y,x) ] \, M_{x,t} + [ \, \sigma \cdot g^{M}(y,1) ] \, M^{R}_{t}
 \end{align}
 
 \noindent $s$ and $g$ give the probabilities of surviving at size $x$ and growing from sizes $x$ to $y$, respectively, and superscripts indicate that these functions may be unique to females ($F$) and males ($M$). 
@@ -201,10 +221,6 @@ Parameter $\rho$ is the primary sex ratio (proportion of recruits that are femal
 We assume that all recruits first appear in the population at $1$ tiller in size regardless of sex, so $e(y=1)=1$ and $e(y>1)=0$. 
 The female fertility function is further defined as:
 
-\begin{align}\label{eq:fert}
-r^{F}(x, \mathbf{F_{t}},\mathbf{M_{t}}) = p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g
-\end{align}
-
 \noindent where $p$ and $c$ are flowering probability and panicle production for females of size $x$, $d$ is the number of seeds (fertilized or unfertilized) per female panicle, $v$ is the probability that a seed a fertilized, and $g$ is the probability that a fertilized seed germinates.
 Lastly, and following Eq. \ref{eq:viab_fn}, seed fertilization depends on the OSR according to:
 
@@ -212,9 +228,16 @@ Lastly, and following Eq. \ref{eq:viab_fn}, seed fertilization depends on the OS
 v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t}}{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t} + p^{M}(x) c^{M}(x) M_{x,t}} \right) ^{\alpha}\right]
 \end{align}
 
-% add a bit about analysis by simulation
+Because the two-sex MPM is nonlinear (vital rates affect and are affected by population structure) we estimated the asynmptotic geometric growth rate ($\lambda$) by numerical simulation, and repeated this across a range of longitudes.
+We used a regression-style Life Table Response Experiment (\citep{caswell2001}) to decompose the decline in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
+The LTRE approximates the change in $\lambda$ with longitude as the product of the sensitivity of $\lambda$ to the parameters times the sensitivity of the parameters to longitude, summed over all parameters:
 
-% add LTRE
+\begin{align}\label{eq:ltre}
+\frac{\partial \lambda}{\partial Longitude} \approx \sum_{i} \frac{\partial \lambda}{\partial \theta^{F}_{i}} \frac{\partial \theta^{F}_{i}}{\partial Longitude} + \frac{\partial \lambda}{\partial \theta^{M}_{i}} \frac{\partial \theta^{M}_{i}}{\partial Longitude}
+\end{align}
+
+\noindent Here, $\theta^{F}_{i}$ and $\theta^{M}_{i}$ represent sex-specific parameters: the regression coefficients for the intercepts and slopes of size-dependent vital rate functions. 
+Because LTRE contributions are additive, we could sum across vital rates to compare the total contributions of female and male parameters. 
 
 %--------------------------------------------------------------------
 \section*{Results}
@@ -248,16 +271,27 @@ v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U
 \end{figure}
  
   \newpage
-\begin{figure}[h!]
+\begin{wrapfigure}{r}{0.5\textwidth}
   \begin{center}
-    \includegraphics[width=0.75\linewidth]{Figures/lambda_long}
+    \includegraphics[width=0.48\textwidth]{Figures/lambda_long_ltre}
   \caption{Caption.}
   \label{fig:lambda_long}
   \end{center}
-\end{figure}
+\end{wrapfigure}
 
+\newpage
+Smart words.
 %--------------------------------------------------------------------
+
 \section*{Discussion}
+\begin{itemize}
+\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
+\item{We found evidence for sexual niche differentiation.}
+  \begin{itemize}
+    \item{Common garden data indicated that females had a reproductive advantage at eastern limits. This recapitulated what we saw in natural population surveys.}
+  \end{itemize}
+\end{itemize}
+
 %--------------------------------------------------------------------
 \section*{Acknowledgements}
 
