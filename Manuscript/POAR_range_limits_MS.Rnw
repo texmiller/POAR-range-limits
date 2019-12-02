@@ -26,7 +26,7 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 
 %-------------------------------------------------------------------------
 
-\title{Two-sex demography, sexual niche differentiation, and range limits}
+\title{Two-sex demography, sexual niche differentiation, and the formation of range limits over an environmental gradient}
 
 
 \author{Tom E.X. Miller$^{\ast}$}
@@ -46,10 +46,20 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 \newpage
 \section*{Abstract}
 \linenumbers
+Understading the mechanisms that generate biogeographic patterns of distribution and abundance is a long-standing goal of ecology that takes on urgency in the context of range shifts in response to environmental change. 
+It is widely hypothesized that distributional limits reflect niche characteristics, but this hypothesis is complicated by widespread potential for intra-specific niche heterogeneity. 
+In dioecious species, for example, sexual niche differentiation may cause divergence between the sexes in the limits of environmental suitability. 
+We studied the mechanisms of range boundary formation in the perennial dioecious grass \textit{Poa arachnifera}, testing the alternative hypotheses that range limits reflect the niche limits of females only, as assumed by classic ecological theory, versus the combined contributions of females and males, including their inter-dependence via male-limitation of female fertility. 
+Common garden experiments across the longitudinal aridity gradient of the southern Great Plains, US revealed female-biased flowering and panicle production approaching eastern range limits, consistent with surveys of operational sex ratio variation in natural populations. 
+A process-based demographic model predicted longitudinal limits of population viability ($\lambda \geq 1$) that matched the observed eastern and western range limits, and further showed that declines in $\lambda$ approaching range limits were driven almost entirely by declines in female vital rates. 
+Thus, despite the potential for mate limitation particularly at eastern margins, the geographic distribution was effectively female-dominant, reflecting the environmental niche of females with little contribution from males. 
+The dominant role of females was attributable to female fertility being quite robust to sex ratio variation (which declined only at extreme under-representation of males) and to relatively low sensitivity of $\lambda$ to reproductive transitions in the life cycle.
+This suggests that female-dominant limitation of geographic distribution may be common to long-lived species with polygamous mating systems. 
+ 
 
 %-------------------------------------------------------------------------
 \section*{Keywords}
-
+demography; dioecy; intra-specific niche heterogeneity; matrix projection model; sex ratio; range limits
 
 %--------------------------------------------------------------------
 \newpage
@@ -76,7 +86,7 @@ At range margins, where environments are extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
 In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species’ ranges tend to be male-biased \citep{field2013ecological}.
 
-Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory provides a straightforward answer. 
+Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory assumes answer. 
 ``Female dominance'' is a pervasive, often implicit feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility \citep{miller2011confronting,rankin2007males,caswell1986two}. 
 This assumption is, of course, wrong but it may often be a convenient approximation when the sex ratio is balanced or does not vary. 
 The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
@@ -247,7 +257,7 @@ The second term represents survival and size transition of established plants fr
 All parameter estimates are reported in Table A1\footnote{This table does not exist yet.}.
 
 Because the two-sex MPM is nonlinear (vital rates affect and are affected by population structure) we estimated the asynmptotic geometric growth rate ($\lambda$) by numerical simulation, and repeated this across a range of longitudes.
-We used a regression-style Life Table Response Experiment (\citep{caswell2001}) to decompose the change in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
+We used a regression-style Life Table Response Experiment \citep{caswell2001} to decompose the change in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
 The LTRE approximates the change in $\lambda$ with longitude as the product of the sensitivity of $\lambda$ to the parameters times the sensitivity of the parameters to longitude, summed over all parameters:
 
 \begin{align}\label{eq:ltre}
