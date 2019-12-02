@@ -896,8 +896,16 @@ abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county
 plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
-## LTRE analysis using mean params
+## compare 2sex and Fdom models
+pdf("Manuscript/Figures/lambda_long_2sex_Fdom.pdf",useDingbats = F)
+par(mar=c(5,5,1,1))
+plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="l",lwd=2,
+     xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5,ylim=c(1,2.2))
+lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=2)
+legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
+dev.off()
 
+## LTRE analysis using mean params
 ## LTRE parameters:
 # these are the indices of the intercepts and slopes
 LTRE_params <- c(1,2,7,8,14,15,20,21)
@@ -1192,6 +1200,14 @@ n_block <- poar %>% select(Block) %>% n_distinct()
 
 n_plants_per_block <- poar %>% filter(year==2015) %>% select(unique.block,ID) %>% group_by(unique.block) %>% summarise(n=n())
 
+poau_sdlg_surv <- round(sdlg_surv$sdlg_surv,2)
+
+survey_range <- range(survey_dat$n_trials)
+
+viab_seeds <- viab %>% mutate(viab_seeds = y_viab==0) %>% filter(SR==1) %>% summarise(mean(viab_seeds))
+
+viab_n <- range(viabVr$totS,na.rm=T)
+
 poar_ms_quantities <- list(
   n_survey_pops=n_survey_pops,
   survey_site_table=survey_site_table,
@@ -1199,7 +1215,11 @@ poar_ms_quantities <- list(
   n_sources=n_sources,
   source_plants=source_plants,
   n_block=n_block,
-  n_plants_per_block=n_plants_per_block$n[1]
+  n_plants_per_block=n_plants_per_block$n[1],
+  poau_sdlg_surv=poau_sdlg_surv,
+  survey_range=survey_range,
+  viab_seeds=round(viab_seeds$`mean(viab_seeds)`,2),
+  viab_n=viab_n
 )
 
 write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")

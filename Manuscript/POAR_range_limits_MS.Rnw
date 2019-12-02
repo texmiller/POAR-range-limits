@@ -82,11 +82,19 @@ This assumption is, of course, wrong but it may often be a convenient approximat
 The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
 However, females may be male-limited in environments in which they are favored, which could reduce population viability in marginal environments. 
 This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses to the environment (Fig. \ref{fig:concept}). 
+While sexual niche divergence sets the stage for two-sex dynamics to play an important role in marginal environments, this influence may be dampened in mating systems where single males can fertilize many females \citep{miller2011confronting} or in life histories where population viability is weakly sensitive to female fertility \citep{franco2004comparative}. 
+% add sentence about how sex specific niches does not guarantee an important role for males, since few males are required in polygamous mating systems and, for slow life cycles, reproductive effects often have weak sensitivities.
 
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.95\linewidth]{Figures/conceptual_fig}
-  \caption{Caption.}
+  \caption{Hypotheses for how environmental variation can affect population viability and range limits in dieocious species. 
+  Under the female-dominant hypothesis, environmental drivers affect population growth ($\lambda$) through effects on females, alone (A). 
+  In geographic / environmental space, this translates to range boundaries that arise at the limits of the female environmental niche, irrespective of where they fall with respect to the male niche (B). 
+  Under the two-sex hypothesis, environmental drivers can affect $\lambda$ through sex-specific responses, which may skew the sex ratio of the mating pool and feed back to affect female fertility via mate availability (A). 
+  In this case, expectations for range limits may differ from the female-dominant prediction, since mate limitation in environments that favor females over males may reduce population viability. 
+  These are alternative hypotheses in the strict sense, but as the role of males becomes weaker the two-sex prediction converges on the female-dominant prediction.
+  }
   \label{fig:concept}
   \end{center}
 \end{figure}
@@ -96,20 +104,24 @@ As an experimental model, we worked with a dieocious plant species (the grass \t
 The environmental isocline governing aridity in this region is expected to shift eastward under climate change \citep{karl2009global}, so understanding how it sets distributional limits may aid in forecasting range future shifts. 
 We hypothesized that sexual niche differentiation with respect to longitudinal variation in aridity may lead to skewed sex ratios approaching range limits, and that mate limitation could cause range boundaries to deviate from female-dominant expectations. 
 
-\begin{wrapfigure}{r}{0.5\textwidth}
-  \centering
-    \includegraphics[width=0.48\textwidth]{Figures/map}
-  \caption{Caption.}
-  \label{fig:map}
-  %\end{center}
-\end{wrapfigure}
-
 This study was conducted in four parts. 
 First, we conducted surveys to ask whether natural populations exhibit clines in operational sex ratio across longitudinal environmental variation. 
 Second, we conducted a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout the southern Great Plains to quantify sex-specific demography in variable abiotic environments. 
 Third, we conducted a local sex ratio manipulation experiment to quantify how viable seed production by females responds to variation in sex ratio. 
 Finally, we connected sex-specific demography with inter-sexual mating dynamics in a two-sex modeling framework to derive demographically-driven predictions for geographic limits of population viability $\lambda \geq 1$. 
 We analyzed the demographic model to decompose the decline in $\lambda$ approaching range limits into contributions from female-dominant and two-sex pathways (Fig. \ref{fig:concept}).
+
+\begin{figure}[h!]
+\begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/map}
+  \caption{Geographic and environmental distribution of \textit{P. arachnifera} in Texas, Oklahoma, and Kansas. 
+  Hatched shapes show counties with herbarium records of occurrence. 
+  Color shows geographic variation in annual precipitation (mm) based on 30-year normals from WorldClim \citep{fick2017worldclim}. 
+  Points show sites for the common garden transplant experiment.
+  }
+  \label{fig:map}
+  \end{center}
+\end{figure}
 
 %--------------------------------------------------------------------
 \section*{Materials and methods}
@@ -159,7 +171,8 @@ For each individual in each year, we recorded data for four demographic vital ra
 We analyzed the demographic vital rates with generalized linear mixed models in a hierarchical Bayesian framework. 
 All the vital rates shared a common linear predictor for the expected value that included fixed effects of size, sex, linear and quadratic terms for longitude, and all 2- and 3-way interactions.
 We included quadratic effects of longitude to account for the possibility of non-monotonic responses, following the hypothesis that fitness may peak in the center of the range. 
-The linear predictor also included random effects of site, block, and source population of the transplant; the corresponding variance terms were used in the demographic model (below) to capture process error in demography.  
+The linear predictor also included random effects of site, block, and source population of the transplant.
+%; the corresponding variance terms were used in the demographic model (below) to capture process error in demography.  
 We pooled all three years of observations for analysis so we do not explicitly model temporal variation but our results are implicitly averaged over years. 
 
 The survival and flowering data were Bernoulli distributed, and these models applied the logit link function. 
@@ -200,36 +213,41 @@ The statistical models for the common garden and sex ratio experiments provided 
 Following the statistical modeling, the MPM accommodates longitude as a predictor variable, allowing us to identify the longitudinal limits of population viability ($\lambda \geq 1$) and investigate the underlying drivers of population decline at range limits. 
 For a given longitude, let $F_{x,t}$ and $M_{x,t}$ be the number of female and male plants of size $x$ in year $t$, where $x \in \{1,2,...,U\}$ and $U$ is the maximum number of tillers a plant can attain (assumed to be the same for females and males). 
 We also include additional state variables for new recruits, $F^{R}_{t}$ and $M^{R}_{t}$, which we assume do not reproduce in their first year.
+For ease of presentation, we do not symbolically show longitude effects in the vital rate functions for growth, survival, flowering, and panicle production but these all included longitude effects on the intercept and slope (with respect to size) as a second-order polynomial, following the statistical models.
+We assume that the parameters of sex ratio-dependent mating (Eq. \ref{eq:viab_fn}) do not vary with longitude. 
+
 For a pre-breeding census, the expected numbers of recruits in year $t+1$ is given by:
 
 \begin{align}\label{eq:recruits}
-F^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g \cdot e(y) \cdot \rho 	] \, F_{x,t}
+F^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot m \cdot \rho 	] \, F_{x,t}
 \\
-M^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot g \cdot e(y) \cdot (1-\rho) 	] \, F_{x,t}
+M^{R}_{t+1} = \sum_{x=1}^{U} 	[ \, p^{F}(x) \cdot c^{F}(x) \cdot d \cdot v(\mathbf{F_{t}},\mathbf{M_{t}}) \cdot m \cdot (1-\rho) 	] \, F_{x,t}
 \end{align}
 
-
-\begin{align}\label{eq:dynamics}
-F_{y,t+1} = \sum_{x=1}^{U} 	[ \, s^{F}(x) \cdot g^{F}(y,x)] \, F_{x,t} + [ \, \sigma \cdot g^{F}(y,1) ] \, F^{R}_{t}
-\\
-M_{y,t+1} = \sum_{x=1}^{U} 	[ \,  s^{M}(x) \cdot g^{M}(y,x) ] \, M_{x,t} + [ \, \sigma \cdot g^{M}(y,1) ] \, M^{R}_{t}
-\end{align}
-
-\noindent $s$ and $g$ give the probabilities of surviving at size $x$ and growing from sizes $x$ to $y$, respectively, and superscripts indicate that these functions may be unique to females ($F$) and males ($M$). 
-$r^{F}$ gives fertility of size-$x$ females (number of new recruits per female per year) and is dependent on population structure (the $U \times 1$ vectors $\mathbf{F_{t}}$ and $\mathbf{M_{t}}$). 
-Parameter $\rho$ is the primary sex ratio (proportion of recruits that are female) and $e(y)$ is the probability distribution of recruit size. 
-We assume that all recruits first appear in the population at $1$ tiller in size regardless of sex, so $e(y=1)=1$ and $e(y>1)=0$. 
-The female fertility function is further defined as:
-
-\noindent where $p$ and $c$ are flowering probability and panicle production for females of size $x$, $d$ is the number of seeds (fertilized or unfertilized) per female panicle, $v$ is the probability that a seed a fertilized, and $g$ is the probability that a fertilized seed germinates.
-Lastly, and following Eq. \ref{eq:viab_fn}, seed fertilization depends on the OSR according to:
+\noindent where $p^{F}$ and $c^{F}$ are flowering probability and panicle production for females of size $x$, $d$ is the number of seeds (fertilized or unfertilized) per female panicle, $v$ is the probability that a seed is fertilized, $m$ is the probability that a fertilized seed germinates, and $\rho$ is the primary sex ratio (proportion of recruits that are female). 
+Seed fertilization depends on the OSR of panicles (following Eq. \ref{eq:viab_fn}) which was derived from the $U \times 1$ vectors of population structure $\mathbf{F_{t}}$ and $\mathbf{M_{t}}$:
 
 \begin{align}\label{eq:viab_MPM}
 v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0} * \left[ 1 - \left( \frac{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t}}{\sum_{x=1}^{U} p^{F}(x) c^{F}(x) F_{x,t} + p^{M}(x) c^{M}(x) M_{x,t}} \right) ^{\alpha}\right]
 \end{align}
 
+Finally, the dynamics of the size-structured component of the population are given by:
+
+\begin{align}\label{eq:dynamics}
+F_{y,t+1} = [ \, \sigma \cdot g^{F}(y,x=1) ] \, F^{R}_{t} + \sum_{x=1}^{U} 	[ \, s^{F}(x) \cdot g^{F}(y,x)] \, F_{x,t}
+\\
+M_{y,t+1} = [ \, \sigma \cdot g^{M}(y,x=1) ] \, M^{R}_{t} + \sum_{x=1}^{U} 	[ \,  s^{M}(x) \cdot g^{M}(y,x) ] \, M_{x,t}
+\end{align}
+
+\noindent For both females and males, the first term represents seedlings that survived their first year and enter the size distribution of established plants.
+Because our common garden experiment relied on greenhouse-raised transplants, we had little information on these early life cycle transitions. 
+We used the seedling survival probability ($\sigma$) from our demographic studies of the perennial congener \textit{Poa autumnalis} in east Texas (T.E.X. Miller and J.A. Rudgers, \textit{unpublished data}) as a stand-in for \textit{P. arachnifera}, and we assume this probability was constant across sexes longitudes ($\sigma = \Sexpr{poar_ms_quantities$poau_sdlg_surv}$). 
+We also assume that surviving seedlings reach size $y$ with probability $g(y,x=1)$, the expected future size of 1-tiller plants from the transplant experiment. 
+The second term represents survival and size transition of established plants from the previous year, where $s$ and $g$ give the probabilities of surviving at size $x$ and growing from sizes $x$ to $y$, respectively, and superscripts indicate that these functions may be unique to females ($F$) and males ($M$). 
+All parameter estimates are reported in Table A1\footnote{This table does not exist yet.}.
+
 Because the two-sex MPM is nonlinear (vital rates affect and are affected by population structure) we estimated the asynmptotic geometric growth rate ($\lambda$) by numerical simulation, and repeated this across a range of longitudes.
-We used a regression-style Life Table Response Experiment (\citep{caswell2001}) to decompose the decline in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
+We used a regression-style Life Table Response Experiment (\citep{caswell2001}) to decompose the change in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
 The LTRE approximates the change in $\lambda$ with longitude as the product of the sensitivity of $\lambda$ to the parameters times the sensitivity of the parameters to longitude, summed over all parameters:
 
 \begin{align}\label{eq:ltre}
@@ -237,50 +255,95 @@ The LTRE approximates the change in $\lambda$ with longitude as the product of t
 \end{align}
 
 \noindent Here, $\theta^{F}_{i}$ and $\theta^{M}_{i}$ represent sex-specific parameters: the regression coefficients for the intercepts and slopes of size-dependent vital rate functions. 
-Because LTRE contributions are additive, we could sum across vital rates to compare the total contributions of female and male parameters. 
+Because LTRE contributions are additive, we summed across vital rates to compare the total contributions of female and male parameters. 
+Finally, we compared the two-sex MPM to the corresponding female-dominant model (Fig. \ref{fig:concept}B) by setting $v(\mathbf{F_{t}},\mathbf{M_{t}}) = v_{0}$, which decouples female fertility from the composition of the mating pool. 
 
 %--------------------------------------------------------------------
 \section*{Results}
 
-\newpage
 \begin{figure}[h!]
-  \begin{center}
-    \includegraphics[width=1\linewidth]{Figures/pop_survey}
-  \caption{Caption.}
+\begin{center}
+    \includegraphics[width=0.6\linewidth]{Figures/pop_survey}
+  \caption{Variation in operational sex ratio (proportion of panicles that were female) across \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations of \textit{P. arachnifera}. Point size is proportional to population size (total panicles; min: \Sexpr{poar_ms_quantities$survey_range[1]}, max: \Sexpr{poar_ms_quantities$survey_range[2]}). 
+  Lines show the fitted binomial regression for 500 samples from the posterior distribution of regression coefficients.}
   \label{fig:survey}
   \end{center}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\subsection*{Sex ratio variation in natural populations}
+We found wide variation in operational sex ratio (proportion of total panicles that were female) across \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations of \textit{P. arachnifera}, including female-only and male-only populations (Fig. \ref{fig:survey}). 
+There was a longitudinal trend to sex ratio variation, with male-biased panicle production in the western parts of the range and female-biased panicle production in the east. 
+Not suriprisingly, small populations deviated most strongly from the mean trend (Fig. \ref{fig:survey}). 
+\begin{figure}%[h!]
   \begin{center}
-    \includegraphics[width=1\linewidth]{Figures/vital_rates}
-  \caption{Caption.}
+    \includegraphics[width=0.85\linewidth]{Figures/vital_rates}
+  \caption{Sex-, size-, and longitude-related variation in:  A--C, inter-annual probability of survival; D--F, inter-annual growth (change in number of tillers); G--I, probability of flowering; J--L, number of panicles produced given flowering. 
+  Points show means by site for females (filled) and males (open) and small (left column), medium (middle column), and large (right column) size classes (discretized, for visualization only).
+  Point size is proportional to the sample size of the mean.
+  Lines show fitted statistical models for females (solid) and males (dashed) based on posterior mean parameter values.
+  Lower panels below each data panel show the posterior distribution of the difference between females and males as a function of longitude (positive and negative values indicate female and advantage, respectively); dashed horizontal line shows zero difference.}
   \label{fig:vital_rates}
   \end{center}
 \end{figure}
- 
- 
- \newpage
+
+\subsection*{Geographic variation in sex-specific demography}
+In year one, there was near-total mortality of transplants in the common garden experiment at three sites due to various catastrophes (a flood, a drought, a pack of voles); otherwise, we had good establishment in the common gardens. 
+There was strong longitudinal variation in demography, including sex-specific demographic responses that varied across vital rates and interactions between size, sex, and longitude. 
+Where sex-specific demographic responses occurred, they were almost always in favor of females. 
+In Fig. \ref{fig:vital_rates}, we show binned means of raw data and fitted vital rate models for four vital rates (rows) and three size classes (columns), discretized for visualization only. 
+This figure also shows the posterior distributions for the difference between the sexes across longitudes. 
+
+Annual survival probability was predicted to peak at western and eastern range edges and was lowest at intermediate longitudes (Fig. \ref{fig:vital_rates}A-C). 
+There was a female survival advantage but only at the western range edge for large sizes. 
+Other vital rates showed the opposite longitudinal pattern for most sizes, with peaks in the center of the range and declines at eastern and western edges. 
+There was a female growth advantage for small sizes at western longitudes (Fig. \ref{fig:vital_rates}D-F).
+The strongest sex difference was in the probability of flowering: females had a flowering advantage, especially for large sizes and at eastern longitudes (Fig. \ref{fig:vital_rates}G-I). 
+Finally, panicle production by flowering plants was similar between the sexes for most sizes, though for the largest sizes there were modest advantages for males in the west and females in the east (Fig. \ref{fig:vital_rates}J-L). 
+The sex differences in reproductive vital rates generated a longitudinal trend in the operational sex ratio of our common garden populations that mirrored the trend in natural populations, with over-representation of female panicles increasing toward eastern range limits.
+Thus, the common garden experiment indicated that the reproductive niche of females extended farther east than that of males. 
+
+\subsection*{Sex-ratio dependent seed fertilization}
+
+Seed fertilitzation by females declined with increasing female bias in experimental populations. 
+Fertilization success was greatest for females that were rare in male-biased populations, where 75-80\% of initiated seeds were viable (Fig. \ref{fig:seed_viability}). 
+Fertilization was robust to sex ratio variation until ca. 75\% of the panicles in a population were female, at which point fertilization strongly declined due to pollen limitation.
+The fitted model specifies that seed fertilization goes to zero as female bias goes to 100\% (Eq. \ref{eq:viab_fn}), and this assumption was generally consistent with the experimental results, where the majority (\Sexpr{poar_ms_quantities$viab_seeds*100}\%) of females from female-only populations produced zero viable seeds. 
+The occasional production of viable seeds in female-only populations (Fig. \ref{fig:seed_viability}) likely reflects rare pollen contamination between experimental plots. 
+
 \begin{figure}[h!]
-  \begin{center}
-    \includegraphics[width=0.75\linewidth]{Figures/seed_viability}
-  \caption{Caption.}
+\begin{center}
+    \includegraphics[width=0.6\linewidth]{Figures/seed_viability}
+  \caption{Seed fertilization success in relation to operational sex ratio (fraction of panicles that are female) in experimental populations. 
+  Circles show data from tetrazolium assays of seed viability; circle size is proprtional to the number of seeds tested (min: \Sexpr{poar_ms_quantities$viab_n[1]}, max: \Sexpr{poar_ms_quantities$viab_n[2]}).
+  Lines show fitted model (Eq. \ref{eq:viab_fn}) for 500 samples from the posterior distribution of parameter estimates.}
   \label{fig:seed_viability}
   \end{center}
 \end{figure}
  
-  \newpage
-\begin{wrapfigure}{r}{0.5\textwidth}
+\subsection*{Two-sex model of range limits}
+The processed-based demographic model connected sex-specific vital rate responses to longitudinal variation (Fig. \ref{fig:vital_rates}) with sex ratio-dependent mating (Fig. \ref{fig:seed_viability}) to predict the contributions of females and males to range limitation. 
+The model predicted maximum fitness in the center of the range and declines in population viability at longitudes that corresponded well with observed range limits. 
+Specifically, the western-most and eastern-most county records of \textit{P. arachnifera} fell within the uncertainty distribution of the model's predictions (represented by the shading in Fig. \ref{fig:lambda_long}A, bolstering our confidence that the model effectively captures the population dynamics of the focal species. 
+
+Decomposition methods revealed that declines in $\lambda$ approaching range limits were driven almost exclusively by females (Fig. \ref{fig:lambda_long}B) with near-zero contributions from males (Fig. \ref{fig:lambda_long}C). 
+Thus, range limitation was an effectively female-dominant process, despite female bias in the mating pool at eastern range margins. 
+Correspondingly, the two-sex model was nearly indistinguishable from a female-dominant model with all else equal except that female seed fertilization did not depend on males (Fig \ref{fig:2sex_Fdom}). 
+Decomposition analysis further revealed that multiple female vital rates contributed to range limits, some in opposing directions. 
+Because female survival increased toward range limits (Fig \ref{fig:vital_rates}A-C), this vital rate had a contribution to $\frac{\partial \lambda}{\partial Longitude}$ that was opposite in sign to the other vital rates (Fig. \ref{fig:lambda_long}B). 
+However, increased survival at range edges was not sufficient to offset declines in other vital rates. 
+The overall decline in $\lambda$ was driven most strongly by the decline in female flowering probabilityat the western limit and by a combination of reduced female flowering and growth at the eastern limit. 
+
+\begin{figure}
   \begin{center}
-    \includegraphics[width=0.48\textwidth]{Figures/lambda_long_ltre}
-  \caption{Caption.}
+    \includegraphics[width=0.5\linewidth]{Figures/lambda_long_ltre}
+  \caption{Population growth ($\lambda$) as a function of longitude, predicted by the two-sex MPM that incorporates sex-specific demographic responses to longitude with sex ratio-dependent seed fertilization. 
+  A, posterior distribution of $\lambda$ reflecting parameter uncertainty, where shaded regions show the 25, 50, 75, and 95\% percentiles of parameter uncertainty. 
+  Dashed horizontal line indicates the limit of population viability ($\lambda=1$) and vertical lines show the longitudes of Brewster and Brazoria Counties, TX, the western- and eastern-most occurrence records of \textit{P. arachnifera}.
+  B--C, LTRE decomposition of the sensitity of $\lambda$ to longitude into additive vital rate contributions of females (B) and males (C) based on posterior mean parameter estimates. }
   \label{fig:lambda_long}
   \end{center}
-\end{wrapfigure}
+\end{figure}
 
-\newpage
-Smart words.
 %--------------------------------------------------------------------
 
 \section*{Discussion}
@@ -323,4 +386,18 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \end{center}
 \end{figure}
  
+ \newpage
+ \section*{Appendix B: Additional results}
+\renewcommand{\thefigure}{B\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{B\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{B\arabic{equation}}\setcounter{equation}{0}
+
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/lambda_long_2sex_Fdom}
+  \caption{Caption.}
+  \label{fig:2sex_Fdom}
+  \end{center}
+\end{figure}
+
 \end{document}
