@@ -304,17 +304,18 @@ In Fig. \ref{fig:vital_rates}, we show binned means of raw data and fitted vital
 This figure also shows the posterior distributions for the difference between the sexes across longitudes. 
 
 Annual survival probability was predicted to peak at western and eastern range edges and was lowest at intermediate longitudes (Fig. \ref{fig:vital_rates}A-C). 
-There was a female survival advantage but only at the western range edge for large sizes. 
+There was a modest female survival advantage but only at the western range edge for large sizes. 
 Other vital rates showed the opposite longitudinal pattern for most sizes, with peaks in the center of the range and declines at eastern and western edges. 
 There was a female growth advantage for small sizes at western longitudes (Fig. \ref{fig:vital_rates}D-F).
 The strongest sex difference was in the probability of flowering: females had a flowering advantage, especially for large sizes and at eastern longitudes (Fig. \ref{fig:vital_rates}G-I). 
-Finally, panicle production by flowering plants was similar between the sexes for most sizes, though for the largest sizes there were modest advantages for males in the west and females in the east (Fig. \ref{fig:vital_rates}J-L). 
-The sex differences in reproductive vital rates generated a longitudinal trend in the operational sex ratio of our common garden populations that mirrored the trend in natural populations, with over-representation of female panicles increasing toward eastern range limits.
-Thus, the common garden experiment indicated that the reproductive niche of females extended farther east than that of males. 
+Finally, panicle production by flowering plants was similar between the sexes for most sizes, though for the largest sizes there were advantages for males in the west and females in the east (Fig. \ref{fig:vital_rates}J-L). 
+
+Sex differences in flowering and panicle production generated a longitudinal trend in the operational sex ratio of our common garden populations that mirrored the trend in natural populations (Fig. \ref{fig:survey}): the fraction of total panicles that were female in our common gardens increased from west to east (Fig. \ref{fig:garden_sex_ratios}A) even as the fraction of surviving plants that were female did not show a longitudinal trend (Fig. \ref{fig:garden_sex_ratios}B).
+Thus, the common garden experiment suggested that the longitudinal trend in the mating pool of natural populations was due to the reproductive niche of females extending farther east than that of males, and not to sex differences in mortality.
 
 \subsection*{Sex-ratio dependent seed fertilization}
 
-Seed fertilitzation by females declined with increasing female bias in experimental populations. 
+Seed fertilitzation by females declined with increasing female bias in in the sex ratio manipulation experiment. 
 Fertilization success was greatest for females that were rare in male-biased populations, where 75-80\% of initiated seeds were viable (Fig. \ref{fig:seed_viability}). 
 Fertilization was robust to sex ratio variation until ca. 75\% of the panicles in a population were female, at which point fertilization strongly declined due to pollen limitation.
 The fitted model specifies that seed fertilization goes to zero as female bias goes to 100\% (Eq. \ref{eq:viab_fn}), and this assumption was generally consistent with the experimental results, where the majority (\Sexpr{poar_ms_quantities$viab_seeds*100}\%) of females from female-only populations produced zero viable seeds. 
@@ -357,13 +358,13 @@ The overall decline in $\lambda$ was driven most strongly by the decline in fema
 %--------------------------------------------------------------------
 
 \section*{Discussion}
-\begin{itemize}
-\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
-\item{We found evidence for sexual niche differentiation.}
-  \begin{itemize}
-    \item{Common garden data indicated that females had a reproductive advantage at eastern limits. This recapitulated what we saw in natural population surveys.}
-  \end{itemize}
-\end{itemize}
+%\begin{itemize}
+%\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
+%\item{We found evidence for sexual niche differentiation.}
+%  \begin{itemize}
+%    \item{Common garden data indicated that females had a reproductive advantage at eastern limits. This recapitulated what we saw in natural population surveys.}
+%  \end{itemize}
+%\end{itemize}
 
 %--------------------------------------------------------------------
 \section*{Acknowledgements}
@@ -391,7 +392,7 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/site_precip}
-  \caption{Caption.}
+  \caption{Total annual precipitation at common garden sites during the study years tracked long-term trends of increasing aridity from east to west.}
   \label{fig:site_precip}
   \end{center}
 \end{figure}
@@ -405,8 +406,21 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/lambda_long_2sex_Fdom}
-  \caption{Caption.}
+  \caption{Comparison of longitudinal variation in $\lambda$ between the two-sex demographic model (dashed line) that includes dependence of female seed production on population structure and the corresponding female-dominant model (solid line) with constant female fertility and all else equal. 
+  Models were evaluated at posterior mean parameter estimates}
   \label{fig:2sex_Fdom}
+  \end{center}
+\end{figure}
+
+ \newpage
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=1\linewidth]{Figures/garden_sex_ratios}
+  \caption{Longitudinal variation in: A, operational sex ratio (fraction of panicles that were female), and B, individual sex ratio (fraction of surviving plants that were female) across \Sexpr{poar_ms_quantities$n_sites} common garden sites.
+  Colors indicate year and point size is proportional to sample size of the fraction (total panicles in A [min: \Sexpr{poar_ms_quantities$garden_osr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_osr_range[2]}] and total plants in B [min: \Sexpr{poar_ms_quantities$garden_sr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_sr_range[2]}]).
+  Lines show fitted binomial GLMs.
+  }
+  \label{fig:garden_sex_ratios}
   \end{center}
 \end{figure}
 

@@ -592,6 +592,78 @@ with(poar_panic_binned,{
 })
 dev.off()
 
+
+# OSR trends in common garden ---------------------------------------------
+
+garden_osr <- poar %>% select( year, site, Sex, long.center, flowerN_t1) %>% 
+  group_by(year, long.center, site, Sex) %>% 
+  summarise(total_panicles = sum(flowerN_t1,na.rm=T)) %>% 
+  spread(key=Sex,value=total_panicles) %>% 
+  rename(fem_pan = `F`,
+         mal_pan = `M`) %>% 
+  mutate(tot_pan=fem_pan+mal_pan,
+         osr = fem_pan/tot_pan,
+         year_index = year-2014)
+
+ggplot(garden_osr)+
+  geom_point(aes(x=long.center,y=osr,color=as.factor(year)))
+
+garden_sr <- poar %>% select( year, site, Sex, long.center, surv_t1) %>% 
+  group_by(year, long.center, site, Sex) %>% 
+  summarise(total_plants = sum(surv_t1,na.rm=T)) %>% 
+  spread(key=Sex,value=total_plants) %>% 
+  rename(fem = `F`,
+         mal = `M`) %>% 
+  mutate(total=fem+mal,
+         sr = fem/total)
+
+ggplot(garden_sr)+
+  geom_point(aes(x=long.center,y=sr,color=as.factor(year)))
+
+## quick glm fit (might do this in rstan later)
+osr_glm <- glm(osr ~ long.center*as.factor(year), weights = tot_pan, family="binomial",data=garden_osr)
+sr_glm <- glm(sr ~ long.center*as.factor(year), weights = total, family="binomial",data=garden_sr)
+
+
+year_cols <- c("#e41a1c","#377eb8","#4daf4a")
+
+pdf("Manuscript/Figures/garden_sex_ratios.pdf",useDingbats = F,height=6,width=12)
+par(mfrow=c(1,2),mar=c(5,6,1,1))
+plot(garden_osr$long.center + mean(latlong$Longitude),garden_osr$osr,type="n",ylim=c(0,1),cex.lab=1.4,
+     xlab="Longitude",ylab="Operational sex ratio\n(proportion female panicles)")
+abline(h=0.5,col="gray",lty=2);title("A",adj=0,font=4)
+points(garden_osr$long.center[garden_osr$year==2015] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2015],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2015]),col=alpha(year_cols[1],0.5))
+points(garden_osr$long.center[garden_osr$year==2016] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2016],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2016]),col=alpha(year_cols[2],0.5))
+points(garden_osr$long.center[garden_osr$year==2017] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2017],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2017]),col=alpha(year_cols[3],0.5))
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[2]*long_seq),col=year_cols[1],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[3] + (coef(osr_glm)[2]+coef(osr_glm)[5])*long_seq),col=year_cols[2],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[4] + (coef(osr_glm)[2]+coef(osr_glm)[6])*long_seq),col=year_cols[3],lwd=3)
+legend("topleft",legend=2015:2017,bty="n",lwd=3,col=year_cols,cex=1.2)
+
+plot(garden_sr$long.center + mean(latlong$Longitude),garden_sr$sr,type="n",ylim=c(0,1),cex.lab=1.4,
+     xlab="Longitude",ylab="Sex ratio\n(proportion female plants)")
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
+points(garden_sr$long.center[garden_sr$year==2015] + mean(latlong$Longitude),
+       garden_sr$sr[garden_sr$year==2015],
+       pch=16,cex=log(garden_sr$total[garden_sr$year==2015]),col=alpha(year_cols[1],0.5))
+points(garden_sr$long.center[garden_sr$year==2016] + mean(latlong$Longitude),
+       garden_sr$sr[garden_sr$year==2016],
+       pch=16,cex=log(garden_sr$total[garden_sr$year==2016]),col=alpha(year_cols[2],0.5))
+points(garden_sr$long.center[garden_sr$year==2017] + mean(latlong$Longitude),
+       garden_sr$sr[garden_sr$year==2017],
+       pch=16,cex=log(garden_sr$total[garden_sr$year==2017]),col=alpha(year_cols[3],0.5))
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)[2]*long_seq),col=year_cols[1],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)[3] + (coef(sr_glm)[2]+coef(sr_glm)[5])*long_seq),col=year_cols[2],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)[4] + (coef(sr_glm)[2]+coef(sr_glm)[6])*long_seq),col=year_cols[3],lwd=3)
+legend("topleft",legend=2015:2017,bty="n",lwd=3,col=year_cols,cex=1.2)
+dev.off()
+
 # Seed viability ----------------------------------------------------------
 viab   <- viabVr %>% 
   select( plot, totS, yesMaybe, sr_f ) %>% 
@@ -1208,6 +1280,10 @@ viab_seeds <- viab %>% mutate(viab_seeds = y_viab==0) %>% filter(SR==1) %>% summ
 
 viab_n <- range(viabVr$totS,na.rm=T)
 
+garden_osr_range <- range(garden_osr$tot_pan[garden_osr$tot_pan>0])
+
+garden_sr_range <- range(garden_sr$total[garden_sr$total>0])
+
 poar_ms_quantities <- list(
   n_survey_pops=n_survey_pops,
   survey_site_table=survey_site_table,
@@ -1219,7 +1295,9 @@ poar_ms_quantities <- list(
   poau_sdlg_surv=poau_sdlg_surv,
   survey_range=survey_range,
   viab_seeds=round(viab_seeds$`mean(viab_seeds)`,2),
-  viab_n=viab_n
+  viab_n=viab_n,
+  garden_osr_range=garden_osr_range,
+  garden_sr_range=garden_sr_range
 )
 
 write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
