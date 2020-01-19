@@ -8,6 +8,11 @@ library(ggthemes)
 
 in_dir <- "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Data/"
 
+# Stable stage distribution from MPM --------------------
+
+ssd_df <- read.csv('results/ssd.csv') %>% 
+            mutate( type = 'Simulated (MPM)' )
+
 # Polygon (gps) data---------------------------------------
 
 files_12  <- list.files( paste0(in_dir, '2012/csv') )
@@ -38,6 +43,7 @@ poly_df <- bind_rows(poly_12, poly_13) %>%
 
 # Experimental data --------------------------------------
 
+# format experimental data
 exp_df <- read.csv( 'data/demography.csv',
                     stringsAsFactors = F ) %>% 
             # only keep records that include the area of clones
@@ -47,33 +53,81 @@ exp_df <- read.csv( 'data/demography.csv',
             mutate( clone_area_t1 = clone_area_t1 / 10000,
                     clone_area_t0 = clone_area_t0 / 10000 ) %>% 
             mutate( id = paste(site, ID, Aluminum.Tag, sep='_') ) %>% 
-            select( id, Sex, clone_area_t1 ) %>% 
-            rename( area     = clone_area_t1 ) %>% 
+            select( id, Sex, tillerN_t1, clone_area_t1 ) %>% 
+            rename( area     = clone_area_t1,
+                    tiller_n = tillerN_t1 ) %>% 
             mutate( log_area = log(area),
                     type     = 'Experimental' ) %>% 
             na.omit 
    
-# final file for plots
-area_df <- bind_rows( poly_df, exp_df )
+# tillerN ~ area relationship ---------------------------
 
+# poisson fit
+ggplot( exp_df ) +
+  geom_point( aes( area, tiller_n ) ) +
+  geom_smooth( aes( area, 
+                    tiller_n), 
+                    method  = glm, se = F,
+                    method.args = list(family = "poisson") )
+   
+ggplot( exp_df ) +
+  geom_point( aes( log_area, tiller_n ) ) +
+  geom_smooth( aes( log_area, 
+                    tiller_n), 
+               method  = glm, se = F,
+               method.args = list(family = "poisson") )
+
+    
+# linear fit
+ggplot( exp_df ) +
+  geom_point( aes( area, tiller_n ) ) +
+  geom_smooth( aes( area, 
+                    tiller_n), 
+               method  = lm )
+
+# Linear fit looks and performs better,
+# moreover, it is more conservative than a Poisson fit
+mod1 <- lm( tiller_n ~ area, data = exp_df )
+mod2 <- glm( tiller_n ~ area, data = exp_df, family = 'poisson' )
+mod3 <- glm( tiller_n ~ log_area, data = exp_df,
+             family = 'poisson' )
+
+AIC( mod1, mod2, mod3 )
+
+# predict number of tillers in observational data 
+poly_df <- poly_df %>% 
+            mutate( tiller_n  = predict( mod1, 
+                                         newdata = poly_df) )
+            
+# final file for plots
+area_df <- bind_rows( poly_df, exp_df ) %>% 
+             mutate( log_tiller_n = log(tiller_n) ) %>% 
+             bind_rows( ssd_df ) %>% 
+             mutate( type = factor( type, 
+                                    levels = c('Simulated (MPM)',
+                                               'Experimental',
+                                               'Observational') ) 
+                     )
+  
 # plot the density
 ggplot(area_df, 
-       aes(x = log_area, y = type ) ) + 
+       aes(x = log_tiller_n, y = type ) ) + 
   # geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
   # scale_fill_viridis_c() +
-  geom_density_ridges( scale = 0.8 ) +
-  scale_y_discrete(expand = expand_scale(mult = c(0.1, 0.85))) +
+  geom_density_ridges( scale = 0.9 ) +
+  scale_y_discrete(expand = expand_scale(mult = c(0.1, 0.6))) +
   theme_few() +
-  # theme_ridges() + 
-  labs( x = expression('Area: log(m'^2*')'),
+  # labs( x = expression('Area: log(m'^2*')'),
+  labs( x = 'log(tiller number)',
         y = 'Type of data' ) +
   theme( axis.text  = element_text( size = 7.5 ),
          axis.title = element_text( size = 7.5 ) ) +
-  ggsave( 'Manuscript/Figures/log_size_obs_experiment.pdf')
+  ggsave( 'Manuscript/Figures/log_tiller_obs_experiment.pdf')
+
 
 # with color
 ggplot(area_df, 
-       aes(x = log_area, y = type,
+       aes(x = log_tiller_n, y = type,
            fill = 0.5 - abs(0.5 - stat(ecdf))) ) +
   stat_density_ridges( geom = "density_ridges_gradient", 
                        calc_ecdf = TRUE,
@@ -81,14 +135,15 @@ ggplot(area_df,
   # geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
   scale_fill_viridis_c( name = "Tail probability", direction = -1 ) +
   # geom_density_ridges( scale = 0.8 ) +
-  scale_y_discrete(expand = expand_scale(mult = c(0.1, 1))) +
+  scale_y_discrete(expand = expand_scale(mult = c(0.1, 0.6))) +
   theme_few() +
-  labs( x = expression('Area: log(m'^2*')'),
+  # labs( x = expression('Area: log(m'^2*')'),
+  labs( x = 'log(tiller number)',
         y = 'Type of data' ) +
   theme( axis.text   = element_text( size = 7.5 ),
          axis.title  = element_text( size = 7.5 ),
          legend.title = element_text( size = 7.5 ) ) +
-  ggsave( 'Manuscript/Figures/log_size_obs_experiment_color.pdf')
+  ggsave( 'Manuscript/Figures/log_tiller_obs_experiment_color.pdf')
 
 
 
@@ -119,5 +174,3 @@ prbl_df <- read.csv( 'data/demography.csv',
             mutate( log_area = log(area) ) %>% 
             subset( id %in% probl_id )
 
-
-prbl_df %>% head
