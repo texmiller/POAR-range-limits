@@ -6,6 +6,7 @@ library(countreg)
 
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
 dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
+dir <- "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits"
 
 ## read data
 poar_dropsites <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/demography.csv"), stringsAsFactors = F)
@@ -946,9 +947,21 @@ for(l in 1:length(long_seq)){
   #SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
   #OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
   #n0[,l] <- lambda_run$n0
-  mat <- megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat
+  
+  mat <- megamatrix_delay( F_params,
+                           M_params,
+                           twosex=F,
+                           long=long_seq[l],
+                           rfx=rfx_fun())$MEGAmat
+
   lambda_long_mean[l] <- lambda(mat)
-  lambda_long_mean_2sex[l] <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+  
+  lambda_long_mean_2sex[l] <- lambdaSim_delay( F_params=F_params,
+                                               M_params=M_params,
+                                               long = long_seq[l],
+                                               rfx = rfx_fun(),
+                                               max.yrs = max_yrs)$lambdatracker[max_yrs]
+  
   #ssd <- stable.stage(mat)
   #SR_long_mean[l] <- sum(ssd[1:(F_params$max_size+1)])
   #n0[,l] <- ssd
@@ -962,7 +975,11 @@ for(l in 1:length(long_seq)){
 }
 
 par(mfrow=c(3,1))
-plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="l",main=F_params$max_size)
+plot(long_seq
+     + mean(latlong$Longitude),
+     lambda_long_mean,
+     type="l",
+     main=F_params$max_size)
 lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lty=2)
 abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county 
 plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
@@ -976,6 +993,42 @@ plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="l",lwd=2,
 lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=2)
 legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
 dev.off()
+
+
+# obtain stable stage distribution for comparison to observed data ----
+
+# stable stage distribution at each longitude
+ssd <- matrix(NA, 56, length(long_seq) )
+
+for(l in 1:length(long_seq)){
+  
+  # stable stage distribution
+  ssd[,l] <- lambdaSim_delay( F_params = F_params,
+                              M_params = M_params,
+                              long     = long_seq[l],
+                              rfx      = rfx_fun(),
+                              max.yrs  = max_yrs)$n0[,1]
+  
+}
+
+# let's assume the population is really big
+sim_size_distrib <- function( ii ){
+
+  n_round <- c( round( ssd[,ii] * 10000 )[1:28 ],
+                round( ssd[,ii] * 10000 )[29:56] )
+  
+  Map( function(x,y) rep(x,y),
+          rep(log(1:28), 2),
+          n_round ) %>% 
+      unlist %>% 
+      data.frame( log_tiller_n = . )
+
+}
+
+size_df <- lapply(1:48, sim_size_distrib ) %>% bind_rows
+
+write.csv(size_df, 'results/ssd.csv', row.names=F)
+
 
 ## LTRE analysis using mean params
 ## LTRE parameters:
