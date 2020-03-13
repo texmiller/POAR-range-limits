@@ -541,14 +541,14 @@ data_allsites_all <- list( n_sites    = poar_allsites.surv$site %>% n_distinct,
 
 # fit the "big" model 
 fit_allsites_full <- stan(
-  file = 'code/stan/poar_full_noLong2intx.stan',#'code/stan/poar_full.stan',
+  file = 'code/stan/poar_full.stan',
   data = data_allsites_all,
   warmup = sim_pars$warmup,
   iter = sim_pars$iter,
   thin = sim_pars$thin,
   chains = sim_pars$chains )
 
-#saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
+#saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
 
