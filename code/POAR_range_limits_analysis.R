@@ -938,43 +938,31 @@ F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),prob
 ## extend the longitude to bounds and beyond of observed distribution
 long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.2)
 lambda_long_mean<-lambda_long_mean_2sex<-SR_long_mean<-OSR_long_mean<-c()
-n0<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
+ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
 max_yrs <- 50
 
 for(l in 1:length(long_seq)){
-  #lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
-  #lambda_long_mean[l] <- lambda_run$lambdatracker[max_yrs]
-  #SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
-  #OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
-  #n0[,l] <- lambda_run$n0
-  
+  #linear model for comparison
   mat <- megamatrix_delay( F_params,
                            M_params,
                            twosex=F,
                            long=long_seq[l],
                            rfx=rfx_fun())$MEGAmat
-
   lambda_long_mean[l] <- lambda(mat)
   
-  lambda_long_mean_2sex[l] <- lambdaSim_delay( F_params=F_params,
+  #2-sex model
+  lambda_run <- lambdaSim_delay( F_params=F_params,
                                                M_params=M_params,
                                                long = long_seq[l],
                                                rfx = rfx_fun(),
-                                               max.yrs = max_yrs)$lambdatracker[max_yrs]
-  
-  #ssd <- stable.stage(mat)
-  #SR_long_mean[l] <- sum(ssd[1:(F_params$max_size+1)])
-  #n0[,l] <- ssd
-  #fem_panic <- ssd[2:(F_params$max_size+1)] %*% 
-  #  (pfx(x=1:F_params$max_size,param=F_params,long=long_seq[l],rfx=rfx_fun()) *
-  #     nfx(x=1:F_params$max_size,param=F_params,long=long_seq[l],rfx=rfx_fun()))
-  #male_panic <- ssd[(M_params$max_size+3):((M_params$max_size+1)*2)] %*% 
-  #  (pfx(x=1:M_params$max_size,param=M_params,long=long_seq[l],rfx=rfx_fun()) *
-  #     nfx(x=1:M_params$max_size,param=M_params,long=long_seq[l],rfx=rfx_fun()))
-  #OSR_long_mean[l] <- fem_panic / (fem_panic + male_panic)
+                                               max.yrs = max_yrs)
+  lambda_long_mean_2sex[l] <- lambda_run$lambdatracker[max_yrs]
+  SR_long_mean[l] <- lambda_run$SRtracker[max_yrs]
+  OSR_long_mean[l] <- lambda_run$OSRtracker[max_yrs]
+  ssd[,l] <- lambda_run$n0
 }
 
-par(mfrow=c(3,1))
+par(mfrow=c(2,2))
 plot(long_seq
      + mean(latlong$Longitude),
      lambda_long_mean,
@@ -982,8 +970,15 @@ plot(long_seq
      main=F_params$max_size)
 lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lty=2)
 abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county 
-plot(long_seq,SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
-plot(long_seq,OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+
+plot(ssd[1:(F_params$max_size+1),1],type="l",col="dodgerblue")
+lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),1],col="tomato")
+lines(ssd[1:(F_params$max_size+1),length(long_seq)],col="dodgerblue",lty=2)
+lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),length(long_seq)],col="tomato",lty=2)
+
+plot(long_seq+mean(latlong$Longitude),SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+plot(long_seq+mean(latlong$Longitude),OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+
 
 ## compare 2sex and Fdom models
 pdf("Manuscript/Figures/lambda_long_2sex_Fdom.pdf",useDingbats = F)
@@ -993,7 +988,6 @@ plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="l",lwd=2,
 lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=2)
 legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
 dev.off()
-
 
 # obtain stable stage distribution for comparison to observed data ----
 
