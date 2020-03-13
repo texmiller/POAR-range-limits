@@ -7,6 +7,7 @@ library(ggplot2)
 library(ggthemes)
 
 in_dir <- "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Data/"
+in_dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/"
 
 # Stable stage distribution from MPM --------------------
 
