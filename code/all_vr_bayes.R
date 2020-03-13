@@ -552,3 +552,56 @@ fit_allsites_full <- stan(
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
 
+# Posterior predictive checks ---------------------------------------------
+## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
+predS <- rstan::extract(fit_allsites_full, pars = c("predS"))$predS
+predG <- rstan::extract(fit_allsites_full, pars = c("predG"))$predG
+phi_G <- rstan::extract(fit_allsites_full, pars = c("phi_g"))$phi_g
+predF <- rstan::extract(fit_allsites_full, pars = c("predF"))$predF
+predP <- rstan::extract(fit_allsites_full, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
+predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
+predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predS)[1], n_post_draws)
+
+y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
+y_g_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
+y_f_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_f))
+y_p_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_p))
+y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
+y_m_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_m))
+
+for(i in 1:n_post_draws){
+  ## sample survival data (bernoulli)
+  y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
+  ## sample flowering data (bernoulli)
+  y_f_sim[i,] <- rbinom(n=length(data_allsites_all$y_f), size=1, prob = invlogit(predF[i,]))
+  ## sample viability data (binomial)
+  y_v_sim[i,] <- rbinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, prob = predV[i,])
+  ## sample germination data (binomial)
+  y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
+  
+  ## sample growth data (zero-truncated NB)
+  for(j in 1:length(data_allsites_all$y_g)){
+    y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predG[i,j]), size=phi_G[i]) / (1 - dnbinom(0, mu = exp(predG[i,j]), size=phi_G[i])))
+  }
+  ## sample panicle data (zero-truncated NB)
+  for(j in 1:length(data_allsites_all$y_p)){
+    y_p_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predP[i,j]), size=phi_P[i]) / (1 - dnbinom(0, mu = exp(predP[i,j]), size=phi_P[i])))
+  }
+}
+
+ppc_dens_overlay(data_allsites_all$y_s, y_s_sim)
+ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 100)
+ppc_dens_overlay(data_allsites_all$y_f, y_f_sim)
+ppc_dens_overlay(data_allsites_all$y_p, y_p_sim)+xlim(0, 50)
+ppc_dens_overlay(data_allsites_all$y_v, y_v_sim) ## maybe need beta-binomial?
+ppc_dens_overlay(data_allsites_all$y_m, y_m_sim) ## maybe need beta-binomial?
+
+mcmc_dens_overlay(fit_allsites_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,phi_g))
+mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
+mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
+                                          bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
+                                          blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
