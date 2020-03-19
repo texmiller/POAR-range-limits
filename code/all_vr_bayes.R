@@ -5,6 +5,7 @@ library(rstan)
 # set rstan options
 rstan_options( auto_write = TRUE )
 options( mc.cores = parallel::detectCores() )
+Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
 #library(shinystan)
 library(tidyverse)
 #library(loo)
@@ -26,13 +27,10 @@ invlogit<-function(x){exp(x)/(1+exp(x))}
 
 # read demographic data
 #poar    <- read.csv('data/demography.csv', stringsAsFactors = F)
-# Tom's Cornell desktop
-poar <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 # Tom's laptop
-#poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
+poar <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography.csv", stringsAsFactors = F)
 #viabVr  <- read.csv('data/viability.csv')
-viabVr <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
-#viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
+viabVr <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/viability.csv")
 
 # Data formatting -------------------------------------------------
 
@@ -51,64 +49,6 @@ poar.surv <- poar %>%
                         block = unique.block ) %>% 
                 mutate( log_size_t0   = log(tillerN_t0),
                         log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
-# 
-# # Tom's survival model experiments ----------------------------------------
-# # data for model
-# data_l <- list( #response data
-#                 y_s        = poar.surv$surv_t1,
-#                 n_s        = poar.surv$surv_t1 %>% length,
-#                 #covariates
-#                 size_s     = poar.surv$log_size_t0,
-#                 male_s     = poar.surv$sex-1,
-#                 long_s     = poar.surv$long.center,
-#                 n_sites    = poar.surv$site %>% n_distinct,
-#                 site_s     = poar.surv$site,
-#                 n_sources  = poar.surv$source %>% n_distinct(),
-#                 source_s =  poar.surv$source,
-#                 n_blocks = poar.surv$block %>% n_distinct(),
-#                 block_s = poar.surv$block
-#                 
-# )
-# # parameters to estimate
-# params <- quote_bare( b_0, b_size, b_sex, b_long,
-#                       b_size_sex, b_size_long, b_long_sex, b_size_long_sex,
-#                       site_tau, block_tau, source_tau)
-# # simulation parameters
-# sim_pars <- list(
-#   warmup = 1000, 
-#   iter = 5000, 
-#   thin = 3, 
-#   chains = 4
-# )
-# # fit the toy model 
-# #fit_mod <- stan(
-# #  file = 'code/stan/surv_tom.stan',
-# #  data = data_l,
-#   #pars = params,
-# #  warmup = sim_pars$warmup,
-# #  iter = sim_pars$iter,
-# #  thin = sim_pars$thin,
-# #  chains = sim_pars$chains )
-# 
-# ## assess fit and convergence
-# mcmc_dens_overlay(fit_mod,par=params)
-# mcmc_trace(fit_mod,par=params)
-# mcmc_intervals(fit_mod,par=params)
-# 
-# ## posterior predictive check
-# y_s_new <- rstan::extract(fit_mod, pars = c("y_s_new"))
-# color_scheme_set("brightblue")
-# ppc_dens_overlay(data_l$y_s, y_s_new[[1]][1:5,])
-# 
-# 
-# surv_summary <- summary(fit_mod)
-# x_surv <- seq(min(poar.surv$log_size_t0),max(poar.surv$log_size_t0),length.out=100)
-# invlogit <- function(x){exp(x)/(1+exp(x))}
-# 
-# plot(jitter(poar.surv$log_size_t0),jitter(poar.surv$surv_t1))
-# lines(x_surv,invlogit(surv_summary$summary[,"mean"]["b_0"] + surv_summary$summary[,"mean"]["b_s"] * x_surv),lwd=3)
-
-###########################################################################
 
 # growth 
 poar.grow <- poar %>% 
@@ -393,7 +333,6 @@ for(i in 1:n_post_draws){
 
 # Now include "bad" sites -------------------------------------------------
 
-poar_allsites <- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
 poar_allsites <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
 
 # Survival
@@ -549,7 +488,7 @@ fit_allsites_full <- stan(
   chains = sim_pars$chains )
 
 #saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
-#fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
+fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
 
 # Posterior predictive checks ---------------------------------------------
@@ -567,7 +506,7 @@ n_post_draws <- 500
 post_draws <- sample.int(dim(predS)[1], n_post_draws)
 
 y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
-y_g_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
+y_g_sim <- y_g_sim_alt <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
 y_f_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_f))
 y_p_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_p))
 y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
@@ -586,22 +525,116 @@ for(i in 1:n_post_draws){
   ## sample growth data (zero-truncated NB)
   for(j in 1:length(data_allsites_all$y_g)){
     y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predG[i,j]), size=phi_G[i]) / (1 - dnbinom(0, mu = exp(predG[i,j]), size=phi_G[i])))
-  }
+    }
   ## sample panicle data (zero-truncated NB)
   for(j in 1:length(data_allsites_all$y_p)){
     y_p_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predP[i,j]), size=phi_P[i]) / (1 - dnbinom(0, mu = exp(predP[i,j]), size=phi_P[i])))
   }
 }
 
+## try a different approach for simulating from ZT-NB
+for(i in 1:n_post_draws){
+  for(j in 1:length(data_allsites_all$y_g)){
+    
+  for(k in 1:1000){
+    g_draw <- rnbinom(n=1,mu = exp(predG[i,j]), size=phi_G[i])
+    if(g_draw>0){y_g_sim_alt[i,j] <- g_draw; break}
+  }
+  }
+}
+
+## survival looks great
 ppc_dens_overlay(data_allsites_all$y_s, y_s_sim)
-ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 100)
+
+## growth
+ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 20)
+ppc_dens_overlay(data_allsites_all$y_g, y_g_sim_alt)+xlim(0, 20)
+
+## flowering looks great
 ppc_dens_overlay(data_allsites_all$y_f, y_f_sim)
-ppc_dens_overlay(data_allsites_all$y_p, y_p_sim)+xlim(0, 50)
-ppc_dens_overlay(data_allsites_all$y_v, y_v_sim) ## maybe need beta-binomial?
-ppc_dens_overlay(data_allsites_all$y_m, y_m_sim) ## maybe need beta-binomial?
+
+## panicles--pretty good
+ppc_dens_overlay(data_allsites_all$y_p, y_p_sim)+xlim(0, 20)
+
+## seed viability
+ppc_dens_overlay(data_allsites_all$y_v, y_v_sim) 
+bayesplot::ppc_intervals(y = data_allsites_all$y_v, yrep = posterior_predict(fit_allsites_full),
+                         x = data_allsites_all$SR_v) + ggplot2::xlab("SR")
+
+## seed germination
+ppc_dens_overlay(data_allsites_all$y_m, y_m_sim) 
 
 mcmc_dens_overlay(fit_allsites_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,phi_g))
 mcmc_trace(fit_full,par=quote_bare(blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g))
 mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                           bsizesex_s, bsizelong_s,blongsex_s,bsizelongsex_s,
                                           blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
+
+
+# growth troubleshooting --------------------------------------------------
+#the PPC looks like the model is under-estimating growth (too many 1-tiller predictions)
+#can a different distribution provide a better fit?
+library(gamlss)
+grow_gamlss_fit <- fitDist(data_allsites_all$y_g,type="counts")
+summary(grow_gamlss_fit)
+grow_gamlss_fit$fits
+## I think this is telling me that a ZA-PIG is best
+## ugh, but how to fit that as a regression
+
+## instead, try making the dispersion param of the NB a function of size, sex, and long
+# data for growth model
+data_grow <- list( n_sites    = poar_allsites.grow$site %>% n_distinct,
+                  n_sources  = poar_allsites.grow$source %>% n_distinct(),
+                  
+                  # growth data
+                  n_blocks_g = poar_allsites.grow$block %>% n_distinct,
+                  site_g     = poar_allsites.grow$site,
+                  source_g =  poar_allsites.grow$source,
+                  block_g    = poar_allsites.grow$block,
+                  site_block_g = data.frame( site_i  = poar_allsites.grow$site,
+                                             block_i = poar_allsites.grow$block ) %>% 
+                    unique %>% .$site_i,
+                  male_g   = poar_allsites.grow$sex-1,
+                  long_g   = poar_allsites.grow$long.center,
+                  size_g   = poar_allsites.grow$log_size_t0,
+                  y_g      = poar_allsites.grow$tillerN_t1,
+                  n_g      = nrow(poar_allsites.grow)
+                  )
+
+
+# simulation parameters
+sim_pars <- list(
+  warmup = 1000, 
+  iter = 10000, 
+  thin = 3, 
+  chains = 3
+)
+
+# fit the "big" model 
+fit_grow <- stan(
+  file = 'code/stan/poar_growth.stan',
+  data = data_grow,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+
+# see how we did
+predG <- rstan::extract(fit_grow, pars = c("predG"))$predG
+dispG <- rstan::extract(fit_grow, pars = c("dispG"))$dispG
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predG)[1], n_post_draws)
+y_g_sim <- y_g_sim_alt <- matrix(NA,n_post_draws,length(data_grow$y_g))
+for(i in 1:n_post_draws){
+  ## sample growth data (zero-truncated NB)
+  for(j in 1:length(data_allsites_all$y_g)){
+    y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predG[i,j]), size=dispG[i,j]) / (1 - dnbinom(0, mu = exp(predG[i,j]), size=dispG[i,j])))
+  }
+}
+ppc_dens_overlay(data_grow$y_g, y_g_sim)+xlim(0, 50)
+## the NB still does not describe the growth data very well,
+## even with more flexibility in the dispersion parameter
+
+
+
