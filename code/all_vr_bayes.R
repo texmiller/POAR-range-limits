@@ -9,7 +9,7 @@ Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
 #library(shinystan)
 library(tidyverse)
 #library(loo)
-#library(bayesplot)
+library(bayesplot)
 #library(gtools)
 library(countreg)
 #library(actuar)
@@ -334,6 +334,7 @@ for(i in 1:n_post_draws){
 # Now include "bad" sites -------------------------------------------------
 
 poar_allsites <- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
+poar_allsites <- read.csv("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv", stringsAsFactors = F)
 
 # Survival
 poar_allsites.surv <- poar_allsites %>% 
@@ -490,6 +491,7 @@ fit_allsites_full <- stan(
 #saveRDS(fit_allsites_full, 'C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 #fit_allsites_full <- readRDS('C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds')
+fit_allsites_full <- readRDS('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds')
 
 # Posterior predictive checks ---------------------------------------------
 ## need to generate simulated data, doing this in Stan gave me errors (problems with log_neg_binom_2_rng)
@@ -547,8 +549,8 @@ for(i in 1:n_post_draws){
 ppc_dens_overlay(data_allsites_all$y_s, y_s_sim)
 
 ## growth
-ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 20)
-ppc_dens_overlay(data_allsites_all$y_g, y_g_sim_alt)+xlim(0, 20)
+bayesplot::ppc_dens_overlay(data_allsites_all$y_g, y_g_sim)+xlim(0, 20)
+bayesplot::ppc_dens_overlay(data_allsites_all$y_g, y_g_sim_alt)+xlim(0, 20)
 
 ## flowering looks great
 ppc_dens_overlay(data_allsites_all$y_f, y_f_sim)
@@ -571,7 +573,8 @@ mcmc_dens_overlay(fit_full,par=quote_bare(b0_s,bsize_s,bsex_s,blong_s,
                                           blong2_s,bsizelong2_s,blong2sex_s,bsizelong2sex_s))
 
 
-# growth troubleshooting --------------------------------------------------
+# Growth troubleshooting: Negative Binomial --------------------------------------------
+
 #the PPC looks like the model is under-estimating growth (too many 1-tiller predictions)
 #can a different distribution provide a better fit?
 library(gamlss)
@@ -623,18 +626,78 @@ fit_grow <- stan(
 predG <- rstan::extract(fit_grow, pars = c("predG"))$predG
 dispG <- rstan::extract(fit_grow, pars = c("dispG"))$dispG
 
-n_post_draws <- 500
-post_draws <- sample.int(dim(predG)[1], n_post_draws)
-y_g_sim <- y_g_sim_alt <- matrix(NA,n_post_draws,length(data_grow$y_g))
+n_post_draws  <- 500
+post_draws    <- sample.int(dim(predG)[1], n_post_draws)
+y_g_sim       <- y_g_sim_alt <- matrix( NA, 
+                                        n_post_draws, 
+                                        length(data_grow$y_g) )
+
+# simulate datasets
 for(i in 1:n_post_draws){
   ## sample growth data (zero-truncated NB)
   for(j in 1:length(data_allsites_all$y_g)){
     y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predG[i,j]), size=dispG[i,j]) / (1 - dnbinom(0, mu = exp(predG[i,j]), size=dispG[i,j])))
   }
 }
-ppc_dens_overlay(data_grow$y_g, y_g_sim)+xlim(0, 50)
+
+# posterior predictive checks
+ppc_dens_overlay(data_grow$y_g, y_g_sim) + 
+  xlim(0, 50) +
+  ggsave( 'nb_regression_truncated.png',
+          width = 6.3, height = 6.3 )
 ## the NB still does not describe the growth data very well,
-## even with more flexibility in the dispersion parameter
+## even with more flexibility in the dispersion paramete
 
 
 
+# Growth troubleshooting: PIG distribution ------------------------------------------------
+
+# fit model
+fit_grow_pig <- stan(
+                      file = 'code/stan/poar_growth_pig_unequal.stan',
+                      data = data_grow,
+                      warmup = sim_pars$warmup,
+                      iter = sim_pars$iter,
+                      thin = sim_pars$thin,
+                      chains = sim_pars$chains 
+                      )
+
+# OPTIONAL: read already fit model
+dir          <- 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/'
+fit_grow_pig <- readRDS( paste0(dir, 'poar_grow_pig_unequal_idiv_cluster.rds') )
+
+# posterior of predictions
+predG <- rstan::extract(fit_grow_pig, pars = c("predG"))$predG
+theta <- rstan::extract(fit_grow_pig, pars = c("theta"))$theta
+
+# set up simulation of data
+n_post_draws  <- 500
+post_draws    <- sample.int(dim(predG)[1], n_post_draws)
+y_g_sim       <- y_g_sim_alt <- matrix( NA, 
+                                        n_post_draws, 
+                                        length(data_grow$y_g) )
+
+
+# fimulate data
+for(i in 1:n_post_draws){
+  ## sample growth data (zero-truncated PIG)
+  for(j in 1:length(data_allsites_all$y_g)){
+    
+    # probability without truncation
+    prob_v <- dpois( 1:1000, 
+                     lambda = (predG[i,j] * theta[i,j]) )
+    
+    # probability for trunctation (denominator)
+    prob_t <- (1 - dpois(0, lambda = (predG[i,j] * theta[i,j]) ) )
+    
+    y_g_sim[i,j] <- sample( x=1:1000, 
+                            size = 1, replace = T,
+                            prob = prob_v / prob_t )
+  }
+}
+
+# Posterior predictive check
+ppc_dens_overlay(data_grow$y_g, y_g_sim) + 
+  xlim(0, 50) +
+  ggsave( 'pig_regression_truncated.png',
+          width = 6.3, height = 6.3 )
