@@ -155,8 +155,8 @@ data {
 parameters {
   real<lower=0> lambda; //poisson mean
   real<lower=0> sigma; // IG shape
-  real<lower=0> theta; // 
-  // vector<lower=0>[N] theta; //observation-level deviates
+  # real<lower=0> theta; // 
+  vector<lower=0>[N] theta; //observation-level deviates
 }
 
 model{
@@ -371,7 +371,7 @@ fit_PIG
 # PIG regression via PGIG --------------------------------------------
 
 # simulate data
-N       <- 130
+N       <- 500
 x       <- runif(N, 1, 5) %>% round(0)
 y       <- rPIG( N, 
                  mu = exp(x * 0.3), # exponential function 
@@ -402,3 +402,44 @@ fit_PIG    <- sampling( mod_pig_r,
                         )
 
 fit_PIG
+
+
+# PIG HACKY regression -----------------------------------------------------
+
+# HACKY: A Poisson with a inverse-Gaussian distributed dispersion parameter
+
+# simulate data
+N       <- 500
+x       <- runif(N, 1, 5) %>% round(0)
+y       <- rPIG( N, 
+                 mu = exp(x * 0.3), # exponential function 
+                 sigma = 1 )
+pig_dat <- list( y     = y,
+                 x     = x,
+                 N     = N )
+
+# compile model
+mod_pig_hack <- stan_model( 'code/stan/pig_reg_hacky.stan' )
+
+# attempt to fit!
+fit_PIG    <- sampling( mod_pig_hack, 
+                        data    = pig_dat, 
+                        chains  = 1, 
+                        iter    = 4000,
+                        warmup  = 1000, 
+                        thin    = 2,
+                        verbose = T 
+                      )
+
+id_1 <- which(pig_dat$x==1)
+id_2 <- which(pig_dat$x==2)
+id_3 <- which(pig_dat$x==3)
+id_4 <- which(pig_dat$x==4)
+id_5 <- which(pig_dat$x==5)
+
+summary(fit_PIG)$summary[,'mean'][id_1+2] %>% mean
+summary(fit_PIG)$summary[,'mean'][id_2+2] %>% mean
+summary(fit_PIG)$summary[,'mean'][id_3+2] %>% mean
+summary(fit_PIG)$summary[,'mean'][id_4+2] %>% mean
+summary(fit_PIG)$summary[,'mean'][id_5+2] %>% mean
+
