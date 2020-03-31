@@ -502,7 +502,9 @@ predF <- rstan::extract(fit_allsites_full, pars = c("predF"))$predF
 predP <- rstan::extract(fit_allsites_full, pars = c("predP"))$predP
 phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
 predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
+phi_V <- rstan::extract(fit_allsites_full, pars = c("phi_v"))$phi_v
 predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
+phi_M <- rstan::extract(fit_allsites_full, pars = c("phi_m"))$phi_m
 
 n_post_draws <- 500
 post_draws <- sample.int(dim(predS)[1], n_post_draws)
@@ -519,10 +521,12 @@ for(i in 1:n_post_draws){
   y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
   ## sample flowering data (bernoulli)
   y_f_sim[i,] <- rbinom(n=length(data_allsites_all$y_f), size=1, prob = invlogit(predF[i,]))
-  ## sample viability data (binomial)
-  y_v_sim[i,] <- rbinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, prob = predV[i,])
-  ## sample germination data (binomial)
-  y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
+  ## sample viability data (beta-binomial)
+  y_v_sim[i,] <- rbetabinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, m=predV[i,], s=phi_V[i])
+  #y_v_sim[i,] <- rbinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, prob = predV[i,])
+  ## sample germination data (beta-binomial)
+  y_m_sim[i,] <- rbetabinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, m=predM[i,], s=phi_M[i])
+  #y_m_sim[i,] <- rbinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, prob = predM[i,])
   
   ## sample growth data (zero-truncated NB)
   for(j in 1:length(data_allsites_all$y_g)){
