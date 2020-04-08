@@ -18,10 +18,11 @@ functions {
 data {
   int<lower=0> N; // number of observations
   int<lower=0> y[N]; // failure in hours
-  vector<lower=0>[N] x; // failure in hours
+  vector[N] x; // failure in hours
 }
 parameters {
-  real<lower=0> b; //poisson mean
+  real b0; 
+  real b1; 
   real<lower=0> sigma; // IG shape
   real<lower=0> theta[N]; //observation-level deviates
 }
@@ -29,7 +30,7 @@ parameters {
 transformed parameters{
   vector<lower=0>[N] yhat;
   
-  yhat = exp( b * x );
+  yhat = exp(b0 + b1 * x );
   
 }
 
