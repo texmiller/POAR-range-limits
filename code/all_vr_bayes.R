@@ -14,6 +14,7 @@ library(bayesplot)
 library(countreg)
 #library(actuar)
 library(rmutil)
+library(actuar)
 #options( stringsAsFactors = T)
 #source('code/format/plot_binned_prop.R')
 
@@ -705,3 +706,117 @@ ppc_dens_overlay(data_grow$y_g, y_g_sim) +
   xlim(0, 50) +
   ggsave( 'pig_regression_truncated.png',
           width = 6.3, height = 6.3 )
+
+# Posterior predictive checks on final full model with ZT-PIG growth ----
+fit_allsites_full <- readRDS("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/fit_allsite_full_pig_trunc.rds")
+
+predS <- rstan::extract(fit_allsites_full, pars = c("predS"))$predS
+predG <- rstan::extract(fit_allsites_full, pars = c("predG"))$predG
+sigmaG <- rstan::extract(fit_allsites_full, pars = c("sigma"))$sigma
+predF <- rstan::extract(fit_allsites_full, pars = c("predF"))$predF
+predP <- rstan::extract(fit_allsites_full, pars = c("predP"))$predP
+phi_P <- rstan::extract(fit_allsites_full, pars = c("phi_p"))$phi_p
+predV <- rstan::extract(fit_allsites_full, pars = c("predV"))$predV
+phi_V <- rstan::extract(fit_allsites_full, pars = c("phi_v"))$phi_v
+predM <- rstan::extract(fit_allsites_full, pars = c("predM"))$predM
+phi_M <- rstan::extract(fit_allsites_full, pars = c("phi_m"))$phi_m
+
+n_post_draws <- 500
+post_draws <- sample.int(dim(predS)[1], n_post_draws)
+
+y_s_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_s))
+y_g_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_g))
+y_f_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_f))
+y_p_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_p))
+y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
+y_m_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_m))
+
+for(i in 1:n_post_draws){
+  ## sample survival data (bernoulli)
+  y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
+  ## sample flowering data (bernoulli)
+  y_f_sim[i,] <- rbinom(n=length(data_allsites_all$y_f), size=1, prob = invlogit(predF[i,]))
+  ## sample viability data (beta-binomial)
+  y_v_sim[i,] <- rbetabinom(n=length(data_allsites_all$y_v), size=data_allsites_all$tot_seeds_v, m=predV[i,], s=phi_V[i])
+  ## sample germination data (beta-binomial)
+  y_m_sim[i,] <- rbetabinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, m=predM[i,], s=phi_M[i])
+  ## sample growth data (zero-truncated PIG) -- generates data as legit PIG
+  for(i in 1:n_post_draws){
+    for(j in 1:length(data_allsites_all$y_g)){
+      ## the pig function appears numerically unstable at low probabilities, so here is a hacky solution
+      pig<-dpoisinvgauss(0:1000,mean=predG[i,j],shape=(sigmaG[i]*predG[i,j]))
+      pig[is.nan(pig) | is.infinite(pig)] <- 0
+      pig_trunc_prob <- pig[2:1001] / (1 - ((1 - sum(pig)) + pig[1]))
+      y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=pig_trunc_prob)
+    } 
+  }
+  ## sample growth data (zero-truncated PIG) -- generates data as Poissong-IG mixture
+  #for(j in 1:length(data_allsites_all$y_g)){
+  #  y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dpois(1:1000,lambda=(predG[i,j]*thetaG[i,j]))/(1-dpois(0,lambda=(predG[i,j]*thetaG[i,j]))))
+  #}
+  ## sample panicle data (zero-truncated NB)
+  for(j in 1:length(data_allsites_all$y_p)){
+    y_p_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dnbinom(1:1000, mu = exp(predP[i,j]), size=phi_P[i]) / (1 - dnbinom(0, mu = exp(predP[i,j]), size=phi_P[i])))
+  }
+}
+
+
+ppc_dens_overlay(data_allsites_all$y_s, y_s_sim)+
+  xlab("Survival status")+ylab("Density")+
+  ggtitle(("Survival"))+theme(legend.position = "none")->ppc_surv
+ppc_dens_overlay(data_allsites_all$y_g, na.omit(y_g_sim))+xlim(0, 50)+
+  xlab("Number of tillers")+ylab("Density")+
+  ggtitle(("Growth"))+theme(legend.position = "none")->ppc_grow
+ppc_dens_overlay(data_allsites_all$y_f, y_f_sim)+
+  xlab("Flowering status")+ylab("Density")+
+  ggtitle(("Flowering"))+theme(legend.position = "none")->ppc_flow
+ppc_dens_overlay(data_allsites_all$y_p, y_p_sim)+xlim(0, 30)+
+  xlab("Number of panicles")+ylab("Density")+
+  ggtitle(("Panicles"))+theme(legend.position = "none")->ppc_panic
+ppc_dens_overlay(data_allsites_all$y_v, y_v_sim)+
+  xlab("Number of viable seeds")+ylab("Density")+
+  ggtitle(("Seed viability"))+theme(legend.position = "none")->ppc_viab
+ppc_dens_overlay(data_allsites_all$y_m, y_m_sim)+
+  xlab("Number of germinants")+ylab("Density")+
+  ggtitle(("Seed germination"))+theme(legend.position = "none")->ppc_germ
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+pdf("Manuscript/Figures/PPC.pdf",useDingbats = F,height=10,width=6)
+multiplot(ppc_surv,ppc_flow,ppc_viab,
+          ppc_grow,ppc_panic,ppc_germ,cols=2)
+dev.off()
