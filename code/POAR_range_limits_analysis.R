@@ -18,11 +18,12 @@ viabVr <- read.csv(paste0(dir,"/Experiment/Demography/POAR-range-limits/data/via
 #fit_dropsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_full.rds"))
 
 #this model includes the three bad sites
-fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds"))
+#fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full.rds"))
+# updated with PIG for growth
+fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsite_full_pig_trunc.rds"))
 
 #this model includes the three bad sites but drops the long^2 interactions terms (but keeps long^2)
 #fit_allsites_full <- readRDS(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/fit_allsites_full_noLong2intx.rds"))
-
 
 ## read in the site latlong file to un-scale longitude
 latlong <- read.csv(paste0(dir,"/Experiment/Demography/data/SiteLatLong.csv"))
@@ -34,6 +35,7 @@ quote_bare <- function( ... ){
     sapply( deparse )
 }
 invlogit<-function(x){exp(x)/(1+exp(x))}
+
 
 # Core vital rates --------------------------------------------------------
 # estimate sex- and longitude-specific vital rates for small, medium, and large plants
