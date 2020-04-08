@@ -187,9 +187,11 @@ The linear predictor also included random effects of site, block, and source pop
 We pooled all three years of observations for analysis so we do not explicitly model temporal variation but our results are implicitly averaged over years. 
 
 The survival and flowering data were Bernoulli distributed, and these models applied the logit link function. 
-We modeled tiller and panicle counts as zero-truncated negative binomial using the log link. 
+We modeled panicle counts as zero-truncated negative binomial using the log link. 
+For growth, we modeled tiller number in year $t+1$ with a zero-truncated Poisson-Inverse Gaussian (PIG) distribution. 
 For flowering and panicle production in year $t$, the size covariate was the natural logarithm of tiller number in year $t$. 
 For survival and size  in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
+Posterior predictive checks indicated that these models described the data well (Fig. \ref{fig:PPC}). 
 
 \subsection*{Sex ratio experiment}
 At one site near the center of the range (Lake Lewisville Environmental Learning Area in North-central Texas), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
@@ -407,6 +409,16 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
 
 \begin{figure}[h!]
   \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/PPC}
+  \caption{Posterior predictive checks of statistical models for demographic vital rates. 
+  Lines show density distributions of real data (thick, dark blue) compared to simulated data sets (thin, light blue) generated from the fitted models based on 500 draws of the posterior distribution of parameter estimates. 
+  Correspondence of the real and simulated data suggests that the fitted models describe the data well.}
+  \label{fig:PPC}
+  \end{center}
+\end{figure}
+
+\begin{figure}[h!]
+  \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/lambda_long_2sex_Fdom}
   \caption{Comparison of longitudinal variation in $\lambda$ between the two-sex demographic model (dashed line) that includes dependence of female seed production on population structure and the corresponding female-dominant model (solid line) with constant female fertility and all else equal. 
   Models were evaluated at posterior mean parameter estimates}
@@ -425,5 +437,8 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \label{fig:garden_sex_ratios}
   \end{center}
 \end{figure}
+
+
+
 
 \end{document}
