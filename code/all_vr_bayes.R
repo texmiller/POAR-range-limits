@@ -732,6 +732,7 @@ y_v_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_v))
 y_m_sim <- matrix(NA,n_post_draws,length(data_allsites_all$y_m))
 
 for(i in 1:n_post_draws){
+  print(i)
   ## sample survival data (bernoulli)
   y_s_sim[i,] <- rbinom(n=length(data_allsites_all$y_s), size=1, prob = invlogit(predS[i,]))
   ## sample flowering data (bernoulli)
@@ -741,7 +742,6 @@ for(i in 1:n_post_draws){
   ## sample germination data (beta-binomial)
   y_m_sim[i,] <- rbetabinom(n=length(data_allsites_all$y_m), size=data_allsites_all$tot_seeds_m, m=predM[i,], s=phi_M[i])
   ## sample growth data (zero-truncated PIG) -- generates data as legit PIG
-  for(i in 1:n_post_draws){
     for(j in 1:length(data_allsites_all$y_g)){
       ## the pig function appears numerically unstable at low probabilities, so here is a hacky solution
       pig<-dpoisinvgauss(0:1000,mean=predG[i,j],shape=(sigmaG[i]*predG[i,j]))
@@ -749,7 +749,6 @@ for(i in 1:n_post_draws){
       pig_trunc_prob <- pig[2:1001] / (1 - ((1 - sum(pig)) + pig[1]))
       y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=pig_trunc_prob)
     } 
-  }
   ## sample growth data (zero-truncated PIG) -- generates data as Poissong-IG mixture
   #for(j in 1:length(data_allsites_all$y_g)){
   #  y_g_sim[i,j] <- sample(x=1:1000,size=1,replace=T,prob=dpois(1:1000,lambda=(predG[i,j]*thetaG[i,j]))/(1-dpois(0,lambda=(predG[i,j]*thetaG[i,j]))))
