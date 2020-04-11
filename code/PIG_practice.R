@@ -443,3 +443,82 @@ summary(fit_PIG)$summary[,'mean'][id_3+2] %>% mean
 summary(fit_PIG)$summary[,'mean'][id_4+2] %>% mean
 summary(fit_PIG)$summary[,'mean'][id_5+2] %>% mean
 
+
+# PIG mixture proof -------------------------------------------------------
+## Now that we fit the growth data with a Poisson-IG mixture,
+## I want to check that I am understand how to parameterize the
+## PIG from this mixture
+univ_pig  <- stan_model( file = 'code/stan/univ_pig_tom.stan' )
+n_rep   <- 500
+n_samples <- 50
+
+mean_store<-shape_store<-fit_mean_store<-fit_shape_store<-c()
+for(i in 1:n_samples){
+  print(i)
+mean_store[i] <- sample(c(3,15),1)
+shape_store[i] <- runif(1,0,20)
+
+pig_dat <- list(y = rpoisinvgauss(n_rep, 
+                                  mean=mean_store[i], 
+                                  shape = shape_store[i]),
+                n = n_rep)
+fit_PIG    <- sampling( univ_pig, 
+                        data    = pig_dat, 
+                        chains  = 2, 
+                        iter    = 8000,
+                        warmup  = 1000, 
+                        thin    = 2,
+                        verbose = T 
+              )
+fit_PIG_par <- lapply(rstan::extract(fit_PIG, pars = c("lambda","sigma")),mean)
+fit_mean_store[i] <- fit_PIG_par$lambda
+fit_shape_store[i] <- fit_PIG_par$sigma
+}
+
+plot(mean_store,fit_mean_store)
+plot(shape_store,fit_shape_store)
+abline(0,1/3)
+abline(0,1/15)
+
+plot(shape_store[mean_store==3],
+     fit_shape_store[mean_store==3]*3)
+abline(0,1)
+
+plot(shape_store[mean_store==15]/15,
+     fit_shape_store[mean_store==15])
+abline(0,1)
+
+## I do not understand the theory behind this but it is quite clear
+## that the Stan fit returns a sigma parameter that is 1/lambda
+## times the shape parameter of rpoisinvgauss
+## I can triple check this by running the PPC using this transformation
+## Can't get this to work with the PPCs. Now trying the regression version of PIG practice.
+reg_pig  <- stan_model( file = 'code/stan/pig_reg_hacky.stan' )
+
+x <- runif(n_rep,-5,5)
+b0 <- 0
+b1 <- -0.5
+pred <- exp(b0 + b1*x)
+
+for(i in 1:n_samples){
+  print(i)
+shape_store[i] <- runif(1,1,50)
+y_pig <- rpoisinvgauss(n_rep,mean=pred,shape = shape_store[i])
+pig_reg_dat <- list(y = y_pig,
+                    x = x,
+                    N = n_rep)
+fit_reg_PIG    <- sampling( reg_pig, 
+                        data    = pig_reg_dat, 
+                        chains  = 3, 
+                        iter    = 8000,
+                        warmup  = 1000, 
+                        thin    = 2,
+                        verbose = T)
+fit_PIG_reg_par <- lapply(rstan::extract(fit_reg_PIG, pars = c("b0","b1","sigma")),mean)
+fit_shape_store[i] <- fit_PIG_reg_par$sigma
+}
+
+plot(shape_store,fit_shape_store)
+summary(lm(fit_shape_store~shape_store))
+
+hist(rstan::extract(fit_reg_PIG, pars = c("sigma")))
