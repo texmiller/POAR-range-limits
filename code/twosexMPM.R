@@ -16,16 +16,19 @@ sx<-function(x,params,long,rfx){
 #PROBABILITY OF GROWTH FROM SIZE X TO Y
 #This function truncates the density asscociation with x==0 and x>x.max
 gxy<-function(x,y,params,long,rfx){
-  grow_mean<-params$grow_mu + 
+  grow_mean<-exp(params$grow_mu + 
     params$grow_size*log(x) + 
     params$grow_long*long + 
     params$grow_size_long*log(x)*long +
     params$grow_long2*(long^2) + 
     params$grow_size_long2*log(x)*(long^2) + 
-    rfx["grow","site"] + rfx["grow","block"] + rfx["grow","source"]
-  grow<-dnbinom(x=y,mu=exp(grow_mean),size=params$phi_g,log=F)
-  truncLower<-dnbinom(x=0,mu=exp(grow_mean),size=params$phi_g,log=F)
-  truncUpper<-sum(dnbinom(x=params$max_size:10000,mu=exp(grow_mean),size=params$phi_g,log=F))
+    rfx["grow","site"] + rfx["grow","block"] + rfx["grow","source"])
+  
+  grow<-dpoisinvgauss(x=y,mean=grow_mean,shape=(grow_mean*params$sigma_g))
+  grow<-ifelse(is.nan(grow) | is.infinite(grow),0,grow)
+  truncLower<-dpoisinvgauss(x=0,mean=grow_mean,shape=(grow_mean*params$sigma_g))
+  truncUpper<-dpoisinvgauss(x=params$max_size:10000,mean=grow_mean,shape=(grow_mean*params$sigma_g))
+  truncUpper<-sum(ifelse(is.nan(truncUpper) | is.infinite(truncUpper),0,truncUpper))
   return(grow/(1-(truncLower+truncUpper)))
 }
 
