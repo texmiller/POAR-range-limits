@@ -1,4 +1,23 @@
 
+// Inverse Gaussian log probability
+functions {
+  
+  real ig_lpdf (real x, real mu, real lambda){
+    //vector [num_elements (x)] prob;
+    real prob;
+    real lprob;
+    prob = (lambda/(2*pi()*(x^3)))^0.5*exp(-lambda*(x - mu)^2/(2*mu^2*x));
+    //for (i in 1:num_elements(x)) {
+      //   prob[i] = (lambda/(2*pi()*(x[i]^3)))^0.5*exp(-lambda*(x[i] - mu)^2/(2*mu^2*x[i]));
+      //}
+    lprob = log( prob ); 
+    //lprob = sum (log(prob)); 
+    return lprob;
+  }
+  
+}
+
+
 data {
   // Data for all vital rates
   int<lower=0> n_sites;         // N. of sites
@@ -108,8 +127,9 @@ parameters {
   real block_rfx_g[n_blocks_g];  
   real<lower=0> source_tau_g; 
   real source_rfx_g[n_sources];
-  real<lower=0> phi_g; // Growth dispersion parameter 
-    
+  real<lower=0> sigma;      // IG shape
+  real<lower=0> theta[n_g]; //observation-level deviates
+  
   //Flowering
   //fixed effects
   real b0_f;    // Survival size intercept
@@ -205,7 +225,7 @@ transformed parameters{
   
   // prediction for growth
   for(igrow in 1:n_g){
-    predG[igrow] = b0_g + 
+    predG[igrow] = exp(b0_g + 
                 //main effects
                 bsize_g * size_g[igrow] + bsex_g * male_g[igrow] + blong_g * long_g[igrow] + 
                 //2-way interactions
@@ -222,7 +242,7 @@ transformed parameters{
                 //random effects
                 site_rfx_g[site_g[igrow]] +
                 block_rfx_g[block_g[igrow]] +
-                source_rfx_g[source_g[igrow]];
+                source_rfx_g[source_g[igrow]]);
   }
 
   // prediction for flowering
@@ -340,6 +360,11 @@ model {
   for (i in 1:n_sources){
     source_rfx_g[i] ~ normal(0, source_tau_g);
   }
+  for(i in 1:n_g){
+    theta[i] ~ ig(1, sigma);
+  }
+
+  
   //Flowering
   b0_f ~ normal(0, 100);   
   bsize_f ~ normal(0, 100);   
@@ -402,17 +427,14 @@ model {
   //for (i in 1:n_s) {
   //y_s[i] ~ bernoulli_logit(predS[i]);
   //}
-  //for (i in 1:n_g) {
-  //y_g[i] ~ neg_binomial_2_log(predG[i], phi_g);
-  //target += - log1m(neg_binomial_2_log_lpmf(0 | predG[i], phi_g)); // manually zero-truncating
-  //}
   //for (i in 1:n_f) {
   //y_f[i] ~ bernoulli_logit(predF[i]);
   //}
-  //for (i in 1:n_p) {
-  //y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
-  //target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); // manually zero-truncating
-  //}
+  for (i in 1:n_p) {
+    y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
+    // manually zero-truncating
+    target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); 
+  }
   //for (i in 1:n_v) {
   //y_v[i] ~ beta_binomial(tot_seeds_v[i], alpha_v[i], beta_v[i]);
   //}
@@ -423,13 +445,14 @@ model {
   //y_d[i] ~ poisson(lambda_d);  
   //}
   y_s ~ bernoulli_logit(predS);
-  y_g ~ neg_binomial_2_log(predG, phi_g);
+  for (i in 1:n_g) {
+    //T[1,] for zero truncation
+    y_g[i] ~ poisson(predG[i] * theta[i]) T[1,]; 
+  }
   y_f ~ bernoulli_logit(predF);
-  y_p ~ neg_binomial_2_log(predP, phi_p);
+  // y_p ~ neg_binomial_2_log(predP, phi_p);
   y_v ~ beta_binomial(tot_seeds_v, alpha_v, beta_v);
   y_m ~ beta_binomial(tot_seeds_m, alpha_m, beta_m);
   y_d ~ poisson(lambda_d);
   
 }
-
-
