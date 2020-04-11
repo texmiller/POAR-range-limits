@@ -3,6 +3,7 @@ library(scales)
 library(bayesplot)
 library(popbio)
 library(countreg)
+library(actuar)
 
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
 dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
@@ -162,8 +163,7 @@ surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blon
 grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
                                                         bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
                                                         blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
-                                                        site_tau_g,block_tau_g,source_tau_g,
-                                                        phi_g))
+                                                        site_tau_g,block_tau_g,source_tau_g))
 
 flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
                                                         bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
@@ -799,7 +799,7 @@ mean_coef <- lapply(rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex
                                                                bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
                                                                blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
                                                                site_tau_g,block_tau_g,source_tau_g,
-                                                               phi_g,
+                                                               sigma,
                                                                
                                                                b0_f,bsize_f,bsex_f,blong_f,
                                                                bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
@@ -835,14 +835,14 @@ F_params$grow_long <- mean_coef$blong_g
 F_params$grow_size_long <- mean_coef$bsizelong_g 
 F_params$grow_long2 <- mean_coef$blong2_g 
 F_params$grow_size_long2 <- mean_coef$bsizelong2_g #0#
-F_params$phi_g <- mean_coef$phi_g 
+F_params$sigma_g <- mean_coef$sigma 
 M_params$grow_mu <- mean_coef$b0_g + mean_coef$bsex_g #+14
 M_params$grow_size <- mean_coef$bsize_g + mean_coef$bsizesex_g 
 M_params$grow_long <- mean_coef$blong_g + mean_coef$blongsex_g 
 M_params$grow_size_long <- mean_coef$bsizelong_g + mean_coef$bsizelongsex_g 
 M_params$grow_long2 <- mean_coef$blong2_g + mean_coef$blong2sex_g #0#
 M_params$grow_size_long2 <- mean_coef$bsizelong2_g + mean_coef$bsizelong2sex_g #0#
-M_params$phi_g <- mean_coef$phi_g 
+M_params$sigma_g <- mean_coef$sigma 
 ## flowering
 F_params$flow_mu <- mean_coef$b0_f 
 F_params$flow_size <- mean_coef$bsize_f 
@@ -878,16 +878,17 @@ F_params$PSR <- 0.5
 ## use POAU seedling survival for females and males
 F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
 ## set max size equal between the sexes
-F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
+F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
 
 ## long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
 ## extend the longitude to bounds and beyond of observed distribution
-long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.2)
+long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.5)
 lambda_long_mean<-lambda_long_mean_2sex<-SR_long_mean<-OSR_long_mean<-c()
 ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
-max_yrs <- 50
+max_yrs <- 20
 
 for(l in 1:length(long_seq)){
+  print(l/length(long_seq))
   #linear model for comparison
   mat <- megamatrix_delay( F_params,
                            M_params,
