@@ -163,7 +163,7 @@ surv_coef <- rstan::extract(fit_full, pars = quote_bare(b0_s,bsize_s,bsex_s,blon
 grow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_g,bsize_g,bsex_g,blong_g,
                                                         bsizesex_g, bsizelong_g,blongsex_g,bsizelongsex_g,
                                                         blong2_g,bsizelong2_g,blong2sex_g,bsizelong2sex_g,
-                                                        site_tau_g,block_tau_g,source_tau_g))
+                                                        site_tau_g,block_tau_g,source_tau_g,sigma))
 
 flow_coef <- rstan::extract(fit_full, pars = quote_bare(b0_f,bsize_f,bsex_f,blong_f,
                                                         bsizesex_f, bsizelong_f,blongsex_f,bsizelongsex_f,
@@ -576,26 +576,10 @@ year_cols <- c("#e41a1c","#377eb8","#4daf4a")
 
 pdf("Manuscript/Figures/garden_sex_ratios.pdf",useDingbats = F,height=6,width=12)
 par(mfrow=c(1,2),mar=c(5,6,1,1))
-plot(garden_osr$long.center + mean(latlong$Longitude),garden_osr$osr,type="n",ylim=c(0,1),cex.lab=1.4,
-     xlab="Longitude",ylab="Operational sex ratio\n(proportion female panicles)")
-abline(h=0.5,col="gray",lty=2);title("A",adj=0,font=4)
-points(garden_osr$long.center[garden_osr$year==2015] + mean(latlong$Longitude),
-       garden_osr$osr[garden_osr$year==2015],
-       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2015]),col=alpha(year_cols[1],0.5))
-points(garden_osr$long.center[garden_osr$year==2016] + mean(latlong$Longitude),
-       garden_osr$osr[garden_osr$year==2016],
-       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2016]),col=alpha(year_cols[2],0.5))
-points(garden_osr$long.center[garden_osr$year==2017] + mean(latlong$Longitude),
-       garden_osr$osr[garden_osr$year==2017],
-       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2017]),col=alpha(year_cols[3],0.5))
-lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[2]*long_seq),col=year_cols[1],lwd=3)
-lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[3] + (coef(osr_glm)[2]+coef(osr_glm)[5])*long_seq),col=year_cols[2],lwd=3)
-lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[4] + (coef(osr_glm)[2]+coef(osr_glm)[6])*long_seq),col=year_cols[3],lwd=3)
-legend("topleft",legend=2015:2017,bty="n",lwd=3,col=year_cols,cex=1.2)
 
 plot(garden_sr$long.center + mean(latlong$Longitude),garden_sr$sr,type="n",ylim=c(0,1),cex.lab=1.4,
      xlab="Longitude",ylab="Sex ratio\n(proportion female plants)")
-abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
+abline(h=0.5,col="gray",lty=2);title("A",adj=0,font=4)
 points(garden_sr$long.center[garden_sr$year==2015] + mean(latlong$Longitude),
        garden_sr$sr[garden_sr$year==2015],
        pch=16,cex=log(garden_sr$total[garden_sr$year==2015]),col=alpha(year_cols[1],0.5))
@@ -609,6 +593,23 @@ lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)
 lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)[3] + (coef(sr_glm)[2]+coef(sr_glm)[5])*long_seq),col=year_cols[2],lwd=3)
 lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm)[1] + coef(sr_glm)[4] + (coef(sr_glm)[2]+coef(sr_glm)[6])*long_seq),col=year_cols[3],lwd=3)
 legend("topleft",legend=2015:2017,bty="n",lwd=3,col=year_cols,cex=1.2)
+
+plot(garden_osr$long.center + mean(latlong$Longitude),garden_osr$osr,type="n",ylim=c(0,1),cex.lab=1.4,
+     xlab="Longitude",ylab="Operational sex ratio\n(proportion female panicles)")
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
+points(garden_osr$long.center[garden_osr$year==2015] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2015],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2015]),col=alpha(year_cols[1],0.5))
+points(garden_osr$long.center[garden_osr$year==2016] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2016],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2016]),col=alpha(year_cols[2],0.5))
+points(garden_osr$long.center[garden_osr$year==2017] + mean(latlong$Longitude),
+       garden_osr$osr[garden_osr$year==2017],
+       pch=16,cex=log(garden_osr$tot_pan[garden_osr$year==2017]),col=alpha(year_cols[3],0.5))
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[2]*long_seq),col=year_cols[1],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[3] + (coef(osr_glm)[2]+coef(osr_glm)[5])*long_seq),col=year_cols[2],lwd=3)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_glm)[4] + (coef(osr_glm)[2]+coef(osr_glm)[6])*long_seq),col=year_cols[3],lwd=3)
+
 dev.off()
 
 # Seed viability ----------------------------------------------------------
@@ -878,11 +879,12 @@ F_params$PSR <- 0.5
 ## use POAU seedling survival for females and males
 F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
 ## set max size equal between the sexes
-F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
+F_params$max_size <- M_params$max_size <- round(quantile(na.omit(poar$tillerN_t1),probs=0.99)) #max(na.omit(poar$tillerN_t0)); 
 
 ## long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
 ## extend the longitude to bounds and beyond of observed distribution
-long_seq <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),0.5)
+## note that length of this vector has a big effect on how fast/slow the following code runs
+long_seq_extend <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),length.out = 40)
 lambda_long_mean<-lambda_long_mean_2sex<-SR_long_mean<-OSR_long_mean<-c()
 ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
 max_yrs <- 20
@@ -936,41 +938,6 @@ lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=
 legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
 dev.off()
 
-# obtain stable stage distribution for comparison to observed data ----
-
-# stable stage distribution at each longitude
-ssd <- matrix(NA, 56, length(long_seq) )
-
-for(l in 1:length(long_seq)){
-  
-  # stable stage distribution
-  ssd[,l] <- lambdaSim_delay( F_params = F_params,
-                              M_params = M_params,
-                              long     = long_seq[l],
-                              rfx      = rfx_fun(),
-                              max.yrs  = max_yrs)$n0[,1]
-  
-}
-
-# let's assume the population is really big
-sim_size_distrib <- function( ii ){
-
-  n_round <- c( round( ssd[,ii] * 10000 )[1:28 ],
-                round( ssd[,ii] * 10000 )[29:56] )
-  
-  Map( function(x,y) rep(x,y),
-          rep(log(1:28), 2),
-          n_round ) %>% 
-      unlist %>% 
-      data.frame( log_tiller_n = . )
-
-}
-
-size_df <- lapply(1:48, sim_size_distrib ) %>% bind_rows
-
-write.csv(size_df, 'results/ssd.csv', row.names=F)
-
-
 ## LTRE analysis using mean params
 ## LTRE parameters:
 # these are the indices of the intercepts and slopes
@@ -1023,6 +990,25 @@ plot(long_seq+mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4);ab
 lines(long_seq[1:47]+mean(latlong$Longitude),
       (lambda_long_mean[2:48]-lambda_long_mean[1:47])/(long_seq[2] - long_seq[1]),col="red",main=F_params$max_size)
 
+
+
+plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
+abline(h=0,col="gray")
+for(i in seq(1,8,by=2)){
+  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
+}
+title(main="B",adj=0)
+
+plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
+abline(h=0,col="gray")
+for(i in seq(9,16,by=2)){
+  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
+}
+title(main="C",adj=0)
+legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
+       lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
 # Lambda-Longitude posterior sampling --------------------------------------------------------
 
 ## set up output matrices
@@ -1240,6 +1226,47 @@ rfx <- data.frame(site = rep(0,4),
 rownames(rfx) <- c("surv","grow","flow","panic")
 lambda(megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],
                   rfx=rfx,twosex=F)$MEGAmat)
+
+
+# Appendix analysis: size distributions and simulation experiment  --------
+
+
+# obtain stable stage distribution for comparison to observed data ----
+hist(poar$tillerN_t0)
+
+
+# stable stage distribution at each longitude
+ssd <- matrix(NA, 56, length(long_seq) )
+
+for(l in 1:length(long_seq)){
+  
+  # stable stage distribution
+  ssd[,l] <- lambdaSim_delay( F_params = F_params,
+                              M_params = M_params,
+                              long     = long_seq[l],
+                              rfx      = rfx_fun(),
+                              max.yrs  = max_yrs)$n0[,1]
+  
+}
+
+# let's assume the population is really big
+sim_size_distrib <- function( ii ){
+  
+  n_round <- c( round( ssd[,ii] * 10000 )[1:28 ],
+                round( ssd[,ii] * 10000 )[29:56] )
+  
+  Map( function(x,y) rep(x,y),
+       rep(log(1:28), 2),
+       n_round ) %>% 
+    unlist %>% 
+    data.frame( log_tiller_n = . )
+  
+}
+
+size_df <- lapply(1:48, sim_size_distrib ) %>% bind_rows
+
+write.csv(size_df, 'results/ssd.csv', row.names=F)
+
 
 
 # MS quantities -----------------------------------------------------------
