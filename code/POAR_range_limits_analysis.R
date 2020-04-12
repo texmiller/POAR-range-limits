@@ -884,7 +884,7 @@ F_params$max_size <- M_params$max_size <- round(quantile(na.omit(poar$tillerN_t1
 ## long_seq <- seq(min(poar_surv_binned$long),max(poar_surv_binned$long),0.3)
 ## extend the longitude to bounds and beyond of observed distribution
 ## note that length of this vector has a big effect on how fast/slow the following code runs
-long_seq_extend <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),length.out = 40)
+long_seq_extend <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),length.out = 20)
 lambda_long_mean<-lambda_long_mean_2sex<-SR_long_mean<-OSR_long_mean<-c()
 ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq_extend))
 max_yrs <- 20
@@ -953,28 +953,28 @@ betas_long2 <- c(F_params[c("surv_long2","surv_size_long2","grow_long2","grow_si
 dp_dlong_fun <- function(beta_long,beta_long2,long){return(beta_long + 2*beta_long2*long)}
 
 ## loop over longitudes and calculated dp_dlong and dlambda_dp
-dp_dlong <- dlambda_dp <- matrix(NA,nrow=length(LTRE_params)*2,ncol=length(long_seq))
+dp_dlong <- dlambda_dp <- matrix(NA,nrow=length(LTRE_params)*2,ncol=length(long_seq_extend))
 lambda_long <- c()
 perturbation <- 0.01
-for(l in 1:length(long_seq)){
-  #lambda_long[l] <- lambda(megamatrix_delay(F_params,M_params,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
-  lambda_long[l] <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+for(l in 1:length(long_seq_extend)){
+  #lambda_long[l] <- lambda(megamatrix_delay(F_params,M_params,twosex=F,long=long_seq_extend[l],rfx=rfx_fun())$MEGAmat)
+  lambda_long[l] <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
   dp_dlong[,l] <- dp_dlong_fun(beta_long = unlist(betas_long), 
                              beta_long2 = unlist(betas_long2), 
-                             long = long_seq[l])
+                             long = long_seq_extend[l])
     #cannot vectorize this part unfortunately
     for(p in 1:8){
       F_params_perturb <- F_params; M_params_perturb <- M_params;  
       F_params_perturb[LTRE_params[p]] <- unlist(F_params[LTRE_params[p]]) + perturbation
-      #lambda_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
-      lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+      #lambda_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq_extend[l],rfx=rfx_fun())$MEGAmat)
+      lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq_extend[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
       dlambda_dp[p,l] <- (lambda_perturb - lambda_long[l]) / perturbation
     }
     for(p in 9:16){
       F_params_perturb <- F_params; M_params_perturb <- M_params;  
       M_params_perturb[LTRE_params[p-8]] <- unlist(M_params[LTRE_params[p-8]]) + perturbation
-      #lambda_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq[l],rfx=rfx_fun())$MEGAmat)
-      lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
+      #lambda_perturb <- lambda(megamatrix_delay(F_params_perturb,M_params_perturb,twosex=F,long=long_seq_extend[l],rfx=rfx_fun())$MEGAmat)
+      lambda_perturb <- lambdaSim_delay(F_params=F_params_perturb,M_params=M_params_perturb,long=long_seq_extend[l],rfx=rfx_fun(),max.yrs=max_yrs)$lambdatracker[max_yrs]
       dlambda_dp[p,l] <- (lambda_perturb - lambda_long[l]) / perturbation
     }
   print(l)
@@ -984,32 +984,33 @@ for(l in 1:length(long_seq)){
 LTRE_out <- dp_dlong * dlambda_dp
 
 par(mfrow=c(2,1))
-plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="b",main=F_params$max_size)
+plot(long_seq_extend+mean(latlong$Longitude),lambda_long_mean,type="b",main=F_params$max_size)
 
-plot(long_seq+mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4);abline(h=0)
-lines(long_seq[1:47]+mean(latlong$Longitude),
-      (lambda_long_mean[2:48]-lambda_long_mean[1:47])/(long_seq[2] - long_seq[1]),col="red",main=F_params$max_size)
+plot(long_seq_extend+mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4);abline(h=0)
+lines(long_seq_extend[1:47]+mean(latlong$Longitude),
+      (lambda_long_mean[2:48]-lambda_long_mean[1:47])/(long_seq_extend[2] - long_seq_extend[1]),col="red",main=F_params$max_size)
 
 
 
-plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(1,8,by=2)){
-  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
+  lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
 }
 title(main="B",adj=0)
 
-plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(9,16,by=2)){
-  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
+  lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
 }
 title(main="C",adj=0)
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
        lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
 # Lambda-Longitude posterior sampling --------------------------------------------------------
+## sample fewer draws bc it takes so damn long
 
 ## set up output matrices
 lambda_long_post <- Fdom_lambda_long <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq_extend))
@@ -1081,7 +1082,7 @@ for(p in 1:n_post_draws){
   ## use POAU seedling survival for females and males
   F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
   ## set max size equal between the sexes
-  F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
+  F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
 
     ## pull out the rfx variances
   rfx <- rfx_fun(site_tau_s = surv_coef$site_tau_s[post_draws[p]],
@@ -1098,14 +1099,15 @@ for(p in 1:n_post_draws){
                    source_tau_p = panic_coef$source_tau_p[post_draws[p]])
   
   for(l in 1:length(long_seq_extend)){
-    Fdom_lambda_long[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
+    #Estimation error only
+    #Fdom_lambda_long[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
     lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),max.yrs=max_yrs)
     lambda_long_post[p,l] <- lambda_run$lambdatracker[max_yrs]
     SR_long_post[p,l] <- lambda_run$SRtracker[max_yrs]
     OSR_long_post[p,l] <- lambda_run$OSRtracker[max_yrs]
 
-    #pick up here
-    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx,twosex=F)$MEGAmat)
+    #Estimation+process error
+    #Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx,twosex=F)$MEGAmat)
     lambda_run_rfx <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx,max.yrs=max_yrs)
     lambda_long_post_rfx[p,l] <- lambda_run_rfx$lambdatracker[max_yrs]
     SR_long_post_rfx[p,l] <- lambda_run_rfx$SRtracker[max_yrs]
@@ -1115,8 +1117,8 @@ for(p in 1:n_post_draws){
 }
 
 ## write output as a list
-lambda_long_post_list <- list(Fdom_lambda_long=Fdom_lambda_long,lambda_long_post=lambda_long_post,SR_long_post=SR_long_post,OSR_long_post=OSR_long_post,
-                              Fdom_lambda_long_rfx=Fdom_lambda_long_rfx,lambda_long_post_rfx=lambda_long_post_rfx,SR_long_post_rfx=SR_long_post_rfx,OSR_long_post_rfx=OSR_long_post_rfx)
+lambda_long_post_list <- list(lambda_long_post=lambda_long_post,SR_long_post=SR_long_post,OSR_long_post=OSR_long_post,
+                              lambda_long_post_rfx=lambda_long_post_rfx,SR_long_post_rfx=SR_long_post_rfx,OSR_long_post_rfx=OSR_long_post_rfx)
 #do this once
 write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
 #now read
