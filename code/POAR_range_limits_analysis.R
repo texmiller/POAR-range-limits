@@ -1117,7 +1117,9 @@ for(p in 1:n_post_draws){
 ## write output as a list
 lambda_long_post_list <- list(Fdom_lambda_long=Fdom_lambda_long,lambda_long_post=lambda_long_post,SR_long_post=SR_long_post,OSR_long_post=OSR_long_post,
                               Fdom_lambda_long_rfx=Fdom_lambda_long_rfx,lambda_long_post_rfx=lambda_long_post_rfx,SR_long_post_rfx=SR_long_post_rfx,OSR_long_post_rfx=OSR_long_post_rfx)
-#write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
+#do this once
+write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
+#now read
 lambda_long_post_list <- read_rds(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
 
 ## visualize results
