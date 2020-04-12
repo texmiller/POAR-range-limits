@@ -1082,7 +1082,7 @@ for(p in 1:n_post_draws){
   ## use POAU seedling survival for females and males
   F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
   ## set max size equal between the sexes
-  F_params$max_size <- M_params$max_size <- quantile(na.omit(poar$tillerN_t1),probs=0.99) #max(na.omit(poar$tillerN_t0)); 
+  F_params$max_size <- M_params$max_size <- round(quantile(na.omit(poar$tillerN_t1),probs=0.99)) #max(na.omit(poar$tillerN_t0)); 
 
     ## pull out the rfx variances
   rfx <- rfx_fun(site_tau_s = surv_coef$site_tau_s[post_draws[p]],
