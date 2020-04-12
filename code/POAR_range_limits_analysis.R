@@ -886,23 +886,23 @@ F_params$max_size <- M_params$max_size <- round(quantile(na.omit(poar$tillerN_t1
 ## note that length of this vector has a big effect on how fast/slow the following code runs
 long_seq_extend <- seq((-104 - mean(latlong$Longitude)),(-94.5 - mean(latlong$Longitude)),length.out = 40)
 lambda_long_mean<-lambda_long_mean_2sex<-SR_long_mean<-OSR_long_mean<-c()
-ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq))
+ssd<-matrix(NA,(F_params$max_size+1)*2,length(long_seq_extend))
 max_yrs <- 20
 
-for(l in 1:length(long_seq)){
-  print(l/length(long_seq))
+for(l in 1:length(long_seq_extend)){
+  print(l/length(long_seq_extend))
   #linear model for comparison
   mat <- megamatrix_delay( F_params,
                            M_params,
                            twosex=F,
-                           long=long_seq[l],
+                           long=long_seq_extend[l],
                            rfx=rfx_fun())$MEGAmat
   lambda_long_mean[l] <- lambda(mat)
   
   #2-sex model
   lambda_run <- lambdaSim_delay( F_params=F_params,
                                                M_params=M_params,
-                                               long = long_seq[l],
+                                               long = long_seq_extend[l],
                                                rfx = rfx_fun(),
                                                max.yrs = max_yrs)
   lambda_long_mean_2sex[l] <- lambda_run$lambdatracker[max_yrs]
@@ -912,12 +912,12 @@ for(l in 1:length(long_seq)){
 }
 
 par(mfrow=c(2,2))
-plot(long_seq
+plot(long_seq_extend
      + mean(latlong$Longitude),
      lambda_long_mean,
      type="l",
      main=F_params$max_size)
-lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lty=2)
+lines(long_seq_extend+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lty=2)
 abline(v=c(-103.252677, -95.445907)) # brewster and brazoria county 
 
 plot(ssd[1:(F_params$max_size+1),1],type="l",col="dodgerblue")
@@ -925,8 +925,8 @@ lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),1],col="tomato")
 lines(ssd[1:(F_params$max_size+1),length(long_seq)],col="dodgerblue",lty=2)
 lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),length(long_seq)],col="tomato",lty=2)
 
-plot(long_seq+mean(latlong$Longitude),SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
-plot(long_seq+mean(latlong$Longitude),OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+plot(long_seq_extend+mean(latlong$Longitude),SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
+plot(long_seq_extend+mean(latlong$Longitude),OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
 
 ## compare 2sex and Fdom models
@@ -1012,8 +1012,8 @@ legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","T
 # Lambda-Longitude posterior sampling --------------------------------------------------------
 
 ## set up output matrices
-lambda_long_post <- Fdom_lambda_long <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
-lambda_long_post_rfx <- Fdom_lambda_long_rfx <- SR_long_post_rfx <- OSR_long_post_rfx <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq))
+lambda_long_post <- Fdom_lambda_long <- SR_long_post <- OSR_long_post <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq_extend))
+lambda_long_post_rfx <- Fdom_lambda_long_rfx <- SR_long_post_rfx <- OSR_long_post_rfx <- matrix(NA,nrow=n_post_draws,ncol=length(long_seq_extend))
 
 F_params <- M_params <- list()
 for(p in 1:n_post_draws){
@@ -1097,16 +1097,16 @@ for(p in 1:n_post_draws){
                    block_tau_p = panic_coef$block_tau_p[post_draws[p]],
                    source_tau_p = panic_coef$source_tau_p[post_draws[p]])
   
-  for(l in 1:length(long_seq)){
-    Fdom_lambda_long[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
-    lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx_fun(),max.yrs=max_yrs)
+  for(l in 1:length(long_seq_extend)){
+    Fdom_lambda_long[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),twosex=F)$MEGAmat)
+    lambda_run <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx_fun(),max.yrs=max_yrs)
     lambda_long_post[p,l] <- lambda_run$lambdatracker[max_yrs]
     SR_long_post[p,l] <- lambda_run$SRtracker[max_yrs]
     OSR_long_post[p,l] <- lambda_run$OSRtracker[max_yrs]
 
     #pick up here
-    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,twosex=F)$MEGAmat)
-    lambda_run_rfx <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq[l],rfx=rfx,max.yrs=max_yrs)
+    Fdom_lambda_long_rfx[p,l] <- lambda(A = megamatrix_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx,twosex=F)$MEGAmat)
+    lambda_run_rfx <- lambdaSim_delay(F_params=F_params,M_params=M_params,long=long_seq_extend[l],rfx=rfx,max.yrs=max_yrs)
     lambda_long_post_rfx[p,l] <- lambda_run_rfx$lambdatracker[max_yrs]
     SR_long_post_rfx[p,l] <- lambda_run_rfx$SRtracker[max_yrs]
     OSR_long_post_rfx[p,l] <- lambda_run_rfx$OSRtracker[max_yrs]
@@ -1121,10 +1121,10 @@ lambda_long_post_list <- list(Fdom_lambda_long=Fdom_lambda_long,lambda_long_post
 lambda_long_post_list <- read_rds(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
 
 ## visualize results
-lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- matrix(NA,2,length(long_seq))
-lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- matrix(NA,2,length(long_seq))
+lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- matrix(NA,2,length(long_seq_extend))
+lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- matrix(NA,2,length(long_seq_extend))
 lambda_long_mean <- lambda_long_rfx_mean <- c()
-  for(l in 1:length(long_seq)){
+  for(l in 1:length(long_seq_extend)){
     lambda_long_q95[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.025,0.975),na.rm = T)
     lambda_long_q75[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.125,0.875),na.rm = T)
     lambda_long_q50[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.25,0.75),na.rm = T)
@@ -1145,87 +1145,60 @@ ltre_lty <- c(1,NA,2,NA,3,NA,5,NA)
 
 pdf("Manuscript/Figures/lambda_long_ltre.pdf",useDingbats = F,height=10,width=4)
 par(mar=c(5,5,1,1),mfrow=c(3,1))
-plot(long_seq + mean(latlong$Longitude),lambda_long,type="n",ylim=c(0,4),lwd=4,
+plot(long_seq_extend + mean(latlong$Longitude),lambda_long,type="n",ylim=c(0,4),lwd=4,
      xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q75[1,],rev(lambda_long_q75[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q50[1,],rev(lambda_long_q50[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
 abline(h=1,lty=3)
-#lines(long_seq + mean(latlong$Longitude),lambda_long_mean)
+#lines(long_seq_extend + mean(latlong$Longitude),lambda_long_mean)
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
 title(main="A",adj=0)
 
-plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(1,8,by=2)){
-  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
+  lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
 }
 title(main="B",adj=0)
 
-plot(long_seq + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(9,16,by=2)){
-  lines(long_seq + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
+  lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
 }
 title(main="C",adj=0)
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
        lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
 dev.off()
 
-plot(long_seq + mean(latlong$Longitude),lambda_long_rfx_mean,type="l",ylim=c(0,3),lwd=4)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+plot(long_seq_extend + mean(latlong$Longitude),lambda_long_rfx_mean,type="l",ylim=c(0,3),lwd=4)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q95[1,],rev(lambda_long_rfx_q95[2,])),
         col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q75[1,],rev(lambda_long_rfx_q75[2,])),
         col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q50[1,],rev(lambda_long_rfx_q50[2,])),
         col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_rfx_q25[1,],rev(lambda_long_rfx_q25[2,])),
         col=alpha("red",0.2),border=NA)
 abline(h=1,col="darkgrey")
 
-## draw random effects for site, block, source
-#rfx <- data.frame(site = rnorm(4,0,c(surv_coef$site_tau_s,grow_coef$site_tau_g,flow_coef$site_tau_f,panic_coef$site_tau_p)),
-#                  block = rnorm(4,0,c(surv_coef$block_tau_s,grow_coef$block_tau_g,flow_coef$block_tau_f,panic_coef$block_tau_p)),
-#                  source = rnorm(4,0,c(surv_coef$source_tau_s,grow_coef$source_tau_g,flow_coef$source_tau_f,panic_coef$source_tau_p)))
-#rownames(rfx) <- c("surv","grow","flow","panic")
 
-
-plot(long_seq,Fdom_lambda_long[1,],type="n",ylim=c(0,10))
-for(i in 1:44){
-  lines(long_seq,Fdom_lambda_long[i,],col=alpha("black",0.2))
-} 
-
-plot(long_seq,lambda_long[1,],type="n",ylim=c(0,10))
-for(i in 1:44){
-  lines(long_seq,lambda_long[i,],col=alpha("black",0.2))
-} 
-
-plot((poar$tillerN_t0),poar$tillerN_t1)
-
-
-F_params$max_size <- quantile(na.omit(poar$tillerN_t0),probs=0.95) #max(na.omit(poar$tillerN_t0)); 
-M_params$max_size <- F_params$max_size
-rfx <- data.frame(site = rep(0,4),
-                  block = rep(0,4),
-                  source = rep(0,4))
-rownames(rfx) <- c("surv","grow","flow","panic")
-lambda(megamatrix(F_params=F_params,M_params=M_params,long=long_seq[l],
-                  rfx=rfx,twosex=F)$MEGAmat)
 
 
 # Appendix analysis: size distributions and simulation experiment  --------
