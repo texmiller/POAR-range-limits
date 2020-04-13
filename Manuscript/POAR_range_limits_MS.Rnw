@@ -124,7 +124,7 @@ We analyzed the demographic model to decompose the decline in $\lambda$ approach
 
 \begin{figure}[h!]
 \begin{center}
-    \includegraphics[width=0.75\linewidth]{Figures/map}
+    \includegraphics[width=0.75\linewidth]{Figures/POAR_BONAP_map}
   \caption{Geographic and environmental distribution of \textit{P. arachnifera} in Texas, Oklahoma, and Kansas. 
   Hatched shapes show counties with herbarium records of occurrence. 
   Color shows geographic variation in annual precipitation (mm) based on 30-year normals from WorldClim \citep{fick2017worldclim}. 
