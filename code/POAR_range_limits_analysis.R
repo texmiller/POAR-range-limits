@@ -613,19 +613,19 @@ lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_gl
 dev.off()
 
 # Seed viability ----------------------------------------------------------
-viab   <- viabVr %>% 
+viab_dat   <- viabVr %>% 
   select( plot, totS, yesMaybe, sr_f ) %>% 
   rename( SR        = sr_f,
-          y_viab = yesMaybe,
-          tot_seeds_viab = totS) %>% 
-  select(y_viab, tot_seeds_viab, SR ) %>% 
+          y_viab_dat = yesMaybe,
+          tot_seeds_viab_dat = totS) %>% 
+  select(y_viab_dat, tot_seeds_viab_dat, SR ) %>% 
   na.omit
 
-#viab_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
+#viab_dat_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
 viab_pars <- rstan::extract(fit_full, pars = quote_bare(v0,a_v,m,lambda_d))
 
-pdf("Manuscript/Figures/seed_viability.pdf",useDingbats = F)
-plot(jitter(viab$SR,75),jitter((viab$y_viab / viab$tot_seeds_viab),75),
+pdf("Manuscript/Figures/seed_viab_datility.pdf",useDingbats = F)
+plot(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab_dat / viab_dat$tot_seeds_viab_dat),75),
      type="n",xlab="Operational sex ratio (fraction female panicles)",
      ylab="Seed viability",cex.lab=1.4)
 for(p in 1:n_post_draws){
@@ -633,8 +633,8 @@ for(p in 1:n_post_draws){
         viab_pars$v0[post_draws[p]] * (1 - seq(0,1,0.01) ^ viab_pars$a_v[post_draws[p]]),
         col=alpha("darkgrey",0.1))
 }
-points(jitter(viab$SR,75),jitter((viab$y_viab / viab$tot_seeds_viab),75),
-       cex = 5 * (viab$tot_seeds_viab / max(viab$tot_seeds_viab)),lwd=2)
+points(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab_dat / viab_dat$tot_seeds_viab_dat),75),
+       cex = 5 * (viab_dat$tot_seeds_viab_dat / max(viab_dat$tot_seeds_viab_dat)),lwd=2)
 dev.off()
 
 # Site climate variation --------------------------------------------------
@@ -1125,25 +1125,27 @@ write_rds(lambda_long_post_list,paste0(dir,"/Experiment/Demography/POAR-range-li
 lambda_long_post_list <- read_rds(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/lambda_long_post_list.rds"))
 
 ## visualize results
-lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- matrix(NA,2,length(long_seq_extend))
-lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- matrix(NA,2,length(long_seq_extend))
+lambda_long_q95 <- lambda_long_q75 <- lambda_long_q50 <- lambda_long_q25 <- lambda_long_q5 <- matrix(NA,2,length(long_seq_extend))
+lambda_long_rfx_q95 <- lambda_long_rfx_q75 <- lambda_long_rfx_q50 <- lambda_long_rfx_q25 <- lambda_long_rfx_q5 <- matrix(NA,2,length(long_seq_extend))
 lambda_long_mean <- lambda_long_rfx_mean <- c()
   for(l in 1:length(long_seq_extend)){
     lambda_long_q95[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.025,0.975),na.rm = T)
     lambda_long_q75[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.125,0.875),na.rm = T)
     lambda_long_q50[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.25,0.75),na.rm = T)
     lambda_long_q25[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.375,0.625),na.rm = T)
+    lambda_long_q5[,l] <- quantile(lambda_long_post_list$lambda_long_post[,l],probs=c(0.475,0.525),na.rm = T)
     lambda_long_mean[l] <- mean(lambda_long_post_list$lambda_long_post[,l],na.rm = T)
     
     lambda_long_rfx_q95[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.025,0.975),na.rm = T)
     lambda_long_rfx_q75[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.125,0.875),na.rm = T)
     lambda_long_rfx_q50[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.25,0.75),na.rm = T)
     lambda_long_rfx_q25[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.375,0.625),na.rm = T)
+    lambda_long_rfx_q5[,l] <- quantile(lambda_long_post_list$lambda_long_post_rfx[,l],probs=c(0.475,0.525),na.rm = T)
     lambda_long_rfx_mean[l] <- mean(lambda_long_post_list$lambda_long_post_rfx[,l],na.rm = T)
   }
 
-polygon_col <- "darkgrey"
-polygon_alpha <- 0.35
+polygon_col <- "black"
+polygon_alpha <- 0.25
 ltre_cols <- c("#e41a1c",NA,"#377eb8",NA,"#4daf4a",NA,"#984ea3",NA)
 ltre_lty <- c(1,NA,2,NA,3,NA,5,NA)
 
@@ -1164,6 +1166,7 @@ polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean
         y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
 abline(h=1,lty=3)
+
 #lines(long_seq_extend + mean(latlong$Longitude),lambda_long_mean)
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
 title(main="A",adj=0)
@@ -1202,7 +1205,53 @@ polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean
         col=alpha("red",0.2),border=NA)
 abline(h=1,col="darkgrey")
 
+## appendix figrue comparing estimation error with proc + est error
+pdf("Manuscript/Figures/lambda_long_proc_est.pdf",useDingbats = F,height=10,width=6)
+par(mar=c(5,5,1,1),mfrow=c(2,1))
+plot(long_seq_extend + mean(latlong$Longitude),lambda_long,type="n",ylim=c(0,5),lwd=4,
+     xlab="Longitude",ylab=expression(paste(lambda)))
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q75[1,],rev(lambda_long_q75[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q50[1,],rev(lambda_long_q50[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q5[1,],rev(lambda_long_q5[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+abline(h=1,lty=3)
+#lines(long_seq_extend + mean(latlong$Longitude),lambda_long_mean)
+abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
+title(main="A) Estimation error only",adj=0)
 
+plot(long_seq_extend + mean(latlong$Longitude),lambda_long,type="n",ylim=c(0,5),lwd=4,
+     xlab="Longitude",ylab=expression(paste(lambda)))
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q95[1,],rev(lambda_long_rfx_q95[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q75[1,],rev(lambda_long_rfx_q75[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q50[1,],rev(lambda_long_rfx_q50[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q25[1,],rev(lambda_long_rfx_q25[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_rfx_q5[1,],rev(lambda_long_rfx_q5[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
+abline(h=1,lty=3)
+#lines(long_seq_extend + mean(latlong$Longitude),lambda_long_rfx_mean)
+abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
+title(main="B) Process + estimation error",adj=0)
+dev.off()
 
 
 # Appendix analysis: size distributions and simulation experiment  --------
