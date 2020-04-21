@@ -4,6 +4,7 @@ library(bayesplot)
 library(popbio)
 library(countreg)
 library(actuar)
+library(rstan)
 
 dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits"
 dir <- "C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits"
@@ -552,11 +553,29 @@ garden_osr <- poar %>% select( year, site, Sex, long.center, flowerN_t1) %>%
          osr = fem_pan/tot_pan,
          year_index = year-2014)
 
+garden_osr_poolyr <- poar %>% select(site, Sex, long.center, flowerN_t1) %>% 
+  group_by(long.center, site, Sex) %>% 
+  summarise(total_panicles = sum(flowerN_t1,na.rm=T)) %>% 
+  spread(key=Sex,value=total_panicles) %>% 
+  rename(fem_pan = `F`,
+         mal_pan = `M`) %>% 
+  mutate(tot_pan=fem_pan+mal_pan,
+         osr = fem_pan/tot_pan)
+
 ggplot(garden_osr)+
   geom_point(aes(x=long.center,y=osr,color=as.factor(year)))
 
 garden_sr <- poar %>% select( year, site, Sex, long.center, surv_t1) %>% 
   group_by(year, long.center, site, Sex) %>% 
+  summarise(total_plants = sum(surv_t1,na.rm=T)) %>% 
+  spread(key=Sex,value=total_plants) %>% 
+  rename(fem = `F`,
+         mal = `M`) %>% 
+  mutate(total=fem+mal,
+         sr = fem/total)
+
+garden_sr_poolyr <- poar %>% select(site, Sex, long.center, surv_t1) %>% 
+  group_by(long.center, site, Sex) %>% 
   summarise(total_plants = sum(surv_t1,na.rm=T)) %>% 
   spread(key=Sex,value=total_plants) %>% 
   rename(fem = `F`,
@@ -612,20 +631,35 @@ lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_gl
 
 dev.off()
 
+## what does it look like pooled across years?
+osr_glm_poolyr <- glm(osr ~ long.center, weights = tot_pan, family="binomial",data=garden_osr_poolyr)
+sr_glm_poolyr <- glm(sr ~ long.center, weights = total, family="binomial",data=garden_sr_poolyr)
+
+par(mfrow=c(1,2),mar=c(5,6,1,1))
+plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.4,
+     xlab="Longitude",ylab="Sex ratio\n(proportion female plants)",cex=log(garden_sr_poolyr$total))
+abline(h=0.5,col="gray",lty=2);title("A",adj=0,font=4)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
+
+plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.4,
+     xlab="Longitude",ylab="Operational sex ratio\n(proportion female panicles)",cex=log(garden_osr_poolyr$tot_pan))
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
+
 # Seed viability ----------------------------------------------------------
 viab_dat   <- viabVr %>% 
   select( plot, totS, yesMaybe, sr_f ) %>% 
   rename( SR        = sr_f,
-          y_viab_dat = yesMaybe,
-          tot_seeds_viab_dat = totS) %>% 
-  select(y_viab_dat, tot_seeds_viab_dat, SR ) %>% 
+          y_viab = yesMaybe,
+          tot_seeds_viab = totS) %>% 
+  select(y_viab, tot_seeds_viab, SR ) %>% 
   na.omit
 
 #viab_dat_pars <- rstan::summary(fit_full, pars=c("v0","a_v"))[[1]][,"mean"]
 viab_pars <- rstan::extract(fit_full, pars = quote_bare(v0,a_v,m,lambda_d))
 
 pdf("Manuscript/Figures/seed_viab_datility.pdf",useDingbats = F)
-plot(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab_dat / viab_dat$tot_seeds_viab_dat),75),
+plot(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab / viab_dat$tot_seeds_viab),75),
      type="n",xlab="Operational sex ratio (fraction female panicles)",
      ylab="Seed viability",cex.lab=1.4)
 for(p in 1:n_post_draws){
@@ -633,8 +667,8 @@ for(p in 1:n_post_draws){
         viab_pars$v0[post_draws[p]] * (1 - seq(0,1,0.01) ^ viab_pars$a_v[post_draws[p]]),
         col=alpha("darkgrey",0.1))
 }
-points(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab_dat / viab_dat$tot_seeds_viab_dat),75),
-       cex = 5 * (viab_dat$tot_seeds_viab_dat / max(viab_dat$tot_seeds_viab_dat)),lwd=2)
+points(jitter(viab_dat$SR,75),jitter((viab_dat$y_viab / viab_dat$tot_seeds_viab),75),
+       cex = 5 * (viab_dat$tot_seeds_viab / max(viab_dat$tot_seeds_viab)),lwd=2)
 dev.off()
 
 # Site climate variation --------------------------------------------------
@@ -781,6 +815,32 @@ points(survey_dat$longit + mean(POAR$Longitude),
        survey_dat$y/survey_dat$n_trials,
        cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,pch=16)
 dev.off()
+
+## another figure option combines natural population survey with common garden sex ratios
+pdf("Manuscript/Figures/nat_pops_gardens_SR.pdf",useDingbats = F,height=4,width=12)
+par(mfrow=c(1,3),mar=c(5,5,1,1))
+## natural populations
+plot(survey_dat$longit + mean(POAR$Longitude),
+     survey_dat$y/survey_dat$n_trials,pch=16,cex=log(survey_dat$n_trials),#cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,#
+     xlab="Longitude",ylab="Proportion female panicles",cex.lab=1.4,
+     col=alpha("black",0.35));title("A",adj=0,font=4)
+abline(h=0.5,col="gray",lty=2)
+lines(x_long + mean(POAR$Longitude),
+      invlogit(mean(coef_surv$b0) + mean(coef_surv$b_long) * x_long),lwd=3,col="black")
+## common gardens
+plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.4,
+     pch=16,col=alpha("black",0.35),
+     xlab="Longitude",ylab="Proportion female panicles",cex=log(garden_osr_poolyr$tot_pan))#cex=4*(garden_osr_poolyr$tot_pan/max(garden_osr_poolyr$tot_pan))+1.5)#
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
+
+plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.4,
+     pch=16,col=alpha("black",0.35),
+     xlab="Longitude",ylab="Proportion female plants",cex=log(garden_sr_poolyr$total))#cex=4*(garden_sr_poolyr$total/max(garden_sr_poolyr$total))+1.5)#
+abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4)
+lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
+dev.off()
+
 
 # Lambda-Longitude mean --------------------------------------------------------
 ## load functions
@@ -1165,6 +1225,9 @@ polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean
 polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q25[1,],rev(lambda_long_q25[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
+polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
+        y=c(lambda_long_q5[1,],rev(lambda_long_q5[2,])),
+        col=alpha(polygon_col,polygon_alpha),border=NA)
 abline(h=1,lty=3)
 
 #lines(long_seq_extend + mean(latlong$Longitude),lambda_long_mean)
@@ -1189,21 +1252,6 @@ title(main="C",adj=0)
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
        lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
 dev.off()
-
-plot(long_seq_extend + mean(latlong$Longitude),lambda_long_rfx_mean,type="l",ylim=c(0,3),lwd=4)
-polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
-        y=c(lambda_long_rfx_q95[1,],rev(lambda_long_rfx_q95[2,])),
-        col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
-        y=c(lambda_long_rfx_q75[1,],rev(lambda_long_rfx_q75[2,])),
-        col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
-        y=c(lambda_long_rfx_q50[1,],rev(lambda_long_rfx_q50[2,])),
-        col=alpha("red",0.2),border=NA)
-polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
-        y=c(lambda_long_rfx_q25[1,],rev(lambda_long_rfx_q25[2,])),
-        col=alpha("red",0.2),border=NA)
-abline(h=1,col="darkgrey")
 
 ## appendix figrue comparing estimation error with proc + est error
 pdf("Manuscript/Figures/lambda_long_proc_est.pdf",useDingbats = F,height=10,width=6)
@@ -1252,7 +1300,6 @@ abline(h=1,lty=3)
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
 title(main="B) Process + estimation error",adj=0)
 dev.off()
-
 
 # Appendix analysis: size distributions and simulation experiment  --------
 
@@ -1323,7 +1370,7 @@ poau_sdlg_surv <- round(sdlg_surv$sdlg_surv,2)
 
 survey_range <- range(survey_dat$n_trials)
 
-viab_seeds <- viab %>% mutate(viab_seeds = y_viab==0) %>% filter(SR==1) %>% summarise(mean(viab_seeds))
+viab_seeds <- viab_dat %>% mutate(viab_seeds = y_viab==0) %>% filter(SR==1) %>% summarise(mean(viab_seeds))
 
 viab_n <- range(viabVr$totS,na.rm=T)
 
