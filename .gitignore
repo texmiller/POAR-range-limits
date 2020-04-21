@@ -32,3 +32,5 @@ data/.csv
 *.synctex.gz
 *.tex
 *.rds
+
+Manuscript/POAR_range_limits_MS.pdf
