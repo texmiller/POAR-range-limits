@@ -26,7 +26,7 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 
 %-------------------------------------------------------------------------
 
-\title{Two-sex demography, sexual niche differentiation, and the formation of range limits over an environmental gradient}
+\title{Two-sex demography, sexual niche differentiation, and the geographic range limits of Texas bluegrass (\textit{Poa arachnifera})}
 
 
 \author{Tom E.X. Miller$^{\ast}$}
@@ -38,7 +38,7 @@ poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits
 
 %-------------------------------------------------------------------------
 \begin{document}
-%\SweaveOpts{concordance=TRUE}
+
 \maketitle
 
 
@@ -277,9 +277,10 @@ Finally, we compared the two-sex MPM to the corresponding female-dominant model 
 
 \begin{figure}[h!]
 \begin{center}
-    \includegraphics[width=0.6\linewidth]{Figures/pop_survey}
-  \caption{Variation in operational sex ratio (proportion of panicles that were female) across \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations of \textit{P. arachnifera}. Point size is proportional to population size (total panicles; min: \Sexpr{poar_ms_quantities$survey_range[1]}, max: \Sexpr{poar_ms_quantities$survey_range[2]}). 
-  Lines show the fitted binomial regression for 500 samples from the posterior distribution of regression coefficients.}
+    \includegraphics[width=1\linewidth]{Figures/nat_pops_gardens_SR}
+  \caption{Sex ratio variation in natural populations (A) and experimental common gardens (B,C) of \textit{P. arachnifera} across its longitudinal distribution.}
+  %Variation in operational sex ratio (proportion of panicles that were female) across \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations of \textit{P. arachnifera}. Point size is proportional to population size (total panicles; min: \Sexpr{poar_ms_quantities$survey_range[1]}, max: \Sexpr{poar_ms_quantities$survey_range[2]}). 
+  %Lines show the fitted binomial regression for 500 samples from the posterior distribution of regression coefficients.}
   \label{fig:survey}
   \end{center}
 \end{figure}
@@ -288,6 +289,7 @@ Finally, we compared the two-sex MPM to the corresponding female-dominant model 
 We found wide variation in operational sex ratio (proportion of total panicles that were female) across \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations of \textit{P. arachnifera}, including female-only and male-only populations (Fig. \ref{fig:survey}). 
 There was a longitudinal trend to sex ratio variation, with male-biased panicle production in the western parts of the range and female-biased panicle production in the east. 
 Not suriprisingly, small populations deviated most strongly from the mean trend (Fig. \ref{fig:survey}). 
+
 \begin{figure}%[h!]
   \begin{center}
     \includegraphics[width=0.85\linewidth]{Figures/vital_rates}
