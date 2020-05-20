@@ -450,7 +450,7 @@ with(poar_flow_binned,{
     par(mar=c(0,4,1,0))
     plot(long[size_bin==i] + mean(latlong$Longitude),mean_flow[size_bin==i],type="n",
          xlab=" ",ylab=" ",xaxt="n");box()
-    if(i==1){mtext("Pr(flower)",side=2,line=3)}
+    if(i==1){mtext("Pr(flowering)",side=2,line=3)}
     title(LETTERS[i+6],adj=0)    
     for(s in 1:2){
       points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_flow[sex==s & size_bin==i],
@@ -798,6 +798,7 @@ fit_surv <- stan(
 
 summary(fit_surv)$summary
 coef_surv <- rstan::extract(fit_surv,par=c("b0","b_long"))
+coef_surv_mean <- lapply(coef_surv,mean)
 x_long <- seq(min(survey_dat$longit),max(survey_dat$longit),length = 100)
 
 n_post <-500
@@ -821,7 +822,8 @@ pdf("Manuscript/Figures/nat_pops_gardens_SR.pdf",useDingbats = F,height=4,width=
 par(mfrow=c(1,3),mar=c(5,5,1,1))
 ## natural populations
 plot(survey_dat$longit + mean(POAR$Longitude),
-     survey_dat$y/survey_dat$n_trials,pch=16,cex=log(survey_dat$n_trials),#cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,#
+     survey_dat$y/survey_dat$n_trials,pch=16,xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
+     cex=log(survey_dat$n_trials),#cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,#
      xlab="Longitude",ylab="Proportion female panicles",cex.lab=1.4,
      col=alpha("black",0.35));title("A",adj=0,font=4)
 abline(h=0.5,col="gray",lty=2)
@@ -829,13 +831,13 @@ lines(x_long + mean(POAR$Longitude),
       invlogit(mean(coef_surv$b0) + mean(coef_surv$b_long) * x_long),lwd=3,col="black")
 ## common gardens
 plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.4,
-     pch=16,col=alpha("black",0.35),
+     pch=16,col=alpha("black",0.35),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      xlab="Longitude",ylab="Proportion female panicles",cex=log(garden_osr_poolyr$tot_pan))#cex=4*(garden_osr_poolyr$tot_pan/max(garden_osr_poolyr$tot_pan))+1.5)#
 abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
 lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
 
 plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.4,
-     pch=16,col=alpha("black",0.35),
+     pch=16,col=alpha("black",0.35),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      xlab="Longitude",ylab="Proportion female plants",cex=log(garden_sr_poolyr$total))#cex=4*(garden_sr_poolyr$total/max(garden_sr_poolyr$total))+1.5)#
 abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4)
 lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
@@ -985,17 +987,35 @@ lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),1],col="tomato")
 lines(ssd[1:(F_params$max_size+1),length(long_seq)],col="dodgerblue",lty=2)
 lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),length(long_seq)],col="tomato",lty=2)
 
-plot(long_seq_extend+mean(latlong$Longitude),SR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
-plot(long_seq_extend+mean(latlong$Longitude),OSR_long_mean,type="b",ylim=c(0,1));abline(h=0.5)
 
 
 ## compare 2sex and Fdom models
 pdf("Manuscript/Figures/lambda_long_2sex_Fdom.pdf",useDingbats = F)
 par(mar=c(5,5,1,1))
-plot(long_seq+mean(latlong$Longitude),lambda_long_mean,type="l",lwd=2,
+plot(long_seq_extend+mean(latlong$Longitude),lambda_long_mean,type="l",lwd=2,
      xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5,ylim=c(1,2.2))
-lines(long_seq+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=2)
+lines(long_seq_extend+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd=2,lty=2)
 legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
+dev.off()
+
+## plot sex ratio clines and changes in seed viability
+pdf("Manuscript/Figures/SR_viab.pdf",useDingbats = F,height=11,width=6)
+par(mfrow=c(2,1),mar=c(5,5,1,1))
+plot(long_seq_extend+mean(latlong$Longitude),OSR_long_mean,type="l",ylim=c(0,1),lwd=4,
+     xlab="Longitude",ylab="Operational sex ratio (fraction female panicles)")
+## compare MPM to natural and common carden population OSR
+lines(long_seq_extend+mean(latlong$Longitude),
+      invlogit(coef_surv_mean$b0 + coef_surv_mean$b_long*long_seq_extend),lwd=3,lty=2,col=alpha("black",0.5))
+lines(long_seq_extend+mean(latlong$Longitude),
+      invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq_extend),lwd=3,lty=3,col=alpha("black",0.5))
+abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
+abline(h=0.5,lty=3,col="lightgray")
+legend("topleft",legend=c("Two-sex model","Common gardens","Natural populations"),lwd=3,lty=c(1,3,2),
+       col=c("black",alpha("black",0.5),alpha("black",0.5)),bg="white")
+title("A",adj=0,font=3)
+plot(long_seq_extend+mean(latlong$Longitude),viab(params=F_params,twosex=T,OSR=OSR_long_mean),
+     ylim=c(0,1),lwd=4,type="l",xlab="Longitude",ylab="Predicted seed viability")
+title("B",adj=0,font=3)
 dev.off()
 
 ## LTRE analysis using mean params
@@ -1300,6 +1320,9 @@ abline(h=1,lty=3)
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
 title(main="B) Process + estimation error",adj=0)
 dev.off()
+
+## Make another figure that breaks down the LTRE
+
 
 # Appendix analysis: size distributions and simulation experiment  --------
 
