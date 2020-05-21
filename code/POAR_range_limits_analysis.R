@@ -987,8 +987,6 @@ lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),1],col="tomato")
 lines(ssd[1:(F_params$max_size+1),length(long_seq)],col="dodgerblue",lty=2)
 lines(ssd[(F_params$max_size+2):((F_params$max_size+1)*2),length(long_seq)],col="tomato",lty=2)
 
-
-
 ## compare 2sex and Fdom models
 pdf("Manuscript/Figures/lambda_long_2sex_Fdom.pdf",useDingbats = F)
 par(mar=c(5,5,1,1))
@@ -998,9 +996,39 @@ lines(long_seq_extend+mean(latlong$Longitude),lambda_long_mean_2sex,type="l",lwd
 legend("topright",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
 dev.off()
 
+## calculate sensitivities of vital rate functions (including seed viability) across longitudes
+## re-run lambda calculations using perturbed vital rate functions than calculate difference with lambda_long_mean_2sex estimated above
+lambda_long_mean_2sex_perturb <- matrix(NA,nrow=5,ncol=length(long_seq_extend))
+perturbation <- 0.01 ## this is a one percent increase in the mean of each vital rate
+pert_mat <- matrix(0,5,5) + diag(perturbation,5,5)
+
+for(l in 1:length(long_seq_extend)){
+  print(l/length(long_seq_extend))
+  for(p in 1:5){
+  #2-sex model
+  lambda_long_mean_2sex_perturb[p,l] <- lambdaSim_delay(F_params=F_params,
+                                 M_params=M_params,
+                                 long = long_seq_extend[l],
+                                 rfx = rfx_fun(),
+                                 max.yrs = max_yrs,
+                                 grow_perturb=pert_mat[1,p],
+                                 surv_perturb=pert_mat[2,p],
+                                 flow_perturb=pert_mat[3,p],
+                                 fert_perturb=pert_mat[4,p],
+                                 viab_perturb=pert_mat[5,p])$lambdatracker[max_yrs]
+  }
+}
+
+grow_sens <- (lambda_long_mean_2sex_perturb[1,] - lambda_long_mean_2sex) / perturbation
+surv_sens <- (lambda_long_mean_2sex_perturb[2,] - lambda_long_mean_2sex) / perturbation 
+flow_sens <- (lambda_long_mean_2sex_perturb[3,] - lambda_long_mean_2sex) / perturbation 
+fert_sens <- (lambda_long_mean_2sex_perturb[4,] - lambda_long_mean_2sex) / perturbation 
+viab_sens <- (lambda_long_mean_2sex_perturb[5,] - lambda_long_mean_2sex) / perturbation 
+
+
 ## plot sex ratio clines and changes in seed viability
-pdf("Manuscript/Figures/SR_viab.pdf",useDingbats = F,height=11,width=6)
-par(mfrow=c(2,1),mar=c(5,5,1,1))
+pdf("Manuscript/Figures/SR_viab_sens.pdf",useDingbats = F,height=8,width=8)
+par(mfrow=c(2,2),mar=c(5,5,1,1))
 plot(long_seq_extend+mean(latlong$Longitude),OSR_long_mean,type="l",ylim=c(0,1),lwd=4,
      xlab="Longitude",ylab="Operational sex ratio (fraction female panicles)")
 ## compare MPM to natural and common carden population OSR
@@ -1011,14 +1039,26 @@ lines(long_seq_extend+mean(latlong$Longitude),
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
 abline(h=0.5,lty=3,col="lightgray")
 legend("topleft",legend=c("Two-sex model","Common gardens","Natural populations"),lwd=3,lty=c(1,3,2),
-       col=c("black",alpha("black",0.5),alpha("black",0.5)),bg="white")
+       col=c("black",alpha("black",0.5),alpha("black",0.5)),bg="white",cex=0.8)
 title("A",adj=0,font=3)
+
 plot(long_seq_extend+mean(latlong$Longitude),viab(params=F_params,twosex=T,OSR=OSR_long_mean),
      ylim=c(0,1),lwd=4,type="l",xlab="Longitude",ylab="Predicted seed viability")
 title("B",adj=0,font=3)
+
+plot(long_seq_extend+mean(latlong$Longitude),grow_sens,type="l",lwd=4,
+     xlab="Longitude",ylab="Vital rate sensitivity",ylim=c(0,8))
+lines(long_seq_extend+mean(latlong$Longitude),surv_sens,lwd=4,col="red")
+lines(long_seq_extend+mean(latlong$Longitude),flow_sens,lwd=4,col="blue")
+lines(long_seq_extend+mean(latlong$Longitude),fert_sens,lwd=4,col="green")
+lines(long_seq_extend+mean(latlong$Longitude),viab_sens,lwd=4,col="purple")
+legend("topleft",legend=c("Survival","Growth","Flowering","Panicles","Seed viability"),
+       lwd=3,col=c("red","black","blue","green","purple"),bg="white",cex=0.8)
+title("C",adj=0,font=3)
 dev.off()
 
-## LTRE analysis using mean params
+
+# LTRE --------------------------------------------------------------------
 ## LTRE parameters:
 # these are the indices of the intercepts and slopes
 LTRE_params <- c(1,2,7,8,14,15,20,21)
