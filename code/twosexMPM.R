@@ -2,7 +2,7 @@
 # vital rate and megamatrix functions ---------------------------------------------------
 
 #SURVIVAL AT SIZE X.
-sx<-function(x,params,long,rfx,perturbation=0){
+sx<-function(x,params,long,rfx,surv_perturb=0){
   surv_mean<-params$surv_mu + 
     params$surv_size*log(x) + 
     params$surv_long*long + 
@@ -10,19 +10,19 @@ sx<-function(x,params,long,rfx,perturbation=0){
     params$surv_long2*(long^2) + 
     params$surv_size_long2*log(x)*(long^2) + 
     rfx["surv","site"] + rfx["surv","block"] + rfx["surv","source"]
-  return(invlogit(surv_mean)+perturbation)
+  return(invlogit(surv_mean) + surv_perturb)
 }
 
 #PROBABILITY OF GROWTH FROM SIZE X TO Y
 #This function truncates the density asscociation with x==0 and x>x.max
-gxy<-function(x,y,params,long,rfx,perturbation=0){
+gxy<-function(x,y,params,long,rfx,grow_perturb=0){
   grow_mean<-exp(params$grow_mu + 
     params$grow_size*log(x) + 
     params$grow_long*long + 
     params$grow_size_long*log(x)*long +
     params$grow_long2*(long^2) + 
     params$grow_size_long2*log(x)*(long^2) + 
-    rfx["grow","site"] + rfx["grow","block"] + rfx["grow","source"])+perturbation
+    rfx["grow","site"] + rfx["grow","block"] + rfx["grow","source"]) + grow_perturb
   
   grow<-dpoisinvgauss(x=y,mean=grow_mean,shape=(grow_mean*params$sigma_g))
   grow<-ifelse(is.nan(grow) | is.infinite(grow),0,grow)
@@ -38,7 +38,7 @@ pxy<-function(x,y,params,long,rfx,grow_perturb=0,surv_perturb=0){
 }
 
 # PROBABILITY OF FLOWERING
-pfx<-function(x,params,long,rfx,perturbation=0){
+pfx<-function(x,params,long,rfx,flow_perturb=0){
   flow_mean<-params$flow_mu + 
     params$flow_size*log(x) + 
     params$flow_long*long + 
@@ -46,11 +46,11 @@ pfx<-function(x,params,long,rfx,perturbation=0){
     params$flow_long2*(long^2) + 
     params$flow_size_long2*log(x)*(long^2) + 
     rfx["flow","site"] + rfx["flow","block"] + rfx["flow","source"]
-  return(invlogit(flow_mean)+perturbation)
+  return(invlogit(flow_mean) + flow_perturb)
 }
 
 #NUMBER OF PANICLES
-nfx<-function(x,params,long,rfx,perturbation=0){
+nfx<-function(x,params,long,rfx,fert_perturb=0){
   panic_mean<-params$panic_mu + 
     params$panic_size*log(x) + 
     params$panic_long*long + 
@@ -58,13 +58,13 @@ nfx<-function(x,params,long,rfx,perturbation=0){
     params$panic_long2*(long^2) + 
     params$panic_size_long2*log(x)*(long^2) + 
     rfx["panic","site"] + rfx["panic","block"] + rfx["panic","source"]
-  return(exp(panic_mean)+perturbation)
+  return(exp(panic_mean) + fert_perturb)
 }
 
 #SEED VIABILITY
-viab<-function(params,twosex,OSR=NULL,perturbation=0){
-  if(twosex==F){return(params$v0+perturbation)}
-  if(twosex==T){return(params$v0 * (1 - OSR ^ params$a_v)+perturbation)}
+viab<-function(params,twosex,OSR=NULL,viab_perturb=0){
+  if(twosex==F){return(params$v0 + viab_perturb)}
+  if(twosex==T){return((params$v0 * (1 - OSR ^ params$a_v)) + viab_perturb)}
 }
 
 #FERTILITY--returns number of recruits
@@ -131,10 +131,10 @@ lambdaSim_delay<-function(F_params,M_params,long,rfx,max.yrs,
   
   for(t in 1:max.yrs){
     ##Estimate panicle SR
-    flowering_females<-n0[2:(matdim+1)]*pfx(x=y,param=F_params,long=long,rfx=rfx,grow_perturb=grow_perturb,surv_perturb=surv_perturb) ## scalar multiplication to weight females by flowering prob
-    F_panicles<-flowering_females%*%nfx(x=y,param=F_params,long=long,rfx=rfx,flow_perturb=flow_perturb,fert_perturb=fert_perturb,viab_perturb=viab_perturb) ##Vector operation to sum female panicles
-    flowering_males<-n0[(matdim+3):((matdim+1)*2)]*pfx(x=y,param=M_params,long=long,rfx=rfx,grow_perturb=grow_perturb,surv_perturb=surv_perturb)
-    M_panicles<-flowering_males%*%nfx(x=y,param=M_params,long=long,rfx=rfx,flow_perturb=flow_perturb,fert_perturb=fert_perturb,viab_perturb=viab_perturb)
+    flowering_females<-n0[2:(matdim+1)]*pfx(x=y,param=F_params,long=long,rfx=rfx,flow_perturb=flow_perturb) ## scalar multiplication to weight females by flowering prob
+    F_panicles<-flowering_females%*%nfx(x=y,param=F_params,long=long,rfx=rfx,fert_perturb=fert_perturb) ##Vector operation to sum female panicles
+    flowering_males<-n0[(matdim+3):((matdim+1)*2)]*pfx(x=y,param=M_params,long=long,rfx=rfx,flow_perturb=flow_perturb)
+    M_panicles<-flowering_males%*%nfx(x=y,param=M_params,long=long,rfx=rfx,fert_perturb=fert_perturb)
     OSRtracker[t]<-F_panicles/(F_panicles+M_panicles) ##Panicle sex ratio (proportion female)
     SRtracker[t]<-sum(n0[1:(matdim+1)])
     #assmble matrix
