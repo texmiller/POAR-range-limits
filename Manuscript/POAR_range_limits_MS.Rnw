@@ -279,7 +279,7 @@ Finally, we compared the two-sex MPM to the corresponding female-dominant model 
 \begin{center}
     \includegraphics[width=1\linewidth]{Figures/nat_pops_gardens_SR}
   \caption{Sex ratio variation of \textit{P. arachnifera} across its longitudinal distribution.
-  \textbf{A}, Operational sex ratio (fraction of panicles that were female) in \Sexpr{poar_ms_quantities$n_survey_pops$n} natural populations; \textbf{B}, Operational sex ratio and \textbf{C}, sex ratio (fraction of plants that were female) in \Sexpr{poar_ms_quantities$n_sites} common gardens. 
+  \textbf{A}, Operational sex ratio (fraction of panicles that were female) in \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations; \textbf{B}, Operational sex ratio and \textbf{C}, sex ratio (fraction of plants that were female) in \Sexpr{poar_ms_quantities$n_sites} common gardens. 
   Within panels, point size is proportional to sample size (total number of panicles in \textbf{A,B} and total plants in \textbf{C}) as follows: \textbf{A}, min: \Sexpr{poar_ms_quantities$survey_range[1]}, max: \Sexpr{poar_ms_quantities$survey_range[2]}; \textbf{B}, min: \Sexpr{poar_ms_quantities$garden_osr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_osr_range[2]}; \textbf{C}, min: \Sexpr{poar_ms_quantities$garden_sr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_sr_range[2]}. 
   In \textbf{B,C}, data are pooled across years. 
   Lines show fitted binomial GLMs.
@@ -343,10 +343,10 @@ The occasional production of viable seeds in female-only populations (Fig. \ref{
 The processed-based demographic model connected sex-specific vital rate responses to longitudinal variation (Fig. \ref{fig:vital_rates}) with sex ratio-dependent mating (Fig. \ref{fig:seed_viability}) to predict the contributions of females and males to range limitation. 
 The model predicted maximum fitness in the center of the range and loss of population viability at longitudes that corresponded well with observed range limits. 
 Specifically, the western-most and eastern-most county records of \textit{P. arachnifera} fell within the uncertainty distribution of the model's predictions (represented by the shading in Fig. \ref{fig:lambda_long}A), bolstering our confidence that the model effectively captured geographic patterns in the population dynamics of this species. 
-Also, the asymptotic population structure predicted by the model showed skew in the operational (panicle) sex ratio with increasing female bias toward the eastern range margins, consistent with observations in the field (Fig. \ref{fig:SR_viab}A). 
-Female bias in the OSR was predicted to cause declines in seed viability toward eastern range margins (Fig. \ref{fig:SR_viab}B).
+Also, the asymptotic population structure predicted by the model showed skew in the operational (panicle) sex ratio with increasing female bias toward the eastern range margins, consistent with observations in the field (Fig. \ref{fig:SR_viab_sens}A). 
+Female bias in the OSR was predicted to cause declines in seed viability toward eastern range margins (Fig. \ref{fig:SR_viab_sens}B).
 However, this effect was weak in magnitude because predicted OSR bias was not extreme enough to cause strong declines in viability, given the relationship derived from the sex ratio manipulation experiment (Fig. \ref{fig:seed_viability}). 
-Furthermore, population viability at the eastern range margin was weakly sensitive to seed viability relative to other vital rates (). 
+Furthermore, population viability at the eastern range margin was weakly sensitive to seed viability relative to other vital rates (\ref{fig:SR_viab_sens}C). 
 These observations underscore the next set of results. 
 
 LTRE decomposition methods revealed that declines in $\lambda$ approaching range limits were driven almost exclusively by females (Fig. \ref{fig:lambda_long}B) with near-zero contributions from males (Fig. \ref{fig:lambda_long}C). 
@@ -417,12 +417,20 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \label{fig:site_precip}
   \end{center}
 \end{figure}
- 
+
  \newpage
- \section*{Appendix B: Additional results}
+ \section*{Appendix B: Parameter estimates of two-sex MPM}
 \renewcommand{\thefigure}{B\arabic{figure}}\setcounter{figure}{0}
 \renewcommand{\thetable}{B\arabic{table}}\setcounter{table}{0}
 \renewcommand{\theequation}{B\arabic{equation}}\setcounter{equation}{0}
+
+% put the big parameter estimate table here %
+
+ \newpage
+ \section*{Appendix C: Additional results}
+\renewcommand{\thefigure}{C\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{C\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{C\arabic{equation}}\setcounter{equation}{0}
 
 \begin{figure}[h!]
   \begin{center}
@@ -446,15 +454,17 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
  \newpage
 \begin{figure}[h!]
   \begin{center}
-    \includegraphics[width=0.75\linewidth]{Figures/SR_viab}
+    \includegraphics[width=\linewidth]{Figures/SR_viab_sens}
   \caption{\textbf{A}, Longitudinal variation in operational sex ratio (fraction of panicles that are female) predicted by the two-sex MPM (solid line) compared to the sex ratio clines fitted to data from common gardens (dotted line) or natural populations (dashed line).
   Vertical lines show the longitudes of the westernmost and easternmost counties with occurrence records of \textit{P. arachnifera}.
-  \textbf{B}, Longitudinal variation in seed viability predicted by the two-sex MPM according to Eq. \ref{eq:viab_fn} and the OSR variation shown in \textbf{A}.}
-  \label{fig:SR_viab}
+  \textbf{B}, Longitudinal variation in seed viability predicted by the two-sex MPM according to Eq. \ref{eq:viab_fn} and the OSR variation shown in \textbf{A}.
+  \textbf{C}, Sensitivities of $\lambda$ to vital rates in relation to longitude.
+  Sensitivities were calculated numerically by perturbing vital rate functions (across all sizes) by $0.01$, recalculating $\lambda$, and dividing the difference by $0.01$.
+  Vital rates were perturbed equally for both sexes though results in Fig \ref{fig:lambda_long}B,C suggest that vital rate sensitivities were dominated by females. 
+  }
+  \label{fig:SR_viab_sens}
   \end{center}
 \end{figure}
-
-
 
 
 \end{document}
