@@ -1100,8 +1100,12 @@ for(l in 1:length(long_seq_extend)){
   print(l)
 }
 
+## write LTRE output based on posterior mean parameters
+write_rds(list(dp_dlong=dp_dlong,dlambda_dp=dlambda_dp),paste0(dir,"/Experiment/Demography/POAR-range-limits/results/POAR_LTRE.rds"))
+POAR_LTRE <- read_rds(paste0(dir,"/Experiment/Demography/POAR-range-limits/results/POAR_LTRE.rds"))
+
 # put it all together 
-LTRE_out <- dp_dlong * dlambda_dp
+LTRE_out <- POAR_LTRE$dp_dlong * POAR_LTRE$dlambda_dp
 
 par(mfrow=c(2,1))
 plot(long_seq_extend+mean(latlong$Longitude),lambda_long_mean,type="b",main=F_params$max_size)
