@@ -144,7 +144,7 @@ Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
 Individuals grow via rhizomes to form ``patches'' that may be as large as $50 m^2$ in area. 
-Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{personal communication}).
+Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001genetic,renganayaki2005identification} and the primary sex ratio is $1$:$1$ (J. Goldman, USDA-ARS, \textit{unpubl. data}).
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
 We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in operational sex ratio corresponding to the longitudinal aridity gradient. 
@@ -225,7 +225,7 @@ For both viability and germination, we found that accounting for overdispersion 
 The statistical models for the common garden and sex ratio experiments provided the backbone of the full demograhpic model, a matrix projection model (MPM) structured by size (tiller number) and sex. 
 Following the statistical modeling, the MPM accommodates longitude as a predictor variable, allowing us to identify the longitudinal limits of population viability ($\lambda \geq 1$) and investigate the underlying drivers of population decline at range limits. 
 
-For a given longitude, let $F_{x,t}$ and $M_{x,t}$ be the number of female and male plants of size $x$ in year $t$, where $x \in \{1,2,...,U\}$ and $U$ is the maximum number of tillers a plant can attain (assumed to be the same for females and males). 
+For a given longitude, let $F_{x,t}$ and $M_{x,t}$ be the number of female and male plants of size $x$ in year $t$, where $x \in \{1,2,...,U\}$ and $U$ is the maximum number of tillers a plant can attain (set to the 99th percentile of observed maximum size). 
 We also include additional state variables for new recruits, $F^{R}_{t}$ and $M^{R}_{t}$, which we assume do not reproduce in their first year.
 For ease of presentation, we do not symbolically show longitude effects in the vital rate functions for growth, survival, flowering, and panicle production but these all included longitude effects on the intercept and slope (with respect to size) as a second-order polynomial, following the statistical models.
 We assume that the parameters of sex ratio-dependent mating (Eq. \ref{eq:viab_fn}) do not vary with longitude. 
@@ -370,15 +370,23 @@ The overall decline in $\lambda$ was driven most strongly by a combination of re
 \end{figure}
 
 Skew in the OSR predicted by the demographic model was less extreme than was observed in natural and experimental populations. 
-This occurred because sex differences in demography, especially flowering, were most pronounced at the largest sizes, and the MPM predicted that these sizes were very rare at stable population structure 
-However, stable size distribution predicted by the MPM was much smaller, on average, than we observed in natural populations (Figure), presumably because transplants did not grow like ``real'' plants. 
+This occurred because sex differences in demography, especially flowering, were most pronounced at the largest sizes, and the MPM predicted that these sizes were very rare at stable population structure. 
+The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Figure), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
 In Appendix X, we explore whether higher growth rates, leading to more realistic size distributions, would generate stronger skew in the OSR and thus a more important role for males.
-We found...
+We found that our conclusion about the weak contributions of males...
 
 
 %--------------------------------------------------------------------
 
 \section*{Discussion}
+
+Understanding the sources of decline in population viability at range edges is the foundation for predicting how species' ranges will respond to global change drivers. 
+Sexual niche differentation has the potential to generate skew in the mating pool across environmental gradients and may therefore contribute to reproductive failure at range edges. 
+In Texas bluegrass, we found that the female reproductive niche extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden experiment. 
+Furthermore, seed viability declined with increasing skew in the OSR, indicating that mate (pollen) limitation can limit female reproductive output in female-biased mating pools. 
+It would appear that all the pieces are in place for an important role of two-sex dynamics in generating distributional limits, particularly at the eastern edges of Texas bluegrass. 
+Yet, the insights derived from a field-parameterized population model indicate the opposite: range limitation in this species was an effectively female-dominant process, with negligible contributions from males. 
+
 %\begin{itemize}
 %\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
 %\item{We found evidence for sexual niche differentiation.}
@@ -418,21 +426,24 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \end{center}
 \end{figure}
 
- \newpage
- \section*{Appendix B: Parameter estimates of two-sex MPM}
+%--------------------------------------------------------------------
+\newpage
+\section*{Appendix B: Parameter estimates of two-sex MPM}
 \renewcommand{\thefigure}{B\arabic{figure}}\setcounter{figure}{0}
 \renewcommand{\thetable}{B\arabic{table}}\setcounter{table}{0}
 \renewcommand{\theequation}{B\arabic{equation}}\setcounter{equation}{0}
 
 % put the big parameter estimate table here %
 
- \newpage
- \section*{Appendix C: Additional results}
+%--------------------------------------------------------------------
+\newpage
+\section*{Appendix C: Additional results}
 \renewcommand{\thefigure}{C\arabic{figure}}\setcounter{figure}{0}
 \renewcommand{\thetable}{C\arabic{table}}\setcounter{table}{0}
 \renewcommand{\theequation}{C\arabic{equation}}\setcounter{equation}{0}
 
-\begin{figure}[h!]
+\newpage
+\begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/PPC}
   \caption{Posterior predictive checks of statistical models for demographic vital rates. 
@@ -442,7 +453,8 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \end{center}
 \end{figure}
 
-\begin{figure}[h!]
+\newpage
+\begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/lambda_long_2sex_Fdom}
   \caption{Comparison of longitudinal variation in $\lambda$ between the two-sex demographic model (dashed line) that includes dependence of female seed production on population structure and the corresponding female-dominant model (solid line) with constant female fertility and all else equal. 
@@ -451,8 +463,8 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \end{center}
 \end{figure}
 
- \newpage
-\begin{figure}[h!]
+\newpage
+\begin{figure}[H]
   \begin{center}
     \includegraphics[width=\linewidth]{Figures/SR_viab_sens}
   \caption{\textbf{A}, Longitudinal variation in operational sex ratio (fraction of panicles that are female) predicted by the two-sex MPM (solid line) compared to the sex ratio clines fitted to data from common gardens (dotted line) or natural populations (dashed line).
@@ -465,6 +477,57 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   \label{fig:SR_viab_sens}
   \end{center}
 \end{figure}
+
+%--------------------------------------------------------------------
+\newpage
+\section*{Appendix D: Size distribution comparisons and simulation experiments}
+\renewcommand{\thefigure}{D\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{D\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{D\arabic{equation}}\setcounter{equation}{0}
+
+In this section, we compare size distributions of natural and experimental populations, and explore how the size distribution predicted by the two-sex IPM affects our conclusions about the role of males in range boundary formation. 
+
+\subsection*{Observed and predicted size distributions}
+
+\paragraph{Natural populations}
+During natural population surveys (2012--2013) we recorded the area ($m^2$) of Texas bluegrass patches using a Trimble GeoExplorer hand-held GPS receiever with sub-meter accuracy. 
+
+\paragraph{Common garden populations}
+Common garden data collection included tiller counts and the maximum length and width of each patch, which we converted to area ($m^2$) assuming an oval shape. 
+We used these data to estimate the relationship between patch area and tiller count (Fig. \ref{}) and applied this fitted relationship to area measurements from natural populations.
+This allowed us to compare the size distributions of natural and common garden populations (pooled across the range) in the same size unit (log(tillers)).
+
+\paragraph{Two-sex MPM}
+The two-sex MPM predicts asymptotic population structure, including stable size distribution (SSD) and sex ratio. 
+For comparison with empirical data, we calculated the SSD (pooling both sexes) predicted in the center of the range (the conclusions that we draw from this analysis hold up if we consider SSD from different parts of the range).
+Because the MPM is structured by tiller number, we converted the SSD to log(tillers) by simulating an arbirarily large ($10000$) population at SSD, taking the natural logarithm of tiller number, and then estimating the empirical distribution of this variable. 
+
+\newpage
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.5\linewidth]{Figures/size_dist}
+  \caption{Size distribution of Texas bluegrass from natural populations (\textbf{A}), common garden populations (\textbf{B}), and predicted by the two-sex MPM (\textbf{C}). 
+In \textbf{C}, the two size distributions come from the base model parameterized following methods described in the main manuscript (gray) and a numerical experiment where growth parameters were numerically increased to generate a size distribution more consistent with natural populations (white). 
+  }
+  \label{fig:size_dist}
+  \end{center}
+\end{figure}
+
+\paragraph{Results}
+Plants from natural populations were larger, on average, than plants in our common garden experiment (Fig. \ref{fig:size_dist}A,B).
+Common garden plants were generally larger each year but the largest sizes in the final year of the common garden corresponded to smaller sizes observed in natural populations (although natural population surveys were subject to detection bias: small plants were likely under-sampled relative to their occurrence). 
+The predicted SSD from the two-sex MPM was consistent with the common garden size distribution (Fig. \ref{fig:size_dist}C), as expected since the model was built with common garden data. 
+These results suggest that common garden plants did not have the same growth trajectories of naturally occurring plants and / or were not given sufficient time to reach the sizes observed in natural populations. 
+
+\subsection*{Numerical experiment to explore the consequences of under-estimating the size distribution}
+The preceding results indicate that the common garden populations, and thus the two-sex MPM built from common garden data, under-estimate the size distribution of Texas bluegrass, relative to what we find in natural populations. 
+Sex differences in demography, and especially flowering, were most pronounced for the largest sizes (Fig. \ref{fig:vital_rates}), but these sizes were predicted to be very rare in a stable population (Fig. \ref{fig:size_dist}C). 
+The under-estimation of large sizes may explain why longitudinal clines in OSR predicted by the MPM and seen in the common garden were weaker than the OSR cline observed in natural populations (Fig. \ref{fig:SR_viab_sens}). 
+It is therefore possible that our main finding -- that males contribute little-to-nothing toward range limitation -- reflects a limitation of the model, since real populations tended to be more female-biased (and potentially more mate-limited) in the eastern range margins than the model predicted.
+
+To explore this possibility, we conducted a numerical experiment that allowed modeled plants to reach larger sizes by increasing the empirically-estimated intercept of the growth vital rate function by a factor of $2.75$ (values larger than this caused numerical instabilities).
+This adjustment caused all plants to increase in size more strongly regardless of initial size, sex, or geographic location. 
+
 
 
 \end{document}
