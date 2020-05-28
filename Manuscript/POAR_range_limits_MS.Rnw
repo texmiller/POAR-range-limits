@@ -494,8 +494,18 @@ During natural population surveys (2012--2013) we recorded the area ($m^2$) of T
 
 \paragraph{Common garden populations}
 Common garden data collection included tiller counts and the maximum length and width of each patch, which we converted to area ($m^2$) assuming an oval shape. 
-We used these data to estimate the relationship between patch area and tiller count (Fig. \ref{}) and applied this fitted relationship to area measurements from natural populations.
+We used these data to estimate the relationship between patch area and tiller count (Fig. \ref{fig:area_tillers_conversion}) using a generalized additive model \citep{mgcv} and applied this fitted relationship to area measurements from natural populations.
 This allowed us to compare the size distributions of natural and common garden populations (pooled across the range) in the same size unit (log(tillers)).
+
+\newpage
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/area_tillers_conversion}
+  \caption{Relationship between area ($m^3$) and tiller count from plants in the common garden experiment. 
+  The fitted gam model (line) was used to convert area measurements from natural populations to tiller counts.}
+  \label{fig:area_tillers_conversion}
+  \end{center}
+\end{figure}
 
 \paragraph{Two-sex MPM}
 The two-sex MPM predicts asymptotic population structure, including stable size distribution (SSD) and sex ratio. 
@@ -528,6 +538,13 @@ It is therefore possible that our main finding -- that males contribute little-t
 To explore this possibility, we conducted a numerical experiment that allowed modeled plants to reach larger sizes by increasing the empirically-estimated intercept of the growth vital rate function by a factor of $2.75$ (values larger than this caused numerical instabilities).
 This adjustment caused all plants to increase in size more strongly regardless of initial size, sex, or geographic location. 
 
-
+\newpage
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_model}
+  \caption{}
+  \label{fig:elevated_growth_model}
+  \end{center}
+\end{figure}
 
 \end{document}
