@@ -60,11 +60,15 @@ tiller_area_df <- exp_df %>%
   na.omit
 
 hist(tiller_area_df$area_t1)
-plot(tiller_area_df$log_area_t1,log(tiller_area_df$tillerN_t1))
 
 tiller_area_model <- gam(log(tillerN_t1) ~ s(log_area_t1), data=tiller_area_df)
 summary(tiller_area_model)
-lines(tiller_area_df$log_area_t1,predict(tiller_area_model),lwd=4)
+
+pdf("Manuscript/Figures/area_tillers_conversion.pdf",useDingbats = F)
+par(mar=c(5,5,1,1),mfrow=c(1,1))
+plot(tiller_area_df$log_area_t1,log(tiller_area_df$tillerN_t1),xlab="log(Area, m^3)",ylab="log(Tiller number)",cex.lab=1.4)
+lines(tiller_area_df$log_area_t1,predict(tiller_area_model),lwd=3)
+dev.off()
 
 ## use fitted gam to predict tiller numbers for natural populations
 poly_df$logtillers_pred <- predict.gam(tiller_area_model,data.frame(log_area_t1 = poly_df$log_area))
@@ -313,20 +317,29 @@ POAR_LTRE_growth_experiment <- read_rds(paste0(dir,"/Experiment/Demography/POAR-
 # put it all together 
 LTRE_out <- POAR_LTRE_growth_experiment$dp_dlong * POAR_LTRE_growth_experiment$dlambda_dp
 
-par(mfrow=c(2,1))
+pdf("Manuscript/Figures/elevated_growth_model.pdf",useDingbats = F,height=10,width=4)
+par(mfrow=c(3,1),mar=c(5,5,2,1))
+plot(long_seq_extend+mean(latlong$Longitude),lambda_long_Fdom,type="l",lwd=2,
+     xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5)
+lines(long_seq_extend+mean(latlong$Longitude),lambda_long,type="l",lty=2,lwd=2)
+legend("topleft",legend=c("Two-sex","Female-dominant"),lwd=2,lty=c(2,1),bty="n",cex=1.2)
+title("A",adj=0)
 
-plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,#ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-1.5,1.5),#ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(1,8,by=2)){
   lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
 }
+title("B",adj=0)
 
-plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,#ylim=c(-0.4,0.5),
+plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-1.5,1.5),#ylim=c(-0.4,0.5),
      xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
 abline(h=0,col="gray")
 for(i in seq(9,16,by=2)){
   lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
 }
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
-       lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
+       lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.2)
+title("C",adj=0)
+dev.off()
