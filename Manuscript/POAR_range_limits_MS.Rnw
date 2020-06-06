@@ -371,9 +371,11 @@ The overall decline in $\lambda$ was driven most strongly by a combination of re
 
 Skew in the OSR predicted by the demographic model was less extreme than was observed in natural and experimental populations. 
 This occurred because sex differences in demography, especially flowering, were most pronounced at the largest sizes, and the MPM predicted that these sizes were very rare at stable population structure. 
-The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Figure), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
-In Appendix X, we explore whether higher growth rates, leading to more realistic size distributions, would generate stronger skew in the OSR and thus a more important role for males.
-We found that our conclusion about the weak contributions of males...
+The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Fig. \ref{fig:size_dist}), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
+In Appendix D, we explore whether higher growth rates, leading to more realistic size distributions, would lead to a more important role for males.
+In numerical experiments with growth parameters, we found that larger size distributions led to stronger female bias and thus stronger reductions in seed viability at eastern range margins (Fig. \ref{}). 
+While these changes increased the contributions of males to range limitation, female contributions were still more than twice as important as males, and there was very little difference between predictions of the two-sex and female-dominant models under this elevated growth scenario (Fig. \ref{fig:elevated_growth_model}). 
+This leads us to conclude that, while our common garden results may quantitatively underestimate OSR bias and its demographic consequences, our qualitative conclusion that range boundary formation is effectively female-dominant is this system is robust to any biases imposed by the size distributions of common garden populations. 
 
 
 %--------------------------------------------------------------------
@@ -534,11 +536,22 @@ The preceding results indicate that the common garden populations, and thus the 
 Sex differences in demography, and especially flowering, were most pronounced for the largest sizes (Fig. \ref{fig:vital_rates}), but these sizes were predicted to be very rare in a stable population (Fig. \ref{fig:size_dist}C). 
 The under-estimation of large sizes may explain why longitudinal clines in OSR predicted by the MPM and seen in the common garden were weaker than the OSR cline observed in natural populations (Fig. \ref{fig:SR_viab_sens}). 
 It is therefore possible that our main finding -- that males contribute little-to-nothing toward range limitation -- reflects a limitation of the model, since real populations tended to be more female-biased (and potentially more mate-limited) in the eastern range margins than the model predicted.
-
 To explore this possibility, we conducted a numerical experiment that allowed modeled plants to reach larger sizes by increasing the empirically-estimated intercept of the growth vital rate function by a factor of $2.75$ (values larger than this caused numerical instabilities).
 This adjustment caused all plants to increase in size more strongly regardless of initial size, sex, or geographic location. 
 
-\newpage
+As expected, this led to stronger sex ratio clines and stronger reductions in seed viability at eastern range margins (Fig. \ref{fig:elevated_growth_SR_viab}). 
+These changes increased the contributions of males to eastern range limitation in the elevated-growth numerical experiment.
+However, the contribution of males to range limitation was still weak relative to that of females (the maximum male contribution was less than half of the female maximum) and differences between the two-sex and female-dominant MPMs were stil very minor (Fig. \ref{fig:elevated_growth_model}). 
+Collectively, these results suggest that the small size distribution of the common garden experiment led to a weaker role of males than would be expected in populations with a more realistic size distribution, but that even with a larger size distribution, declines in female performance still dominant range boundary formation.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_SR_viab}
+  \caption{}
+  \label{fig:elevated_growth_SR_viab}
+  \end{center}
+\end{figure}
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_model}
