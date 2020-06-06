@@ -5,7 +5,18 @@
 library(dplyr)
 library(mgcv)
 library(scales)
+library(actuar)
+library(popbio)
 in_dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/"
+
+## useful functions
+quote_bare <- function( ... ){
+  substitute( alist(...) ) %>% 
+    eval( ) %>% 
+    sapply( deparse )
+}
+invlogit<-function(x){exp(x)/(1+exp(x))}
+
 
 # Size distribution comparison --------------------------------------------
 ## first generate a figure comparing MPM SSD, common garden size distribution, and natural population size distribution
@@ -176,7 +187,7 @@ F_params$sdlg_surv <- M_params$sdlg_surv <- sdlg_surv$sdlg_surv
 F_params$max_size <- M_params$max_size <- round(quantile(na.omit(poar$tillerN_t1),probs=0.99)) #max(na.omit(poar$tillerN_t0)); 
 
 ## do these SSD simulations for middle of the range (longitude 0)
-growth_factor <- c(1,3) ## <- going with 3x increase in grow_mu
+growth_factor <- c(1,2.75) ## <- going with 3x increase in grow_mu
 new_mat_size <- round(F_params$max_size*1.5) ## <- increasing max size by 50%
 ## FRIDAY: use a smaller matrix (less than double standard max) but with 2x growth
 ssd<-matrix(NA,new_mat_size,length(growth_factor))
@@ -253,17 +264,20 @@ for(l in 1:length(long_seq_extend)){
 }
 }
 
-par(mfrow=c(3,1),mar=c(5,4,1,1))
-
+pdf("Manuscript/Figures/elevated_growth_SR_viab.pdf",useDingbats = F,height=9,width=5)
+par(mfrow=c(2,1),mar=c(5,4,1,1))
 plot(long_seq_extend+mean(latlong$Longitude),OSR_long_gsim[1,],type="n",ylim=c(0,1),
      xlab="Longitude",ylab="Operational sex ratio (fraction female panicles)")
 lines(long_seq_extend+mean(latlong$Longitude),OSR_long_gsim[1,],lwd=4)
 lines(long_seq_extend+mean(latlong$Longitude),OSR_long_gsim[2,],lwd=4,lty=2)
 abline(h=0.5,lty=3,col="lightgray")
-
+legend("topleft",legend=c("Original model","Elevated growth"),lwd=3,lty=c(1,2),bty="n")
+title("A",adj=0)
 plot(long_seq_extend+mean(latlong$Longitude),viab(params=F_params,twosex=T,OSR=OSR_long_gsim[1,]),
      ylim=c(0,1),lwd=4,type="l",xlab="Longitude",ylab="Predicted seed viability")
 lines(long_seq_extend+mean(latlong$Longitude),viab(params=F_params,twosex=T,OSR=OSR_long_gsim[2,]),lwd=4,lty=2)
+title("B",adj=0)
+dev.off()
 
 ## Now do LTRE on fake parameter set
 # these are the indices of the intercepts and slopes
