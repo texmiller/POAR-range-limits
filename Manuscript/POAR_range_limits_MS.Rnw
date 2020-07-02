@@ -373,9 +373,9 @@ Skew in the OSR predicted by the demographic model was less extreme than was obs
 This occurred because sex differences in demography, especially flowering, were most pronounced at the largest sizes, and the MPM predicted that these sizes were very rare at stable population structure. 
 The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Fig. \ref{fig:size_dist}), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
 In Appendix D, we explore whether higher growth rates, leading to more realistic size distributions, would lead to a more important role for males.
-In numerical experiments with growth parameters, we found that larger size distributions led to stronger female bias and thus stronger reductions in seed viability at eastern range margins (Fig. \ref{}). 
+In numerical experiments with growth parameters, we found that larger size distributions led to stronger female bias and thus stronger reductions in seed viability at eastern range margins (Fig. \ref{fig:elevated_growth_SR_viab}). 
 While these changes increased the contributions of males to range limitation, female contributions were still more than twice as important as males, and there was very little difference between predictions of the two-sex and female-dominant models under this elevated growth scenario (Fig. \ref{fig:elevated_growth_model}). 
-This leads us to conclude that, while our common garden results may quantitatively underestimate OSR bias and its demographic consequences, our qualitative conclusion that range boundary formation is effectively female-dominant is this system is robust to any biases imposed by the size distributions of common garden populations. 
+This leads us to conclude that, while our common garden results may quantitatively underestimate OSR bias and its demographic consequences, our qualitative conclusion that range boundary formation is effectively female-dominant in this system is robust to any biases imposed by the size distributions of common garden populations. 
 
 
 %--------------------------------------------------------------------
@@ -547,7 +547,8 @@ Collectively, these results suggest that the small size distribution of the comm
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_SR_viab}
-  \caption{}
+  \caption{Two-sex model predictions for \textbf{A} operational sex ratio (fraction of panicles that are female) and \textbf{B} seed viability at stable population structure in relation to longitude. 
+  Solid line shows predictions of the base model using field-estmated parameter values and dashed line shows the same model with elevated growth of both sexes and across all longitudes (intercept of growth function increased by a factor of 2.75). }
   \label{fig:elevated_growth_SR_viab}
   \end{center}
 \end{figure}
@@ -555,7 +556,10 @@ Collectively, these results suggest that the small size distribution of the comm
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_model}
-  \caption{}
+  \caption{Results for elevated growth model, in which the intercept of growth function was increased by a factor of 2.75.
+  \textbf{A}, contrast of two-sex and female-dominant models, as in Fig. \ref{fig:2sex_Fdom};
+  \textbf{B,C}, Life Table Response Experiments decomposing the change in $\lambda$ with respect to longitude into contributions from female\textbf{B} and male \textbf{C} vital rates (layout as in Fig. \ref{fig:lambda_long}). 
+  }
   \label{fig:elevated_growth_model}
   \end{center}
 \end{figure}
