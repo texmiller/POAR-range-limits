@@ -18,10 +18,10 @@
 \doublespacing
 
 <<setup,echo=F, message=F, warning=F>>=
-knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_chunk$set(fig.pos = 'H',error=TRUE)
 library(tidyverse)
 library(xtable)
-poar_ms_quantities <- read_rds("C:/Users/tm9/Desktop/git local/POAR-range-limits/Manuscript/poar_ms_quantities.rds")
+poar_ms_quantities <- read_rds("C:/CODE/POAR-range-limits/Manuscript/poar_ms_quantities.rds")
 @
 
 %-------------------------------------------------------------------------
@@ -69,7 +69,7 @@ Understanding the processes that generate species' distributional limits is a fo
 The niche concept is central to theory for range limits \citep{Hutchinson1958} and available evidence suggests that geographic distributions may commonly be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
 Species distribution modeling has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence and environmental variables.
 In contrast, there is growing interest in process-based models of range limits, where individual-level demographic responses to environmental variation inform predictions about the ecological niche and environmental limits of population viability (i.e., at least replacement-level population growth, $\lambda \geq 1$) \citep{merow2014using,merow2017climate,diez2014probabilistic}. 
-The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change \citep{evans2016towards,ehrlen2015predicting}. 
+The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change. These models, beyond improving predictions, will allow predicting abundances and how fast they will respond to environmental change \citep{evans2016towards,ehrlen2015predicting}. 
 
 The widespread idea that range limits reflect niche limits intersects awkwardly with another pervasive concept in ecology: intra-specific niche heterogeneity. 
 This refers to the fact that individuals within a population or species may differ in their interactions with the biotic and/or abiotic environment \citep{bolnick2002ecology,araujo2011ecological,holt2009bringing}. 
@@ -87,7 +87,7 @@ At range margins, where environments are extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
 In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species’ ranges tend to be male-biased \citep{field2013ecological}.
 
-Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory assumes answer. 
+Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory assumes the answer. 
 ``Female dominance'' is a pervasive, often implicit feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility \citep{miller2011confronting,rankin2007males,caswell1986two}. 
 This assumption is, of course, wrong but it may often be a convenient approximation when the sex ratio is balanced or does not vary. 
 The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
@@ -112,7 +112,7 @@ While sexual niche divergence sets the stage for two-sex dynamics to play an imp
 
 Here we ask, for the first time, whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether the additional role of males determines range boundary formation. 
 As an experimental model, we worked with a dieocious plant species (the grass \textit{Poa arachnifera}) narrowly distributed across the sharp longitudinal aridity gradient in the southern Great Plains, US (Fig. \ref{fig:map}). 
-The environmental isocline governing aridity in this region is expected to shift eastward under climate change \citep{karl2009global}, so understanding how it sets distributional limits may aid in forecasting range future shifts. 
+The environmental isocline governing aridity in this region is expected to shift eastward under climate change \citep{karl2009global}, so understanding how it sets distributional limits may aid in forecasting future range shifts. 
 We hypothesized that sexual niche differentiation with respect to longitudinal variation in aridity may lead to skewed sex ratios approaching range limits, and that mate limitation could cause range boundaries to deviate from female-dominant expectations. 
 
 This study was conducted in four parts. 
@@ -190,7 +190,7 @@ The survival and flowering data were Bernoulli distributed, and these models app
 We modeled panicle counts as zero-truncated negative binomial using the log link. 
 For growth, we modeled tiller number in year $t+1$ with a zero-truncated Poisson-Inverse Gaussian (PIG) distribution. 
 For flowering and panicle production in year $t$, the size covariate was the natural logarithm of tiller number in year $t$. 
-For survival and size  in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
+For survival and size in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
 Posterior predictive checks indicated that these models described the data well (Fig. \ref{fig:PPC}). 
 
 \subsection*{Sex ratio experiment}
@@ -199,8 +199,8 @@ Details of this experiment, which was conducted in 2014--2015, are described in 
 Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates each of 34 density-sex ratio combinations. 
 The experiment was established ca. 1 km from a natural population at this site and plots were situated with a minimum of 15 m spacing, a buffer that was intended to limit pollen movement between plots (pilot data indicated that $\geq 90\%$ of wind pollination occurred within $13 m$). 
 We measured female reproductive success in different density and sex ratio environments by collecting panicles from a subset of females in each plot at the end of the reproductive season.
-In the lab, we counted the total number of seeds on each panicle and assessed seed viability with tetrazolium assays of 25 seeds per panicle.
-We also conducted germination trials in the greenhouse (17--57 seeds per panicle, mode: 30). 
+In the lab, we counted the total number of seeds on each panicle and assessed seed viability in the greenhouse with germination trials of 25 seeds per panicle. 
+We also conducted tetrazolium-based seed viability assays (17--57 seeds per panicle, mode: 30). 
 
 \subsubsection*{Statistical analysis of sex ratio experiment}
 Our previous study examined how interactions between density and frequency (sex ratio) dependence contributed to female reproductive success \citep{compagnoni2017can}. 
@@ -212,7 +212,7 @@ We modeled the seed viability data with a binomial distribution where the probab
 v = v_{0} * (1 - OSR^{\alpha})
 \end{align}
 
-\noindent where $OSR$ is the operational sex ratio (fraction of panicles that were female) in our experimental populations. 
+\noindent where $OSR$ is the operational sex ratio (fraction of panicles that were female) in our experimental populations. The OSR therefore quantifies the availability of males to each female individual in a population.
 This function has the properties, supported by our previous work, that seed viability is maximized at $v_{0}$ as $OSR$ approaches zero and goes to zero as $OSR$ approaches $1$.
 Parameter $\alpha$ controls how viability declines with increasing female bias. 
 
@@ -334,7 +334,7 @@ The occasional production of viable seeds in female-only populations (Fig. \ref{
     \includegraphics[width=0.6\linewidth]{Figures/seed_viability}
   \caption{Seed fertilization success in relation to operational sex ratio (fraction of panicles that are female) in experimental populations. 
   Circles show data from tetrazolium assays of seed viability; circle size is proprtional to the number of seeds tested (min: \Sexpr{poar_ms_quantities$viab_n[1]}, max: \Sexpr{poar_ms_quantities$viab_n[2]}).
-  Lines show fitted model (Eq. \ref{eq:viab_fn}) for 500 samples from the posterior distribution of parameter estimates.}
+  Lines show model predictions (Eq. \ref{eq:viab_fn}) for 500 samples from the posterior distribution of parameter estimates.}
   \label{fig:seed_viability}
   \end{center}
 \end{figure}
@@ -389,6 +389,8 @@ Furthermore, seed viability declined with increasing skew in the OSR, indicating
 It would appear that all the pieces are in place for an important role of two-sex dynamics in generating distributional limits, particularly at the eastern edges of Texas bluegrass. 
 Yet, the insights derived from a field-parameterized population model indicate the opposite: range limitation in this species was an effectively female-dominant process, with negligible contributions from males. 
 
+
+
 %\begin{itemize}
 %\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
 %\item{We found evidence for sexual niche differentiation.}
@@ -397,10 +399,22 @@ Yet, the insights derived from a field-parameterized population model indicate t
 %  \end{itemize}
 %\end{itemize}
 
+
+As a general rule, in long-lived species with polygamous mating systems, range limits should generally reflect the niche limits of females. Polygyny implies that reproduction will be affected by sex ratios only at very high proportion of females. This is exemplified by our results, where seed production started to decrease only in populations comprised of 70\% females. Moreover, in long-lived species population growth rates will depend only weakly to reproduction \citep{franco2004comparative}. These two characteristics will substantially decrease the likelihood of males setting range limits.
+
+However, the premises for males to contribute in range limit formation, albeit rare, are likely to occur in nature. First, female-skewed sex ratios are common both plants \citep{barrett2010ecological} and animals \citep{caswell2001}. Second, there are several examples of plants responding in contrasting ways to environmental gradients according to sex \citep{bierzychudek1988spatial}. These patterns can be driven by several mechanisms, such as physiology \citep{dawson1999sexual}, differences in competitive ability \citep{eppley2006females}, or demographic rates \citep{delph1999sexual}. Third, mate limitation is common in both animals \citep{gascoigne2009dangerously} and plants \citep{Ashman et al. 2004}. Accordingly, in plants, pollen limitation is considered the reason why dioecious plant species tend to have a substantially smaller range than selfing species \citep{grossenbacher2015geographic}.
+
+Our results reinforce the commonality of demographic compensation in nature, and provides evidence in favor of the abundant center hypothesis of range formation. Demographic compensation occurs when the vital rates of a species have opposing trends across an environmental gradient \citep{villellas2015demographic}. The abundant center hypothesis posits that the fitness and abundance of species will gradually decrease towards range edges \citep{brown1995spatial}. Our results show that in P. arachnifera, survival tended to compensate the negative response of the remaining vital rates at latitudinal extremes. However, this compensation was not sufficient to prevent a decrease in population growth rates at the extremes of the longitudinal range of the species. A recent study found a similar pattern, where compensation between vital rates could not prevent a decrease of population growth rate towards the southern range edge of Erythranthe cardinalis \citep{sheth2018demographic}. Our results and those of Sheth and Angert (2018) might explain why previous tests of the abundant center hypothesis failed to support this hypothesis. These previous tests relied on vital rates rather than population growth rates, providing contrasting results  \citep{sexton2009evolution,abeli2014effects}. Contrasting results among vital rates are expected, because demographic compensation should be adaptive \citep{villellas2015demographic}. Accordingly, the studies that calculate population growth rates along an environmental gradient tend to support the abundant center hypothesis. We know of four such studies in the existing literature. Three of these studies showed a decrease in population growth rates towards at least one end of the environmental gradients \citep{eckhart2011geography,sheth2018demographic,baer2019declining}. The fourth study showed population growth rate along environmental gradients was unpredictable \citep{oldfather2019microclimate}. However, this last study emphasized the importance of microclimate, which can have dramatic effects on alpine plants \citep{scherrer2010infra}. In general, our results suggest that to understand range formation, investigators should rely on population growth rates, or on the entire life cycle of species.
+
+
 %--------------------------------------------------------------------
 \section*{Acknowledgements}
 
+We thank Dariusz Malinowski, Jason Goldman, Tom Arsuffi, Alan Byboth, John Walker, Kenneth Steigman, Steven Gibson, Wesley Newman, Kerry Griffis, Liz Martin, Melanie Hartman, Brian Northup, Dexter R Mardis, and Dixie Smith for assistance in accessing and setting up the field sites. We thank Marion Donald, Kory Kolis, and Nakian Kim for assistance in the field and greenhouse. 
+
 \section*{Author contributions}
+
+A.C. and T.E.X.M. designed the study. A.C., and T.E.X.M. carried out the study. T.E.X.M. and A.C. conducted the statistical analyses and drafted the manuscript. A.C. and T.E.X.M. finalized the manuscript.
 
 \section*{Data accessibility}
 
@@ -542,7 +556,7 @@ This adjustment caused all plants to increase in size more strongly regardless o
 As expected, this led to stronger sex ratio clines and stronger reductions in seed viability at eastern range margins (Fig. \ref{fig:elevated_growth_SR_viab}). 
 These changes increased the contributions of males to eastern range limitation in the elevated-growth numerical experiment.
 However, the contribution of males to range limitation was still weak relative to that of females (the maximum male contribution was less than half of the female maximum) and differences between the two-sex and female-dominant MPMs were stil very minor (Fig. \ref{fig:elevated_growth_model}). 
-Collectively, these results suggest that the small size distribution of the common garden experiment led to a weaker role of males than would be expected in populations with a more realistic size distribution, but that even with a larger size distribution, declines in female performance still dominant range boundary formation.
+Collectively, these results suggest that the small size distribution of the common garden experiment led to a weaker role of males than would be expected in populations with a more realistic size distribution, but that even with a larger size distribution, declines in female performance still dominante range boundary formation.
 
 \begin{figure}[H]
   \begin{center}
@@ -556,9 +570,9 @@ Collectively, these results suggest that the small size distribution of the comm
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.5\linewidth]{Figures/elevated_growth_model}
-  \caption{Results for elevated growth model, in which the intercept of growth function was increased by a factor of 2.75.
+  \caption{Results for the elevated growth model, in which the intercept of growth function was increased by a factor of 2.75.
   \textbf{A}, contrast of two-sex and female-dominant models, as in Fig. \ref{fig:2sex_Fdom};
-  \textbf{B,C}, Life Table Response Experiments decomposing the change in $\lambda$ with respect to longitude into contributions from female\textbf{B} and male \textbf{C} vital rates (layout as in Fig. \ref{fig:lambda_long}). 
+  \textbf{B,C}, Life Table Response Experiments decomposing the change in $\lambda$ with respect to longitude into contributions from female \textbf{B} and male \textbf{C} vital rates (layout as in Fig. \ref{fig:lambda_long}). 
   }
   \label{fig:elevated_growth_model}
   \end{center}
