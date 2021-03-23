@@ -342,7 +342,7 @@ The occasional production of viable seeds in female-only populations (Fig. \ref{
 \subsection*{Two-sex model of range limits}
 The processed-based demographic model connected sex-specific vital rate responses to longitudinal variation (Fig. \ref{fig:vital_rates}) with sex ratio-dependent mating (Fig. \ref{fig:seed_viability}) to predict the contributions of females and males to range limitation. 
 The model predicted maximum fitness in the center of the range and loss of population viability at longitudes that corresponded well with observed range limits. 
-Specifically, the western-most and eastern-most county records of \textit{P. arachnifera} fell within the uncertainty distribution of the model's predictions (represented by the shading in Fig. \ref{fig:lambda_long}A), bolstering our confidence that the model effectively captured geographic patterns in the population dynamics of this species. 
+Specifically, the western-most and eastern-most county records of \textit{P. arachnifera} fell within the uncertainty distribution of the model's predictions (represented by the shading in Fig. \ref{fig:lambda_long}A), bolstering our confidence that the model effectively captured geographic patterns in the population viability of this species. 
 Also, the asymptotic population structure predicted by the model showed skew in the operational (panicle) sex ratio with increasing female bias toward the eastern range margins, consistent with observations in the field (Fig. \ref{fig:SR_viab_sens}A). 
 Female bias in the OSR was predicted to cause declines in seed viability toward eastern range margins (Fig. \ref{fig:SR_viab_sens}B).
 However, this effect was weak in magnitude because predicted OSR bias was not extreme enough to cause strong declines in viability, given the relationship derived from the sex ratio manipulation experiment (Fig. \ref{fig:seed_viability}). 
@@ -374,7 +374,7 @@ This occurred because sex differences in demography, especially flowering, were 
 The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Fig. \ref{fig:size_dist}), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
 In Appendix D, we explore whether higher growth rates, leading to more realistic size distributions, would lead to a more important role for males.
 In numerical experiments with growth parameters, we found that larger size distributions led to stronger female bias and thus stronger reductions in seed viability at eastern range margins (Fig. \ref{fig:elevated_growth_SR_viab}). 
-While these changes increased the contributions of males to range limitation, female contributions were still more than twice as important as males, and there was very little difference between predictions of the two-sex and female-dominant models under this elevated growth scenario (Fig. \ref{fig:elevated_growth_model}). 
+While these changes increased the contributions of males to range limitation, female contributions were still more than twice as important as males, and there was very little difference between predictions of the two-sex and female-dominant models even under this elevated growth scenario (Fig. \ref{fig:elevated_growth_model}). 
 This leads us to conclude that, while our common garden results may quantitatively underestimate OSR bias and its demographic consequences, our qualitative conclusion that range boundary formation is effectively female-dominant in this system is robust to any biases imposed by the size distributions of common garden populations. 
 
 
@@ -382,12 +382,15 @@ This leads us to conclude that, while our common garden results may quantitative
 
 \section*{Discussion}
 
-Understanding the sources of decline in population viability at range edges is the foundation for predicting how species' ranges will respond to global change drivers. 
-Sexual niche differentation has the potential to generate skew in the mating pool across environmental gradients and may therefore contribute to reproductive failure at range edges. 
-In Texas bluegrass, we found that the female reproductive niche extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden experiment. 
+Understanding the causes of decline in population viability at range edges is the foundation for predicting how species' ranges will respond to global change drivers. 
+Sexual niche differentation has the potential to generate skew in the mating pool across environmental gradients and may therefore contribute to reproductive failure at range edges of dioecious species. 
+In Texas bluegrass, we found evidence for sexual niche differentiation that manifested over a large-scale geographic gradient: the female reproductive niche extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden experiment. 
 Furthermore, seed viability declined with increasing skew in the OSR, indicating that mate (pollen) limitation can limit female reproductive output in female-biased mating pools. 
 It would appear that all the pieces are in place for an important role of two-sex dynamics in generating distributional limits, particularly at the eastern edges of Texas bluegrass. 
 Yet, the insights derived from a field-parameterized population model indicate the opposite: range limitation in this species was an effectively female-dominant process, with negligible contributions from males. 
+Thus, female dominance is not a ``straw man'' null hypothesis; in this system and likely others, males did not meaningfully contribute to population dynamics. 
+Of course, \textit{some} males are required for successful regeneration but within this species' range of sex ratio variation, and given the demographic sensitivities to sex ratio, explicitly accounting for inter-sexual interactions did not meaningfully improve understanding of range limitation. 
+In the remainder of this section, we discuss these results and their broader significance in greater depth. 
 
 %\begin{itemize}
 %\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
