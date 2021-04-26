@@ -21,7 +21,7 @@
 knitr::opts_chunk$set(fig.pos = 'H',error=TRUE)
 library(tidyverse)
 library(xtable)
-poar_ms_quantities <- read_rds("C:/CODE/POAR-range-limits/Manuscript/poar_ms_quantities.rds")
+poar_ms_quantities <- read_rds("poar_ms_quantities.rds")
 @
 
 %-------------------------------------------------------------------------
@@ -49,12 +49,12 @@ poar_ms_quantities <- read_rds("C:/CODE/POAR-range-limits/Manuscript/poar_ms_qua
 Understading the mechanisms that generate biogeographic patterns of distribution and abundance is a long-standing goal of ecology. 
 It is widely hypothesized that distributional limits reflect the environmental niche, but this hypothesis is complicated by widespread potential for intra-specific niche heterogeneity. 
 In dioecious species, for example, sexual niche differentiation may cause divergence between the sexes in their limits of environmental suitability. 
-We studied the mechanisms of range boundary formation in the perennial dioecious grass \textit{Poa arachnifera}, testing the alternative hypotheses that range limits reflect the niche limits of females only, as assumed by classic ecological theory, versus the combined contributions of females and males, including their inter-dependence via male-limitation of female fertility. 
+We studied the mechanisms of range boundary formation in Texas bluegrass (\textit{Poa arachnifera}), a perennial dioecious plant, testing the alternative hypotheses that range limits reflect the niche limits of females only, as assumed by classic ecological theory, versus the combined contributions of females and males, including their inter-dependence via male-limitation of female fertility. 
 Common garden experiments across the longitudinal aridity gradient of the southern Great Plains, US revealed female-biased flowering and panicle production approaching eastern range limits, consistent with surveys of operational sex ratio variation in natural populations. 
 A process-based demographic model predicted longitudinal limits of population viability ($\lambda \geq 1$) that matched the observed eastern and western range limits, and further showed that declines in $\lambda$ approaching range limits were driven almost entirely by declines in female vital rates. 
-Thus, despite the potential for mate limitation particularly at eastern margins, the geographic distribution was effectively female-dominant, reflecting the environmental niche of females with little contribution from males. 
+Thus, despite the potential for mate limitation, particularly at eastern margins, the geographic distribution was effectively female-dominant, reflecting the environmental niche of females with little contribution from males. 
 The dominant role of females was attributable to female fertility being quite robust to sex ratio variation (which declined only at extreme under-representation of males) and to relatively low sensitivity of $\lambda$ to reproductive transitions in the life cycle.
-This suggests that female-dominant limitation of geographic distribution may be common to long-lived species with polygamous mating systems. 
+This suggests that female-dominant limitation of geographic distribution may be common to long-lived species with polygamous mating systems, and that female responses to environmental drivers may often be sufficient for predicting range shifts in response to environmental change. 
  
 
 %-------------------------------------------------------------------------
@@ -69,32 +69,31 @@ Understanding the processes that generate species' distributional limits is a fo
 The niche concept is central to theory for range limits \citep{Hutchinson1958} and available evidence suggests that geographic distributions may commonly be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
 Species distribution modeling has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence and environmental variables.
 In contrast, there is growing interest in process-based models of range limits, where individual-level demographic responses to environmental variation inform predictions about the ecological niche and environmental limits of population viability (i.e., at least replacement-level population growth, $\lambda \geq 1$) \citep{merow2014using,merow2017climate,diez2014probabilistic}. 
-The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change. These models, beyond improving predictions, will allow predicting abundances and how fast they will respond to environmental change \citep{evans2016towards,ehrlen2015predicting}. 
+The mechanistic understanding offered by process-based models of range limits provides a potentially powerful vehicle for predicting range shifts in response to current and future environmental change \citep{evans2016towards,ehrlen2015predicting}. 
 
 The widespread idea that range limits reflect niche limits intersects awkwardly with another pervasive concept in ecology: intra-specific niche heterogeneity. 
 This refers to the fact that individuals within a population or species may differ in their interactions with the biotic and/or abiotic environment \citep{bolnick2002ecology,araujo2011ecological,holt2009bringing}. 
-Intra-specific niche differences may be based on demographic state variables such as life stage, size class or other, unmeasured aspects of individual identity. 
+Intra-specific niche differences may correspond to demographic state variables such as life stage, size class or other, unmeasured aspects of individual identity. 
 If range limits are a geographic manifestation of niche limits, but a single population or species may be comprised of many niches, then whose niche is it that determines the geographic distribution and how would we know?
 
 Sexual niche differentiation is a common form of intra-specific niche heterogeneity \citep{bolnick2002ecology} and has been widely documented in animals (the vast majority of which are dioecious) and plants (ca. 6\% of angiosperms are dioecious: \citealt{renner1995dioecy}). 
 The prevalence of sexual niche differentiation was recognized by Darwin (\citeyear{darwin2019descent}), who described ``different habits of life, not related...to the reproductive functions'' of females and males.
-There are now numerous examples of sex differences in trophic position \citep{pekar2011intersexual,law2018carnivory}, habitat use \citep{bowyer2004sexual,phillips2004seasonal}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
-It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bierzychudek1988spatial, bolnick2003sexual} or as a byproduct of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}.
+There are now many examples of sex differences in trophic position \citep{pekar2011intersexual,law2018carnivory}, habitat use \citep{bowyer2004sexual,phillips2004seasonal,de2018habitat}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
+It has been hypothesized that sex-specific niches may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bierzychudek1988spatial,bolnick2003sexual,de2015ecological} or as a byproduct of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}.
 
 Sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010ecological,eberhart2017sex}.
-Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex,hultine2018does} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex,dudaniec2021latitudinal}. 
+Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex,hultine2018does,bisang2020sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex,dudaniec2021latitudinal}. 
 At range margins, where environments are extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
-In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species’ ranges tend to be male-biased \citep{field2013ecological}.
+In dioecious plants, for example, populations at the upper altitudes and latitudes and in the more xeric margins of species' ranges tend to be male-biased \citep{field2013ecological}.
 
-Returning to the question of whose niche determines range limits given potential for sexual niche differentiation, classic ecological theory assumes the answer. 
+Returning to the question of whose niche determines range limits given the potential for sexual niche differentiation, classic ecological theory assumes the answer. 
 ``Female dominance'' is a pervasive, often implicit feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility \citep{miller2011confronting,rankin2007males,caswell1986two}. 
-This assumption is, of course, wrong but it may often be a convenient approximation when the sex ratio is balanced or does not vary. 
+This assumption is wrong, of course, but it may be \emph{adequate} when the sex ratio is balanced or does not vary. 
 The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
 However, females may be male-limited in environments in which they are favored, which could reduce population viability in marginal environments. 
 This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses to the environment (Fig. \ref{fig:concept}). 
 While sexual niche divergence sets the stage for two-sex dynamics to play an important role in marginal environments, this influence may be dampened in mating systems where single males can fertilize many females \citep{miller2011sex} or in life histories where population viability is weakly sensitive to female fertility \citep{franco2004comparative}. 
-% add sentence about how sex specific niches does not guarantee an important role for males, since few males are required in polygamous mating systems and, for slow life cycles, reproductive effects often have weak sensitivities.
 
 \begin{figure}[H]
   \begin{center}
@@ -110,16 +109,16 @@ While sexual niche divergence sets the stage for two-sex dynamics to play an imp
   \end{center}
 \end{figure}
 
-Here we ask, for the first time to our knowledge, whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether the additional role of males determines range boundary formation. 
-As an experimental model, we worked with a dieocious plant species (the grass \textit{Poa arachnifera}) narrowly distributed across the sharp longitudinal aridity gradient in the southern Great Plains, US (Fig. \ref{fig:map}). 
+Here we ask whether female demographic responses to environmental variation, alone, are sufficient to understand the ecological origins of range limits, or whether males and female-male interactions must additionally be considered. 
+As an experimental model, we worked with a dieocious plant species (the grass \textit{Poa arachnifera}) narrowly distributed across the sharp longitudinal aridity gradient of the southern Great Plains, US (Fig. \ref{fig:map}). 
 The environmental isocline governing aridity in this region is expected to shift eastward under climate change \citep{karl2009global}, so understanding how it sets distributional limits may aid in forecasting future range shifts. 
-We hypothesized that sexual niche differentiation with respect to longitudinal variation in aridity may lead to skewed sex ratios approaching range limits, and that mate limitation could cause range boundaries to deviate from female-dominant expectations. 
+We hypothesized that sexual niche differentiation with respect to longitudinal variation in aridity may lead to skewed sex ratios approaching range limits, and that mate limitation at environmental extremes could cause range boundaries to deviate from female-dominant expectations. 
 
 This study was conducted in four parts. 
-First, we conducted surveys to ask whether natural populations exhibit clines in operational sex ratio across longitudinal environmental variation. 
+First, we conducted surveys to ask whether natural populations of Texas bluegrass exhibit longitudinal clines in operational sex ratio across  the aridity gradient. 
 Second, we conducted a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout the southern Great Plains to quantify sex-specific demography in variable abiotic environments. 
-Third, we conducted a local sex ratio manipulation experiment to quantify how viable seed production by females responds to variation in sex ratio. 
-Finally, we connected sex-specific demography with inter-sexual mating dynamics in a two-sex modeling framework to derive demographically-driven predictions for geographic limits of population viability $\lambda \geq 1$. 
+Third, we conducted a local sex ratio manipulation experiment to quantify how viable seed production by females responds to variation in OSR. 
+Finally, we connected sex-specific demography with inter-sexual mating dynamics in a two-sex modeling framework to derive demographically-driven predictions for geographic limits of population viability ($\lambda \geq 1$). 
 We analyzed the demographic model to decompose the decline in $\lambda$ approaching range limits into contributions from female-dominant and two-sex pathways (Fig. \ref{fig:concept}).
 
 \begin{figure}[h!]
