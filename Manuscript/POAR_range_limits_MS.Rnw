@@ -257,7 +257,7 @@ Because our common garden experiment relied on greenhouse-raised transplants, we
 We used the seedling survival probability ($\sigma$) from our demographic studies of the perennial congener \textit{Poa autumnalis} in east Texas (T.E.X. Miller and J.A. Rudgers, \textit{unpublished data}) as a stand-in for \textit{P. arachnifera}, and we assume this probability was constant across sexes and longitudes ($\sigma = \Sexpr{poar_ms_quantities$poau_sdlg_surv}$). 
 We also assume that surviving seedlings reach size $y$ with probability $g(y,x=1)$, the expected future size of 1-tiller plants from the transplant experiment. 
 The second term represents survival and size transition of established plants from the previous year, where $s$ and $g$ give the probabilities of surviving at size $x$ and growing from sizes $x$ to $y$, respectively, and superscripts indicate that these functions may be unique to females ($F$) and males ($M$). 
-All parameter estimates were derived from the statistical modeling described above, except where noted, and are reported in Table A1\footnote{This table does not exist yet.}.
+%All parameter estimates were derived from the statistical modeling described above, except where noted, and are reported in Table A1\footnote{This table does not exist yet.}.
 
 Because the two-sex MPM is nonlinear (vital rates affect and are affected by population structure) we estimated the asymptotic geometric growth rate ($\lambda$) by numerical simulation, and repeated this across a range of longitudes.
 We used a regression-style Life Table Response Experiment \citep{caswell2001} to decompose the change in $\lambda$ towards range limits into contributions from female and male vital rates (the female-dominant hypothesis predicts that declines in $\lambda$ at range limits are driven solely by females). 
@@ -370,11 +370,11 @@ The overall decline in $\lambda$ was driven most strongly by a combination of re
 
 Skew in the OSR predicted by the demographic model was less extreme than was observed in natural and experimental populations (\ref{fig:SR_viab_sens}A). 
 This occurred because sex differences in demography, especially flowering, were most pronounced at the largest sizes, and the MPM predicted that these sizes were very rare at stable population structure. 
-The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Fig. \ref{fig:size_dist}), presumably because transplants did not grow like ``real'' plants or did not have time in our three-year experiment to reach those sizes. 
-In Appendix D, we explore whether higher growth rates, leading to a more realistic size distribution, would lead to a more important role for males.
+The stable size distribution predicted by the MPM corresponded well to the common garden data (from which the MPM was built) but was much smaller, on average, than the size distribution we observed in natural populations (Fig. \ref{fig:size_dist}), presumably because transplants did not grow like ``real'' plants and/or did not have time in our three-year experiment to reach those sizes. 
+In Appendix C, we explore whether higher growth rates, leading to a more realistic size distribution, would lead to a more important role for males.
 In numerical experiments with growth parameters, we found that larger size distributions led to stronger female bias and thus stronger reductions in seed viability at eastern range margins (Fig. \ref{fig:elevated_growth_SR_viab}). 
 While these changes increased the contributions of males to range limitation, female contributions were still more than twice as important as males, and there was very little difference between predictions of the two-sex and female-dominant models even under this elevated growth scenario (Fig. \ref{fig:elevated_growth_model}). 
-This leads us to conclude that, while our common garden-parameterized may quantitatively underestimate OSR bias and its demographic consequences in natural population, our qualitative conclusion that range boundary formation is effectively female-dominant in this system is robust to any biases imposed by the size distributions of common garden populations. 
+This leads us to conclude that, while our common garden-parameterized model may quantitatively underestimate OSR bias and its demographic consequences relative to natural populations, our qualitative conclusion that range boundary formation is effectively female-dominant in this system is robust to any biases imposed by the growth trajectories and size distributions of common garden populations. 
 
 
 %--------------------------------------------------------------------
@@ -383,7 +383,7 @@ This leads us to conclude that, while our common garden-parameterized may quanti
 
 Understanding the causes of decline in population viability at range edges is a classic ecological problem and the foundation for predicting how species' ranges will respond to global change drivers. 
 Sexual niche differentiation has the potential to generate skew in the mating pool across environmental gradients and may therefore contribute to reproductive failure at range edges of dioecious species. 
-In Texas bluegrass, we found evidence for sexual niche differentiation that manifested over a large-scale geographic gradient: the female reproductive niche (environment-dependent flowering and panicle production) extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden populations 
+In Texas bluegrass, we found evidence for sexual niche differentiation that manifested over a large-scale geographic gradient: the female reproductive niche (environment-dependent flowering and panicle production) extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden populations. 
 Furthermore, seed viability declined with increasing skew in the OSR, indicating that mate (pollen) limitation can limit the reproductive output of female-biased mating pools. 
 It would appear that all the pieces are in place for an important role of two-sex dynamics in contributing to distributional limits of Texas bluegrass, particularly at the eastern range edge. 
 Yet, insights derived from the field-parameterized population model indicate the opposite: range limitation in this species is an effectively female-dominant process, with negligible contributions from males. 
@@ -401,33 +401,53 @@ We therefore hypothesize that range limits are more likely to be dominated by th
 As studies of sex ratio variation and sex-specific demography across species' ranges accumulate in the literature \citep[e.g.,]{dudaniec2021latitudinal,petry2016sex,lynch2014climate}, this hypothesis may be tractably pursued with comparative analyses. 
 
 While life history and mating system may determine the demographic consequences of skewed sex ratios, the sensitivity of sex ratio to environmental factors is another critical ingredient of how environmental variation can affect the population dynamics of dioecious species.
-Our study adds to a small but growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios along environmental gradients \citep{bialic2020deer}, \textbf{OTHERS?}%,eberhart2017sex,veran2009demographic,shelton2010origin
+Our study adds to a small but growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios along environmental gradients \citep{bialic2020deer}\textbf{OTHERS?}, %,eberhart2017sex,veran2009demographic,shelton2010origin
 highlighting that OSR bias need not reflect differential mortality between the sexes \citep{ueno2007makes,morrison2016causes}. 
-However, as a field, we lack a strong predictive framework for how often and in which direction environmental drivers are likely to perturb the operational sex ratio -- and this gap is particularly important in the context of global change. 
+However, as a field, we lack a strong predictive framework for how often and in which direction environmental drivers are likely to skew the operational sex ratio -- and this gap is particularly important in the context of global change. 
 We have focused on the limits of population viability with respect to geographic environmental variation but analogous processes will likely govern how populations respond to temporal environmental change, including direct effects on female demography and indirect effects via perturbations to the mating pool (Fig. \ref{fig:concept}). 
 There is a need to better understand and predict which species and types of species are susceptible to climate change-induced shifts in OSR. 
-Geographic variation in OSR may be an instructive proxy for how dioecious species will respond to climate change \citep{petry2016sex}, which adds value of studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
+Geographic variation in OSR may be an instructive proxy for how dioecious species will respond to climate change \citep{petry2016sex}, which adds value to studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
 
 Previous studies of dioecious plants have shown that male bias is more common than female bias and is particularly pronounced in harsh abiotic environments, likely reflecting the greater resource requirements needed to pay the female cost of reproduction \citep{field2013comparative,field2013ecological,bierzychudek1988spatial}. 
 Our surveys of natural populations are consistent with the broader pattern of male-biased OSR at xeric range edges.
-However, our common garden populations did not exhibit male bias in the xeric west -- averaging across years or in any single year (Fig. \ref{fig:gardens_by_year}) -- nor did we find any strong demographic evidence for a western male advantage (in fact, there was a western female advantage in growth and survival for some sizes). 
+However, our common garden populations did not exhibit male bias in the xeric west -- averaged across years or in any single year (Fig. \ref{fig:gardens_by_year}) -- nor did we find any strong demographic evidence for a western male advantage (in fact, there was a western female advantage in growth and survival for some sizes). 
 If male advantage / female disadvantage under harsh abiotic conditions is driven by the greater resource requirements of females then it is possible that clonal propagation and/or legacies of greenhouse rearing masked the `true' sex differences at xeric-edge common garden sites. 
 Instead, the stronger pattern of sex ratio bias was the female reproductive advantage at the mesic, eastern range edge. 
 We hypothesize that the mesic edge is limited by competition and that the female reproductive advantage reflects competitive superiority of females, which has been suggested in previous studies of Texas bluegrass \citep{compagnoni2017can} and shown in other dioecious plants \citep{eppley2006females}, particularly under mesic conditions \citep{chen2014intra}. 
 Theory suggests that biotic interactions such as competition are likely to limit species' ranges at the benign (e.g., mesic) end of abiotic gradients \citep{louthan2015and} though this has not been explored, to our knowledge, in the context of sex-structured dynamics.  
 Future studies in our system or others could test whether females and males differ in their responses to biotic stressors at xeric and mesic range edges to reveal how biotic factors shape range limits via sex-specific demography.
 
-Beyond the novel elements of sex-structured demography and mate limitation, our work informs and advances the broader literature on the processes generating species' range limits and suggests new directions of inquiry. 
-First, the Texas bluegrass case study demonstrates that a process-based model capturing environment-dependent demography can accurately predict geographic range limits: the predicted limits of $\lambda \geq 1$ corresponded well to observed longitudinal limits from historical records, particularly given the uncertainty in predicted range limits . 
-We parameterized the model with respect to longitude, which tightly covaries with aridity, especially given the minimal topography of the southern Great Plains. 
-Extensions of this model that transition from implicit to explicit consideration of aridity will allow us to forecast range responses of Texas bluegrass to future climate change and ask whether climate change will reduce or amplify OSR bias and mate limitation and range edges. 
+Beyond the novel elements of sex-structured demography and mate limitation, our work informs and advances the broader literature on the processes generating species' range limits. 
+First, the Texas bluegrass case study demonstrates that a process-based model capturing environment-dependent demography can accurately predict geographic range limits: the predicted limits of $\lambda \geq 1$ corresponded well to observed longitudinal limits from historical records, particularly given the uncertainty characterized by our hierarchical Bayesian statistical approach. 
+We parameterized the model with respect to longitude, which tightly covaries with aridity in the southern Great Plains. 
+Extensions of this model that transition from implicit to explicit consideration of aridity will allow us to forecast range responses of Texas bluegrass to future climate change and ask whether climate change will reduce or amplify OSR bias and mate limitation at range edges. 
 It would be interesting to additionally consider this species' latitudinal limits, which correspond to a temperature gradient, though our exploratory analyses revealed no clear sex differences or sex ratio variation with respect to latitude. 
 
-Second, While not the central focus of our study, our results also provide novel evidence for contrasting demographic responses to environmental drivers throughout a species' range -- or ``demographic compensation'' \citep{villellas2015demographic,doak2010demographic}. 
-Specifically, while most vital rates declines toward eastern and western range limits, survival showed the opposite pattern. 
+Second, our results also provide novel evidence for contrasting demographic responses to environmental drivers throughout a species' range -- or ``demographic compensation'' \citep{villellas2015demographic,doak2010demographic}. 
+Elevated performance in some life history processes can compensate for declines in other processes and thus buffer range-edge populations against harsh environmental conditions. 
+In Texas bluegrass, most vital rates declined toward eastern and western range limits but survival showed the opposite pattern. 
 Increased survival at longitudinal extremes partially offset declines in other vital rate but this positive response was weaker than the negative responses in other vital rates.
 Ultimately, increased survival was not sufficient to prevent declines in population viability from the range center to eastern and western limits, which were dominated by declining female growth and flowering. 
-A recent study found a similar pattern, where compensation between vital rates could not prevent a decrease of population growth rate towards the southern range edge of \textit{Erythranthe cardinalis} \citep{sheth2018demographic}.
+A recent study found a similar pattern, where compensation between vital rates could not prevent a decrease of population growth rate towards the southern range edge of \textit{Erythranthe cardinalis} \citep{sheth2018demographic}. 
+
+Third, our results highlight some important considerations in how environment-dependent demographic models are best parameterized to derive insights into the drivers of range limits. 
+Our approach relied heavily on common garden populations, which allowed us to plant and track known-sex individuals in contrasting environmental conditions that encompass and exceed the natural geographic distribution. 
+The ability to robustly sample edge and beyond-edge environments is a powerful advantage of the common garden transplant approach \citep{hargreaves2013species}. 
+However, this also limited the size variation that we were able to model, and the size distributions of common garden populations skewed consistently smaller than natural populations.
+In Appendix C, we show that our conclusions are likely robust to this feature of the common gardens.
+However, our ability to quantify the consequences of size representation is itself limited by size representation: we can simulate a population in which the largest common garden sizes are more common than they actually were, but simulating a population with sizes much larger than what we observed requires extrapolation of our statistical models to unobserved states, and we are skeptical about what insights such an exercise could provide (in Appendix C, we extrapolated demographic performance to sizes 50\% greater than observed \textbf{CHECK}). 
+This issue is not unique to our study but will be encountered by any transplant study intended to yield inferences about range limits of species with significant size structure.
+If we could re-do our experiment knowing what we know now, we would combine data from natural and transplanted populations to more realistically model size-dependent demography.
+Other investigators inspired by similar questions about the demographic drivers of range limits should consider such a hybrid approach.
+
+\paragraph{Conclusion.}
+We have documented geographic variation in operational sex ratio; elucidated how sexual niche differentiation and sex-specific demography generate this pattern; quantified how female fertility responds to availability of males; and demonstrated that, in the end, sex ratio variation is a rather inconsequential component of declines in population viability at range limits. 
+In Texas bluegrass and, we speculate, other dioecious plants and animals with similar life history and reproductive traits, the geographic distribution is essentially the \textit{female's} environmental niche `writ large' \citep{hargreaves2013species}. 
+
+Understanding and predicting geographic distributions and their responses to environmental change demands careful consideration of which biological details must be accounted for and which others can be safely ignored. 
+Our results show that complex, non-linear dynamics involving females, males, and frequency-dependent reproduction can be reasonably approximated as a simple, linear process (female-dominant population growth).
+We suggest that this is good news. 
+The next challenge is to figure out how often and under what conditions ecologists can get away with it. 
 
 %we have still no way to predict species whose OSR changes predictable across environmental gradients. We do have species-specific studies that explain the mechanisms that determine skewed OSR, such as sex differences in mortality \citep{meagher1981population}. However, there is no theory to predict dioecious species with environmentally controlled OSR.
 
@@ -456,19 +476,19 @@ A recent study found a similar pattern, where compensation between vital rates c
 
 %--------------------------------------------------------------------
 \section*{Acknowledgements}
-
-We gratefully acknowledge the many individuals who facilitated our geographically distributed field experiment, especially Dariusz Malinowski, Jason Goldman, Tom Arsuffi, Alan Byboth, John Walker, Kenneth Steigman, Steven Gibson, Wesley Newman, Kerry Griffis, Liz Martin, Melanie Hartman, Brian Northup, Dexter R Mardis, and Dixie Smith. 
-This work 
-
-for assistance in accessing and setting up the field sites. We thank Marion Donald, Kory Kolis, and Nakian Kim for assistance in the field and greenhouse. 
+We gratefully acknowledge the many individuals who facilitated our field work, especially Dariusz Malinowski, Jason Goldman, Tom Arsuffi, Alan Byboth, John Walker, Kenneth Steigman, Steven Gibson, Wesley Newman, Kerry Griffis, Liz Martin, Melanie Hartman, Brian Northup, Leland Russell, Dexter R Mardis, and Dixie Smith. 
+This work was made possible by a network of biological field stations that hosted our geographically distributed experiment. 
+We acknowledge Sam Houston State University, Texas A\&M University, University of Texas, Texas Tech University, Pittsburgh State University, and Wichita State University for investing in field stations and making these facilities available to us. 
+We thank Marion Donald, Kory Kolis, Nakian Kim, and Alex Espana for valuable assistance in the field, lab, and greenhouse. 
+Our work was supported by NSF Division of Environmental Biology awards 1543651 and 1754468 and by the Rice University Faculty Initiatives Fund. 
 
 \section*{Author contributions}
-
 A.C. and T.E.X.M. designed the study, carried out the study, and conducted the statistical analyses. 
 T.E.X.M drafted the manuscript and both authors finalized the submission.
 
 \section*{Data accessibility}
-
+A data package will be formally published in parallel with this manuscript.
+For now, reviewers may access our raw data at \url{https://github.com/texmiller/POAR-range-limits}.
 
 %--------------------------------------------------------------------
 \bibliographystyle{gcb}
@@ -496,21 +516,11 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
 
 %--------------------------------------------------------------------
 \newpage
-\section*{Appendix B: Parameter estimates of two-sex MPM}
+\section*{Appendix B: Additional results}
 \renewcommand{\thefigure}{B\arabic{figure}}\setcounter{figure}{0}
 \renewcommand{\thetable}{B\arabic{table}}\setcounter{table}{0}
 \renewcommand{\theequation}{B\arabic{equation}}\setcounter{equation}{0}
 
-% put the big parameter estimate table here %
-
-%--------------------------------------------------------------------
-\newpage
-\section*{Appendix C: Additional results}
-\renewcommand{\thefigure}{C\arabic{figure}}\setcounter{figure}{0}
-\renewcommand{\thetable}{C\arabic{table}}\setcounter{table}{0}
-\renewcommand{\theequation}{C\arabic{equation}}\setcounter{equation}{0}
-
-\newpage
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/PPC}
@@ -557,10 +567,10 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
 
 %--------------------------------------------------------------------
 \newpage
-\section*{Appendix D: Size distribution comparisons and simulation experiments}
-\renewcommand{\thefigure}{D\arabic{figure}}\setcounter{figure}{0}
-\renewcommand{\thetable}{D\arabic{table}}\setcounter{table}{0}
-\renewcommand{\theequation}{D\arabic{equation}}\setcounter{equation}{0}
+\section*{Appendix C: Size distribution comparisons and simulation experiments}
+\renewcommand{\thefigure}{C\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{C\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{C\arabic{equation}}\setcounter{equation}{0}
 
 In this section, we compare size distributions of natural and experimental populations, and explore how the size distribution predicted by the two-sex IPM affects our conclusions about the role of males in range boundary formation. 
 
