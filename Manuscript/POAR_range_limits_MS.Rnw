@@ -381,27 +381,45 @@ This leads us to conclude that, while our common garden-parameterized may quanti
 
 \section*{Discussion}
 
-Understanding the causes of decline in population viability at range edges is the foundation for predicting how species' ranges will respond to global change drivers. 
+Understanding the causes of decline in population viability at range edges is a classic ecological problem and the foundation for predicting how species' ranges will respond to global change drivers. 
 Sexual niche differentiation has the potential to generate skew in the mating pool across environmental gradients and may therefore contribute to reproductive failure at range edges of dioecious species. 
-In Texas bluegrass, we found evidence for sexual niche differentiation that manifested over a large-scale geographic gradient: the female reproductive niche (environment-dependent flowering and panicle production) extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden experiment. 
+In Texas bluegrass, we found evidence for sexual niche differentiation that manifested over a large-scale geographic gradient: the female reproductive niche (environment-dependent flowering and panicle production) extended farther east than that of males, generating female-biased operational sex ratios toward the eastern, mesic range margins, a pattern detected in natural populations and recapitulated in our common garden populations 
 Furthermore, seed viability declined with increasing skew in the OSR, indicating that mate (pollen) limitation can limit the reproductive output of female-biased mating pools. 
 It would appear that all the pieces are in place for an important role of two-sex dynamics in contributing to distributional limits, particularly at the eastern range edge of Texas bluegrass. 
-Yet, the insights derived from a field-parameterized population model indicate the opposite: range limitation in this species is an effectively female-dominant process, with negligible contributions from males. 
-Thus, female dominance in not a ``straw man'' null hypothesis, proposed with the intent to be torn down. 
-In this system and likely others, female dominance is an adequate framework for understanding range dynamics: despite evidence for sexual niche differentiation, only the female niche mattered for determining the environmental limits of population viability. 
+Yet, insights derived from the field-parameterized population model indicate the opposite: range limitation in this species is an effectively female-dominant process, with negligible contributions from males. 
+Thus, in this system and likely others, female dominance is an adequate framework for understanding range dynamics: despite evidence for sexual niche differentiation, only the female niche mattered for determining the environmental limits of population viability. 
 This does not mean that sex is unimportant, but rather that lack of sex is never so severe that it limits population viability. 
 
 The limited role of males in our experimental system can be explained by two factors. 
 First, seed fertilization was robust to variation in OSR and was not predicted to strongly decline within the range of OSR bias that we observed and modeled, suggesting that few males are required to pollinate all or most females. 
 Second, population growth ($\lambda$) was weakly sensitive to seed viability, which further buffered the demographic consequences of sex ratio bias. 
-We speculate that our results should apply to other species or systems that satisfy either, but especially both, of these conditions. 
-While there are striking examples of skewed sex ratios causing declines in population growth \citep{milner2003reproductive} or expansion \citep{miller2013sex}, other examples suggest limited demographic consequences of sex ratio variation \citep{mysterud2002role,ewen2011demographic,gownaris2020sex}. 
-Ultimately, sensitivity of female reproductive success to sex ratio should depend strongly on mating system, with female dominance at the ``extremely polygamous'' end of the continuum \citep{miller2011sex}. 
-The sensitivity of population viability to female reproductive success, in turn, is likely predicted by life history strategy: in long-lived, iteroparous species population growth rates are often weakly sensitive to reproduction \citep{franco2004comparative}. 
-We therefore hypothesize that range limits are more likely to be dominated by the female environmental niche in longer-lived species with more polygamous mating systems, while males are more likely to contribute in shorter-lived, monogamous species. 
-As studies of sex ratio variation and sex-specific demography across species' ranges accumulate in the literature \citep{dudaniec2021latitudinal,petry2016sex,lynch2014climate}, this hypothesis could be pursued with comparative analyses. 
+We speculate that our qualitative conclusions should apply to other species or systems that satisfy either, but especially both, of these conditions. 
+While there are striking examples of female-biased sex ratios causing declines in population growth \citep{milner2003reproductive} or range expansion \citep{miller2013sex}, other examples suggest limited demographic consequences of sex ratio variation \citep{mysterud2002role,ewen2011demographic,gownaris2020sex}. 
+Ultimately, sensitivity of female reproductive success to sex ratio should depend strongly on mating system, with female dominance at the ``extremely polygamous'' end of a continuum \citep{miller2011sex}. 
+The sensitivity of population viability to female reproductive success, in turn, is likely predicted by life history strategy: in long-lived, iteroparous species population growth rates are often weakly sensitive to reproduction relative to growth and survival \citep{franco2004comparative}. 
+We therefore hypothesize that range limits are more likely to be dominated by the female environmental niche in longer-lived species with more polygamous mating systems, while males are more likely to contribute in shorter-lived, monogamous species that may be particularly sensitive to missed mating opportunities. 
+As studies of sex ratio variation and sex-specific demography across species' ranges accumulate in the literature \citep{dudaniec2021latitudinal,petry2016sex,lynch2014climate}, this hypothesis may be tractably pursued with comparative analyses. 
 
-%We used a plant model system for its powerful tractability (opportunity to transplant known-sex individuals into contrasting environments) but it is worth considering how well insights from dioecious plants correspond to dioecious animals. 
+While life history and mating system may determine the demographic consequences of skewed sex ratios, the sensitivity of sex ratio to environmental factors is another critical ingredient of how environmental variation can affect the population dynamics of dioecious species.
+Our study adds to a small but growing body of work investigating the demographic processes giving rise to skewed operational sex ratios along environmental gradients \citep{bialic2020deer}, \textbf{OTHERS?}%,eberhart2017sex,veran2009demographic,shelton2010origin
+highlighting that OSR bias need not reflect differential mortality between the sexes \citep{ueno2007makes,morrison2016causes}. 
+However, as a field, we lack a strong predictive framework for how often, in which species, and in which direction environmental drivers (and which drivers) are likely to perturb the operational sex ratio -- and this gap is particularly important in the context of global change. 
+We have focused on the limits of population viability with respect to geographic environmental variation but analogous processes will likely govern how populations respond to temporal environmental change, including direct effects on female demography and indirect effects via perturbations to the mating pool \ref{fig:concept}. 
+There is a need to better understand and predict which species and types of species are susceptible to climate change-induced shifts in OSR. 
+Geographic variation in OSR may be an instructive proxy for how dioecious species will respond to future climate change \citep{petry2016sex}, which suggests added value of studies of the causes and consequences of spatial variation in sex ratio. 
+
+Previous studies of dioecious plants have shown that male bias is much more common than female bias and is particularly pronounced in xeric environments, likely reflecting the greater resource requirements needed to pay the female cost of reproduction \citep{field2013comparative,field2013ecological}. 
+Our surveys of natural populations are consistent the broader pattern of male-biased OSR at xeric range edges.
+However, common garden populations did not exhibit male bias in the west -- on average across years or in any single year (Fig. \ref{fig:gardens_by_year}) -- nor did we find any strong demographic evidence for a western male advantage. 
+If male advantage under harsh abiotic conditions is driven by the greater reproductive costs of females then it is possible that clonal propagation and/or legacies of greenhouse rearing masked the `true' sex differences at xeric-edge common garden sites. 
+Instead, the stronger pattern of sex ratio bias was the female reproductive advantage at the mesic range edge. 
+We hypothesize that the mesic range edge is limited by competition and that the female demographic advantage reflects competitive superiority of females, which has been suggested in previous studies of Texas bluegrass \citep{compagnoni2017can} and shown in other dioecious plants \citep{eppley2006females}, particularly under mesic conditions \citep{chen2014intra}. 
+Theory suggests that biotic interactions such as competition are likely to limit species' ranges at the benign end of abiotic environmental gradients \citep{louthan2015and} though this has not been explored, to our knowledge, in the context of two-sex population dynamics.  
+Future studies in our system or others could test whether females and males differ in their responses to biotic stressors at xeric and mesic range edges to reveal how biotic factors shape range limits via sex-specific demography. 
+
+%we have still no way to predict species whose OSR changes predictable across environmental gradients. We do have species-specific studies that explain the mechanisms that determine skewed OSR, such as sex differences in mortality \citep{meagher1981population}. However, there is no theory to predict dioecious species with environmentally controlled OSR.
+
+%We used a plant model system for its powerful tractability (especially the opportunity to transplant known-sex individuals into contrasting environments) but it is worth considering how well insights from dioecious plants correspond to dioecious animals. 
 
 %\begin{itemize}
 %\item{Revisit conceptual importance of connecting niche heterogeneity with range limits.}
@@ -411,8 +429,12 @@ As studies of sex ratio variation and sex-specific demography across species' ra
 %  \end{itemize}
 %\end{itemize}
 
-Our results suggest that in long-lived species with polygamous mating systems, range limits should reflect the niche limits of females. Polygyny implies mate limitation only at highly skewed sex ratios, and the population of long-lived species do not strongly depend on reproduction. Our polygynous model organism showed that mate limitation occurred became substantial only in populations comprised of 70\% females. Moreover, in long-lived species population growth rates will depend only weakly to reproduction \citep{franco2004comparative}.
-However, our results do not rule out the possibility that range limits are determined by both sexes in short-lived, polygynous species. Because short-lived species are sensitive to reproduction, mate limitation will have substantial effects on their long-term population growth rate. Mate limitation would therefore affect range limit formation when the OSR of a short-lived species changed dramatically across environmental gradients. The literature provides several examples of short-lived species with environmentally controlled OSR \citep{freeman1976differential,freeman1985influence, purrington1993parental, eppley2001gender}. However, we have still no way to predict species whose OSR changes predictable across environmental gradients. We do have species-specific studies that explain the mechanisms that determine skewed OSR, such as sex differences in mortality \citep{meagher1981population}. However, there is no theory to predict dioecious species with environmentally controlled OSR.
+%Our results suggest that in long-lived species with polygamous mating systems, range limits should reflect the niche limits of females. Polygyny implies mate limitation only at highly skewed sex ratios, and the population of long-lived species do not strongly depend on reproduction. Our polygynous model organism showed that mate limitation occurred became substantial only in populations comprised of 70\% females. Moreover, in long-lived species population growth rates will depend only weakly to reproduction \citep{franco2004comparative}.
+%However, our results do not rule out the possibility that range limits are determined by both sexes in short-lived, polygynous species. 
+%Because short-lived species are sensitive to reproduction, mate limitation will have substantial effects on their long-term population growth rate. 
+%Mate limitation would therefore affect range limit formation when the OSR of a short-lived species changed dramatically across environmental gradients. 
+%The literature provides several examples of short-lived species with environmentally controlled OSR \citep{freeman1976differential,freeman1985influence, purrington1993parental, eppley2001gender}. 
+
  
 However, the premises for males to contribute in range limit formation, albeit rare, are likely to occur in nature. First, female-skewed sex ratios are common both plants \citep{barrett2010ecological} and animals \citep{caswell2001}. Second, there are several examples of plants responding in contrasting ways to environmental gradients according to sex \citep{bierzychudek1988spatial}. These patterns can be driven by several mechanisms, such as physiology \citep{dawson1999sexual}, differences in competitive ability \citep{eppley2006females}, or demographic rates \citep{delph1999sexual}. Third, mate limitation is common in both animals \citep{gascoigne2009dangerously} and plants \citep{ashman2004pollen}. Accordingly, in plants, pollen limitation is considered the reason why dioecious plant species tend to have a substantially smaller range than selfing species \citep{grossenbacher2015geographic}.
 
@@ -423,13 +445,18 @@ Despite demographic compensation, our evidence is consistent with the abundant c
 %--------------------------------------------------------------------
 \section*{Acknowledgements}
 
-We thank Dariusz Malinowski, Jason Goldman, Tom Arsuffi, Alan Byboth, John Walker, Kenneth Steigman, Steven Gibson, Wesley Newman, Kerry Griffis, Liz Martin, Melanie Hartman, Brian Northup, Dexter R Mardis, and Dixie Smith for assistance in accessing and setting up the field sites. We thank Marion Donald, Kory Kolis, and Nakian Kim for assistance in the field and greenhouse. 
+We gratefully acknowledge the many individuals who facilitated our geographically distributed field experiment, especially Dariusz Malinowski, Jason Goldman, Tom Arsuffi, Alan Byboth, John Walker, Kenneth Steigman, Steven Gibson, Wesley Newman, Kerry Griffis, Liz Martin, Melanie Hartman, Brian Northup, Dexter R Mardis, and Dixie Smith. 
+This work 
+
+for assistance in accessing and setting up the field sites. We thank Marion Donald, Kory Kolis, and Nakian Kim for assistance in the field and greenhouse. 
 
 \section*{Author contributions}
 
-A.C. and T.E.X.M. designed the study. A.C., and T.E.X.M. carried out the study. T.E.X.M. and A.C. conducted the statistical analyses and drafted the manuscript. A.C. and T.E.X.M. finalized the manuscript.
+A.C. and T.E.X.M. designed the study, carried out the study, and conducted the statistical analyses. 
+T.E.X.M drafted the manuscript and both authors finalized the submission.
 
 \section*{Data accessibility}
+
 
 %--------------------------------------------------------------------
 \bibliographystyle{gcb}
@@ -479,6 +506,15 @@ print(xtable(poar_ms_quantities$survey_site_table, caption = "Sites of natural p
   Lines show density distributions of real data (thick, dark blue) compared to simulated data sets (thin, light blue) generated from the fitted models based on 500 draws of the posterior distribution of parameter estimates. 
   Correspondence of the real and simulated data suggests that the fitted models describe the data well.}
   \label{fig:PPC}
+  \end{center}
+\end{figure}
+
+\newpage
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/garden_sex_ratios}
+  \caption{Year-specific sex ratios of plants (A) and panicles (B) in common garden populations spanning the longitudinal aridity gradient. Points sizes are proportional to sample sizes and lines show fitted binomial GLMs.}
+  \label{fig:gardens_by_year}
   \end{center}
 \end{figure}
 
