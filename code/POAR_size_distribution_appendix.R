@@ -7,6 +7,7 @@ library(mgcv)
 library(scales)
 library(actuar)
 library(popbio)
+library(tidyverse)
 in_dir <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/"
 
 ## useful functions
@@ -77,7 +78,8 @@ summary(tiller_area_model)
 
 pdf("Manuscript/Figures/area_tillers_conversion.pdf",useDingbats = F)
 par(mar=c(5,5,1,1),mfrow=c(1,1))
-plot(tiller_area_df$log_area_t1,log(tiller_area_df$tillerN_t1),xlab="log(Area, m^3)",ylab="log(Tiller number)",cex.lab=1.4)
+plot(tiller_area_df$log_area_t1,log(tiller_area_df$tillerN_t1),col=alpha("black",0.5),
+     xlab=expression(paste("log Area (",m^2,")")),ylab="log(Tiller number)",cex.lab=1.4)
 lines(tiller_area_df$log_area_t1,predict(tiller_area_model),lwd=3)
 dev.off()
 

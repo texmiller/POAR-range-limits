@@ -621,7 +621,7 @@ This allowed us to compare the size distributions of natural and common garden p
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/area_tillers_conversion}
-  \caption{Relationship between area ($m^3$) and tiller count from plants in the common garden experiment. 
+  \caption{Relationship between area ($m^2$) and tiller count from plants in the common garden experiment. 
   The fitted gam model (line) was used to convert area measurements from natural populations to tiller counts.}
   \label{fig:area_tillers_conversion}
   \end{center}
@@ -637,7 +637,7 @@ Because the MPM is structured by tiller number, we converted the SSD to log(till
   \begin{center}
     \includegraphics[width=0.5\linewidth]{Figures/size_dist}
   \caption{Size distribution of Texas bluegrass from natural populations (\textbf{A}), common garden populations (\textbf{B}), and predicted by the two-sex MPM (\textbf{C}). 
-In \textbf{C}, the two size distributions come from the base model parameterized following methods described in the main manuscript (gray) and a numerical experiment where growth parameters were numerically increased to generate a size distribution more consistent with natural populations (white). 
+In \textbf{C}, the two size distributions come from the base model parameterized following methods described in the main manuscript (``field model'', in gray) and a numerical experiment where growth parameters were numerically increased to generate a size distribution more consistent with natural populations (``elevated growth model'', in white). 
   }
   \label{fig:size_dist}
   \end{center}
