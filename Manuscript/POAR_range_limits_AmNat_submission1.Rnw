@@ -136,7 +136,7 @@ While sexual niche divergence sets the stage for two-sex dynamics to play an imp
   In geographic / environmental space, this translates to range boundaries that arise at the limits of the female environmental niche, irrespective of where they fall with respect to the male niche (B). 
   Under the two-sex hypothesis, environmental drivers can affect $\lambda$ through sex-specific responses, which may skew the sex ratio of the mating pool and feed back to affect female fertility via mate availability (A). 
   In this case, expectations for range limits may differ from the female-dominant prediction, since mate limitation in environments that favor females over males may reduce population viability. 
-  These are alternative hypotheses in the strict sense, but as the role of males becomes weaker the two-sex prediction converges on the female-dominant prediction.
+  %These are alternative hypotheses in the strict sense, but as the role of males becomes weaker the two-sex prediction converges on the female-dominant prediction.
   }
   \label{fig:concept}
   \end{center}
@@ -434,12 +434,13 @@ We therefore hypothesize that range limits are more likely to be dominated by th
 As studies of sex ratio variation and sex-specific demography across species' ranges accumulate in the literature \citep[e.g.,][]{dudaniec2021latitudinal,petry2016sex,lynch2014climate}, this hypothesis may be tractably pursued with comparative analyses. 
 
 While life history and mating system may determine the demographic consequences of skewed sex ratios, the sensitivity of sex ratio to environmental factors is another critical ingredient of how environmental variation can affect the population dynamics of dioecious species.
-Our study adds to a growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios \citep{eberhart2017sex,veran2009demographic,shelton2010origin} and parsing the contributions of environmental drivers \citep{bialic2020deer}.
+Our study adds to a growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios using two-sex models \citep{eberhart2017sex,veran2009demographic,shelton2010origin} and parsing the contributions of environmental drivers \citep{bialic2020deer}.
 %highlighting that OSR bias need not reflect differential mortality between the sexes \citep{ueno2007makes,morrison2016causes}. 
 However, as a field, we lack a strong predictive framework for how often and in which direction environmental drivers are likely to skew the operational sex ratio -- and this gap is particularly important in the context of global change. 
 We have focused on the limits of population viability with respect to geographic environmental variation but analogous processes will likely govern how populations respond to temporal environmental change, including direct effects on female demography and indirect effects via perturbations to the mating pool (Fig. \ref{fig:concept}). 
 There is a need to better understand and predict which species and types of species are susceptible to climate change-induced shifts in OSR.
-Geographic variation in OSR may be an instructive proxy for how the dioecious species whose population growth rate is most sensitive to sex ratio will respond to climate change \citep{petry2016sex}. The link between OSR and responses to climate adds value to studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
+Geographic variation in OSR may be an instructive proxy for how dioecious species will respond to climate change \citep{petry2016sex}. 
+The link between OSR and responses to climate adds value to studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
 
 Previous studies of dioecious plants have shown that male bias is more common than female bias and is particularly pronounced in harsh abiotic environments, likely reflecting the greater resource requirements needed to pay the female cost of reproduction \citep{field2013comparative,field2013ecological,bierzychudek1988spatial}. 
 Our surveys of natural populations are consistent with the broader pattern of male-biased OSR at xeric range edges.
