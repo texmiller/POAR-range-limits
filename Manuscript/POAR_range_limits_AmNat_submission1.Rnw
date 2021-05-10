@@ -188,7 +188,7 @@ To quantify the mating environment, we focus our analyses on the sex ratio of in
 We fit a binomial generalized linear model (glm), where females were ``successes'' and total inflorescences was the number of ``trials'', to test whether the OSR varied systematically with respect to longitude. 
 Here and in the experiments that follow we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (Fig. \ref{fig:map}) but also factors that co-vary with precipitation such as productivity. 
 This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and rstan \citep{stan2018rstan} with vague priors on all parameters.
-In all cases, model fit was assessed with posterior predictive checks \citep{conn2018guide}. 
+In all cases, model fit was assessed with posterior predictive checks \citep{gelman1996posterior}. 
 All code for statistical and demographic modeling is available at \url{https://github.com/texmiller/POAR-range-limits}.
 
 \subsection*{Common garden experiment}
@@ -228,7 +228,7 @@ Posterior predictive checks indicated that these models described the data well 
 \subsection*{Sex ratio experiment}
 At one site near the center of the range (Lake Lewisville Environmental Learning Area, Texas), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
 Details of this experiment, which was conducted in 2014--2015, are described in Compagnoni et al. \citeyear{compagnoni2017can}. 
-Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates each of 34 density-sex ratio combinations. 
+Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates for each of 34 density-sex ratio combinations. 
 The experiment was established ca. 1 km from a natural population at this site and plots were situated with a minimum of 15 m spacing, a buffer that was intended to limit pollen movement between plots (pilot data indicated that $\geq 90\%$ of wind pollination occurred within $13 m$). 
 We measured female reproductive success in different density and sex ratio environments by collecting panicles from a subset of females in each plot at the end of the reproductive season.
 In the lab, we counted the total number of seeds on each panicle and assessed seed viability in the greenhouse with germination trials of 25 seeds per panicle. 
@@ -428,18 +428,18 @@ First, seed fertilization was robust to variation in OSR and was not predicted t
 Second, population growth ($\lambda$) was weakly sensitive to seed viability, which further buffered the demographic consequences of sex ratio bias. 
 We speculate that our qualitative conclusions should apply to other species or systems that satisfy either, but especially both, of these conditions. 
 While there are striking examples of female-biased sex ratios causing declines in population growth \citep{milner2003reproductive} or range expansion \citep{miller2013sex}, other examples suggest limited demographic consequences of sex ratio variation \citep{mysterud2002role,ewen2011demographic,gownaris2020sex}. 
-Ultimately, sensitivity of female reproductive success to sex ratio should depend strongly on mating system, with female dominance at the ``extremely polygamous'' end of a continuum \citep{miller2011sex}. 
+Ultimately, sensitivity of female reproductive success to sex ratio should depend strongly on the mating system, with female dominance at the ``extremely polygamous'' end of a continuum \citep{miller2011sex}. 
 The sensitivity of population viability to female reproductive success, in turn, is likely predicted by life history strategy: in long-lived, iteroparous species, population growth rates are often weakly sensitive to reproduction relative to growth and survival \citep{franco2004comparative}. 
 We therefore hypothesize that range limits are more likely to be dominated by the female environmental niche in longer-lived species with more polygamous mating systems, while males are more likely to play an important role in shorter-lived, monogamous species that may be particularly sensitive to missed mating opportunities. 
 As studies of sex ratio variation and sex-specific demography across species' ranges accumulate in the literature \citep[e.g.,]{dudaniec2021latitudinal,petry2016sex,lynch2014climate}, this hypothesis may be tractably pursued with comparative analyses. 
 
 While life history and mating system may determine the demographic consequences of skewed sex ratios, the sensitivity of sex ratio to environmental factors is another critical ingredient of how environmental variation can affect the population dynamics of dioecious species.
-Our study adds to a small but growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios along environmental gradients \citep{bialic2020deer}\textbf{OTHERS?}, %,eberhart2017sex,veran2009demographic,shelton2010origin
+Our study adds to a small but growing body of work quantifying the demographic mechanisms giving rise to skewed operational sex ratios along environmental gradients \citep{gonzalez2019sex,bialic2020deer,santidrian2020temperature}, %,eberhart2017sex,veran2009demographic,shelton2010origin
 highlighting that OSR bias need not reflect differential mortality between the sexes \citep{ueno2007makes,morrison2016causes}. 
 However, as a field, we lack a strong predictive framework for how often and in which direction environmental drivers are likely to skew the operational sex ratio -- and this gap is particularly important in the context of global change. 
 We have focused on the limits of population viability with respect to geographic environmental variation but analogous processes will likely govern how populations respond to temporal environmental change, including direct effects on female demography and indirect effects via perturbations to the mating pool (Fig. \ref{fig:concept}). 
-There is a need to better understand and predict which species and types of species are susceptible to climate change-induced shifts in OSR. 
-Geographic variation in OSR may be an instructive proxy for how dioecious species will respond to climate change \citep{petry2016sex}, which adds value to studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
+There is a need to better understand and predict which species and types of species are susceptible to climate change-induced shifts in OSR.
+Geographic variation in OSR may be an instructive proxy for how the dioecious species whose population growth rate is most sensitive to sex ratio will respond to climate change \citep{petry2016sex}. The link between OSR and responses to climate adds value to studies of the causes and consequences of spatial variation in sex ratio, particularly at geographic scales that encompass ``past'' and ``future'' conditions. 
 
 Previous studies of dioecious plants have shown that male bias is more common than female bias and is particularly pronounced in harsh abiotic environments, likely reflecting the greater resource requirements needed to pay the female cost of reproduction \citep{field2013comparative,field2013ecological,bierzychudek1988spatial}. 
 Our surveys of natural populations are consistent with the broader pattern of male-biased OSR at xeric range edges.
@@ -468,8 +468,8 @@ Our approach relied heavily on common garden populations, which allowed us to pl
 The ability to robustly sample edge and beyond-edge environments is a powerful advantage of the common garden transplant approach \citep{hargreaves2013species}. 
 However, this also limited the size variation that we were able to model, and the size distributions of common garden populations skewed consistently smaller than natural populations.
 In Appendix C, we show that our conclusions are likely robust to this feature of the common gardens.
-However, our ability to quantify the consequences of size representation is itself limited by size representation: we can simulate a population in which the largest common garden sizes are more common than they actually were, but simulating a population with sizes much larger than what we observed requires extrapolation of our statistical models to unobserved states, and we are skeptical about what insights such an exercise could provide (in Appendix C, we extrapolated demographic performance to sizes 50\% greater than observed \textbf{CHECK}). 
-This issue is not unique to our study but will be encountered by any transplant study intended to yield inferences about range limits of species with significant size structure.
+However, simulating a population with sizes much larger than what we observed requires extrapolation of our statistical models to unobserved states, and we are skeptical about what insights such an exercise could provide (in Appendix C, we extrapolated demographic performance to sizes 50\% greater than observed \textbf{CHECK}). 
+This issue is not unique to our study but will be encountered by any transplant study intended to yield inferences about range limits of species with significant size structure, such as trees.
 If we could re-do our experiment knowing what we know now, we would combine data from natural and transplanted populations to more realistically model size-dependent demography.
 Other investigators inspired by similar questions about the demographic drivers of range limits should consider such a hybrid approach.
 
