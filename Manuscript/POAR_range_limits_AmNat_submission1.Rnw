@@ -58,11 +58,11 @@ Aldo Compagnoni$^{2,3}$}
 
 \bigskip
 
-\textit{Manuscript elements}: Figure~1, figure~2, table~1, online appendices~A and B (including figure~A1 and figure~A2). Figure~2 is to print in color.
+\textit{Manuscript elements}: Figure~1--6, online appendices~A--C. Figure~2 and Figure~6 are to print in color.
 
 \bigskip
 
-\textit{Keywords}: Examples, model, template, guidelines.
+\textit{Keywords}: demography; dioecy; intra-specific niche heterogeneity; matrix projection model; sex ratio; range limits.
 
 \bigskip
 
@@ -469,7 +469,7 @@ Our approach relied heavily on common garden populations, which allowed us to pl
 The ability to robustly sample edge and beyond-edge environments is a powerful advantage of the common garden transplant approach \citep{hargreaves2013species}. 
 However, this also limited the size variation that we were able to include and model, and the size distributions of common garden populations skewed consistently smaller than natural populations.
 In Appendix C, we show that our conclusions are likely robust to this feature of the common gardens.
-However, our ability to quantify the consequences of size representation is itself limited by size representation: we can simulate a population in which the largest common garden sizes are more common than they actually were, but simulating a population with sizes much larger than observed requires extrapolation of our statistical models, and we are skeptical about what insights such an exercise could provide (in Appendix C, we extrapolated demographic performance to sizes 50\% greater than observed, still smaller than the largest plants in natural populations). 
+However, our ability to quantify the consequences of size representation is itself limited by size representation: we can simulate a population in which the largest common garden sizes are more common than they actually were, but simulating a population with sizes much larger than observed requires extrapolation of our statistical models, and we are skeptical about what insights such an exercise could provide (in Appendix C, we extrapolated demographic performance to sizes 50\% greater than the observed maximum). 
 This issue is not unique to our study but will be encountered by any transplant study intended to yield inferences about range limits of species with significant size structure, such as trees.
 If we could re-do our experiment knowing what we know now, we would combine data from natural and transplanted populations to more realistically model size-dependent demography.
 Other investigators inspired by similar questions about the demographic drivers of range limits should consider such a hybrid approach.
