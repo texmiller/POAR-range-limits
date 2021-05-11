@@ -1,0 +1,15 @@
+To the editorial board:
+
+Thank you for considering our manuscript ("Two-sex demography, sexual niche differentiation, and the geographic range limits of Texas bluegrass (Poa arachnifera)") for publication in The American Naturalist. 
+
+This work sits at the interface of two sub-disciplines of population biology: the demographic origins of range limits and the dynamics of sex-structured populations. This is an interesting interface because theory for range limits emphasizes the importance of niche limits in determining geographic distributions, yet females and males of dioecious species often exhibit sexual niche differentiation. If range limits reflect niche limits, but females and males occupy distinct niches, then whose niche is it that determines the geographic distribution and how would we know? Most theory implicitly or explicitly assumes that the answer is "female". However, this assumption may break down at range edges because sexual niche differentiation can translate to sex-specific dis/advantages at environmental extremes, causing skewed sex ratios and possible mate limitation. 
+
+In this manuscript, we integrate natural population surveys, field experiments, and demographic modeling to understand the origins of geographic range limits in a dioecious plant species (Texas bluegrass, a tractable model system distributed over a dramatic environmental gradient in the southern Great Plains, US). We test the competing hypotheses that range limits are "female-dominant" (driven entirely by female responses to environmental drivers) or "two-sex" (arise from a combination of female and male responses and their inter-dependence via mating). To our knowledge, this paper is the first to articulate the distinction between female-dominant and two-sex drivers of range limits (our conceptual model is summarized in Figure 1) as well as the first experimental test of how males and mate limitation influence range limits (spoiler: not much). 
+
+We think this work is well suited to Am Nat because it integrates across subdisciplines to tackle a big question: why are species where they are and not where they're not? The paper offers all the "ingredients" that readers expect from Am Nat papers, including a timely topic, conceptual novelty, fascinating natural history, ambitious field experiments, and sophisticated modeling. It is our hope that this work advances understanding of how and why distributional limits arise, though reviewers should be the judge of whether the paper lives up to that aspiration. 
+
+We have opted out of double-blind review because this paper builds upon our previous work (one piece of our modeling framework is published elsewhere), so our identities could be easily deduced. Our identities are also obvious from our GitHub repo, where we direct reviewers to find all data and code to reproduce our analyses. 
+
+Sincerely,
+Tom Miller
+Aldo Compagnoni

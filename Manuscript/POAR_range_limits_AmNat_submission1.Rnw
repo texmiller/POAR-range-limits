@@ -37,28 +37,20 @@ poar_ms_quantities <- read_rds("poar_ms_quantities.rds")
 %-------------------------------------------------------------------------
 
 \title{Two-sex demography, sexual niche differentiation, and the geographic range limits of Texas bluegrass (\textit{Poa arachnifera})}
-
-\author{Tom E.X. Miller$^{1,\ast}$ \\ 
-Aldo Compagnoni$^{2,3}$}
-
+\author{Tom E.X. Miller$^{1,\ast}$ and Aldo Compagnoni$^{2,3}$ \\
+The authors wish to be identified to the reviewers.} 
 \date{}
 
 \begin{document}
-
 \maketitle
-
 \noindent{} 1. Program in Ecology and Evolutionary Biology, Department of BioSciences, Rice University, Houston, TX 77005;
-
-\noindent{} 2. Institute of Biology, Martin Luther University Halle-Wittenberg, Halle (Saale), Germany;
-
-\noindent{} 3. German Centre for Integrative Biodiversity Research (iDiv) Halle-Jena-Leipzig, Leipzig, Germany;
-
+\noindent{} 2. Institute of Biology, Martin Luther University Halle-Wittenberg, Halle, Germany;
+\noindent{} 3. German Centre for Integrative Biodiversity Research (iDiv), Leipzig, Germany;
 \noindent{} $\ast$ Corresponding author; e-mail: tom.miller@rice.edu
-
 
 \bigskip
 
-\textit{Manuscript elements}: Figure~1--6, online appendices~A--C. Figure~2 and Figure~6 are to print in color.
+\textit{Manuscript elements}: Figures~1--6, online appendices~A--C. Figure~2 and Figure~6 are to print in color.
 
 \bigskip
 
