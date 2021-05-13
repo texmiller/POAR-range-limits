@@ -512,7 +512,7 @@ T.E.X.M drafted the manuscript and both authors finalized the submission.
 
 \section*{Data accessibility}
 A data package will be formally published in parallel with this manuscript.
-For now, reviewers may access our raw data at \url{https://github.com/texmiller/POAR-range-limits}.
+For now, reviewers may access our data at \url{https://github.com/texmiller/POAR-range-limits}.
 
 %--------------------------------------------------------------------
 \bibliographystyle{apalike}
