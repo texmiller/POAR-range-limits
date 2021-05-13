@@ -75,10 +75,10 @@ Understanding the mechanisms that generate biogeographic range limits is a long-
 It is widely hypothesized that distributional limits reflect the environmental niche, but this hypothesis is complicated by widespread potential for intra-specific niche heterogeneity. 
 In dioecious species, sexual niche differentiation may cause divergence between the sexes in their limits of environmental suitability. 
 We studied range boundary formation in Texas bluegrass (\textit{Poa arachnifera}), a perennial dioecious plant, testing the alternative hypotheses that range limits reflect the niche limits of females only versus the combined contributions of females and males, including their inter-dependence via mating. 
-Common garden experiments across a longitudinal aridity gradient revealed female-biased flowering approaching eastern range limits, consistent with surveys of natural populations. 
-A demographic model showed that declines in $\lambda$ approaching range limits were driven almost entirely by declines in female vital rates. 
-The dominant role of females was attributable to seed viability being robust to sex ratio variation and to relatively low sensitivity of $\lambda$ to reproductive transitions.
-Our results suggest that female-dominant range limits may be common to long-lived species with polygamous mating systems, and that female responses to environmental drivers may often be sufficient for predicting range shifts in response to environmental change.
+Common garden experiments across a longitudinal aridity gradient revealed female-biased flowering approaching eastern range limits, suggesting that mate limitation may constrain the species' distribution. 
+However, a demographic model showed that declines in $\lambda$ approaching range limits were driven almost entirely by female vital rates. 
+The dominant role of females was attributable to seed viability being robust to sex ratio variation and to low sensitivity of $\lambda$ to reproductive transitions.
+We suggest that female-dominant range limits may be common to long-lived species with polygamous mating systems, and that female responses to environmental drivers may often be sufficient for predicting range shifts in response to environmental change.
 
 %-------------------------------------------------------------------------
 \section*{Keywords}
