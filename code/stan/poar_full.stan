@@ -71,12 +71,13 @@ data {
   int<lower=0> n_v;   // data points
   int<lower=0> y_v[n_v];  // number of viable seeds
   int<lower=0> tot_seeds_v[n_v]; // number of trials
-  real SR_v[n_v]; // Sex ratio (proportion female?)
+  real SR_v[n_v]; // Sex ratio (proportion female)
+  
   // Data for seed germination sub-model (m)
   int<lower=0> n_m;   // data points
   int<lower=0> y_m[n_m];  // number of germinating seeds
   int<lower=0> tot_seeds_m[n_m]; // number of trials
-  real SR_m[n_m]; // Sex ratio (proportion female?)
+  real SR_m[n_m]; // Sex ratio (proportion female)
   
   // data for seed count
   int<lower=0> n_d;   // data points
@@ -132,11 +133,11 @@ parameters {
   
   //Flowering
   //fixed effects
-  real b0_f;    // Survival size intercept
-  real bsize_f;   // Survival size slope
-  real bsex_f;   // Survival sex effect
-  real blong_f;   // Survival longitude slope
-  real bsizesex_f;   // Interactions
+  real b0_f;    
+  real bsize_f;   
+  real bsex_f;   
+  real blong_f;   
+  real bsizesex_f;   
   real bsizelong_f;
   real blongsex_f;
   real bsizelongsex_f;
@@ -154,11 +155,11 @@ parameters {
       
   //Panicles
   //fixed effects
-  real b0_p;    // Survival size intercept
-  real bsize_p;   // Survival size slope
-  real bsex_p;   // Survival sex effect
-  real blong_p;   // Survival longitude slope
-  real bsizesex_p;   // Interactions
+  real b0_p;    
+  real bsize_p;   
+  real bsex_p;   
+  real blong_p;  
+  real bsizesex_p;   
   real bsizelong_p;
   real blongsex_p;
   real bsizelongsex_p;
@@ -304,9 +305,6 @@ transformed parameters{
   
 }
 
-// The model to be estimated. We model the output
-// 'y' to be normally distributed with mean 'mu'
-// and standard deviation 'sigma'.
 model {
   
   // priors on parameters
@@ -363,8 +361,6 @@ model {
   for(i in 1:n_g){
     theta[i] ~ ig(1, sigma);
   }
-
-  
   //Flowering
   b0_f ~ normal(0, 100);   
   bsize_f ~ normal(0, 100);   
@@ -415,7 +411,7 @@ model {
   for (i in 1:n_sources){
     source_rfx_p[i] ~ normal(0, source_tau_p);
   }
-  
+  // viability and germination
   v0  ~ beta(10,1);  // intercept viability model
   a_v ~ gamma(1,1);  // "decay" in viability with SR
   phi_v ~ pareto(0.1,1.5);
@@ -424,35 +420,26 @@ model {
   lambda_d ~ inv_gamma(0.001, 0.001);
   
   // sampling
-  //for (i in 1:n_s) {
-  //y_s[i] ~ bernoulli_logit(predS[i]);
-  //}
-  //for (i in 1:n_f) {
-  //y_f[i] ~ bernoulli_logit(predF[i]);
-  //}
+  //panicles need loop for zero truncation
   for (i in 1:n_p) {
     y_p[i] ~ neg_binomial_2_log(predP[i], phi_p);
     // manually zero-truncating
     target += - log1m(neg_binomial_2_log_lpmf(0 | predP[i], phi_p)); 
   }
-  //for (i in 1:n_v) {
-  //y_v[i] ~ beta_binomial(tot_seeds_v[i], alpha_v[i], beta_v[i]);
-  //}
-  //for (i in 1:n_m) {
-  //y_m[i] ~ beta_binomial(tot_seeds_m[i], alpha_m[i], beta_m[i]);
-  //}
-  //for (i in 1:n_d){
-  //y_d[i] ~ poisson(lambda_d);  
-  //}
+  //survival
   y_s ~ bernoulli_logit(predS);
+  //growth needs loop for zero truncation
   for (i in 1:n_g) {
     //T[1,] for zero truncation
     y_g[i] ~ poisson(predG[i] * theta[i]) T[1,]; 
   }
+  //flowering
   y_f ~ bernoulli_logit(predF);
-  // y_p ~ neg_binomial_2_log(predP, phi_p);
+  //viability
   y_v ~ beta_binomial(tot_seeds_v, alpha_v, beta_v);
+  //germination
   y_m ~ beta_binomial(tot_seeds_m, alpha_m, beta_m);
+  //seed number
   y_d ~ poisson(lambda_d);
   
 }
