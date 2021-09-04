@@ -5,6 +5,7 @@
 .Ruserdata
 .csv
 data/.csv
+results
 
 *.aux
 *.glo
