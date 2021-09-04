@@ -9,6 +9,19 @@ library(dplyr)
 library(testthat)
 
 # read data ----------------------------------------------------------------
+
+# climate data 
+clim_site <- read.csv('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/avg_yr_climate_sites.csv') %>% 
+               dplyr::select( site, ppt_avg ) %>% 
+               rename( ppt_avg_site = ppt_avg )
+clim_coll <- read.csv('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/avg_yr_climate_codes.csv') %>% 
+               dplyr::select( Code, ppt_avg_coll ) %>% 
+               # only collections used in the study
+               subset( Code %in% c("QLP", "HHC", 
+                                   "CWM", "LAR", 
+                                   "COB", "SLR", 
+                                   "LLELA", "SSC") )
+  
 # 2014
 f14     <- read.csv("fall2014/f2014DemoData.csv")
 # 2015
@@ -412,6 +425,23 @@ sex_symbol <- function(x){
   return(out)
 }
 
+# Standardize average site ppt
+clim_site_st <- clim_site %>% 
+  subset( site %in% unique(d_all$site) ) %>% 
+  mutate( ppt_avg_scaled = scale(ppt_avg_site)[,1],
+          ppt_avg_center = scale(ppt_avg_site,scale=F)[,1] )
+
+# Standardize ALL climate data 
+clim_st <-   
+  expand.grid( Code         = clim_coll$Code,
+               site         = clim_site_st$site ) %>% 
+  left_join( clim_coll ) %>% 
+  left_join( clim_site_st ) %>% 
+  mutate( ppt_mismatch        = ppt_avg_site - ppt_avg_coll ) %>% 
+  mutate( ppt_mismatch_scaled = scale(ppt_mismatch)[,1],
+          ppt_mismatch_center = scale(ppt_mismatch,scale=F)[,1] ) 
+
+
 # epigenetic changes
 poar <- d_all %>% 
           # add lat/lon information
@@ -435,7 +465,8 @@ poar <- d_all %>%
           mutate(ploidy = replace(ploidy, Code == "HHC" | Code == "LLELA", "high") ) %>%
           sex_symbol() %>% 
           # Remove resuscitated individuals
-          subset( !(surv_t1 %in% 1 & tillerN_t0 %in% 0) )
+          subset( !(surv_t1 %in% 1 & tillerN_t0 %in% 0) ) %>% 
+          left_join( clim_st ) 
 
 
 # Write out data ----------------------------------------------------------------
