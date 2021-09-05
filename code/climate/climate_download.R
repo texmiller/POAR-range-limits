@@ -3,7 +3,7 @@ library(tidyverse)
 in_dir  <- "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/GIS/"
 
 # read and format coordinate data
-sites     <- read.csv("POAR-range-limits/data/demography_allsites.csv") %>% 
+sites     <- read.csv( "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/demography_allsites.csv") %>% 
               dplyr::select( site, Latitude, Longitude ) %>% 
               unique %>% 
               mutate( coord_type = 'Field site' )
@@ -44,7 +44,7 @@ yr_mon_df <- lapply(file_l, get_yr_month) %>%
                setNames( c('year', 'month') )
 
 
-# Download --------------------------------------------------------
+# Download CHELSA --------------------------------------------------------
 
 # list of data frames with precipitation values
 clim_l <- list()
@@ -67,3 +67,44 @@ for( ii in 1:length(file_l) ){
 clim_df <- clim_l %>% bind_rows()
 
 write.csv(clim_df, 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate.csv', row.names=F)
+
+
+# Download CRUTS ---------------------------------------------------------------
+
+# what we need from CRUTS
+yr_mon_df <- expand.grid( year  = 2014:2016,
+                          month = 1:12 ) %>% 
+              arrange(year, month )
+
+# prouce links
+link_v <- paste0( 'https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V1/chelsa_cruts/prec/CHELSAcruts_prec_',
+                  paste0(yr_mon_df$month, '_', yr_mon_df$year),
+                  '_V.1.0.tif')
+
+# list of data frames with precipitation values
+clim_l <- list()
+
+# loop through the 420 files!
+for( ii in 2:length(file_l) ){
+  
+  download.file( link_v[ii], destfile = paste0(getwd(),'/temp.tif'), mode = "wb")
+  
+  repP        <- raster( 'temp.tif' )
+  values_clim <- raster::extract( repP, site_coord, 
+                                  method = 'bilinear')
+  clim_l[[ii]]<- coord_df %>% 
+    mutate( year     = yr_mon_df$year[ii],
+            month    = yr_mon_df$month[ii],
+            value    = values_clim)
+  
+  file.remove( grep('.tif$',list.files(),value=T)[1] )
+  
+  print( ii )
+  
+}
+
+cruts_df <- clim_l %>% bind_rows
+
+write.csv(cruts_df, 
+          'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate_cruts.csv', 
+          row.names=F)
