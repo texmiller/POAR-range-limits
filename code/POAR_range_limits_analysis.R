@@ -67,9 +67,10 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 # Read and format data -------------------------------------------------
 #common garden data
-poar_allsites <- read.csv("https://www.dropbox.com/s/bmg6ieiaoz8upri/demography_allsites.csv?dl=1", stringsAsFactors = F)
+poar_allsites <- read.csv("https://www.dropbox.com/s/xk4225mn8btqhbm/demography_allsites.csv?dl=1", stringsAsFactors = F)
 #seed viability and germination
 viabVr <- read.csv("https://www.dropbox.com/s/jfkgoxgv8o1fgqx/viability.csv?dl=1")
+
 
 # Survival
 poar_allsites.surv <- poar_allsites %>% 
