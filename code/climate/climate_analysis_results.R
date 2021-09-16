@@ -42,7 +42,7 @@ par_v       <- c( 'blong_s', 'bmmatch_s',
                   'blong_f', 'bmmatch_f',
                   'blong_p', 'bmmatch_p' )
 
-# extract kernel density estimation
+# extract kernel density estimation values (both xs and ys)
 dens_extr <- function( x, id ){
   x %>% density %>% .[id] %>% .[[1]]
 }
@@ -62,7 +62,7 @@ kernel_df <- dplyr::select( par_mmatch,
   ungroup %>% 
   separate( param, c('Parameter','vr'), sep='_' )
   
-# plot 
+# plot longitude vs. mismatch
 kernel_df %>% 
   subset( Parameter == 'Mismatch' ) %>% 
   ggplot( ) +
@@ -86,9 +86,11 @@ kernel_df %>%
 
 # effect of precipitation mismatch ----------------------------
 
+# names of parameter of site-level random effect variance
 par_v     <- c( 'site_tau_s', 'site_tau_g',
                 'site_tau_f', 'site_tau_p' )
 
+# Format a parameters data frame across models
 format_pars <- function(x, mod_lab ){
   
   x %>% 
@@ -96,6 +98,7 @@ format_pars <- function(x, mod_lab ){
                  'Flowering', 'Panicles' ) ) %>% 
     gather( vr, value, Survival:Panicles ) %>%  
     group_by( vr ) %>% 
+    # Calculate kernel density estimation
     summarise( x = dens_extr(value, 1),   
                y = dens_extr(value, 2) ) %>% 
     ungroup %>% 
@@ -103,12 +106,13 @@ format_pars <- function(x, mod_lab ){
     
 }
 
+# format parameters, and put them all in one data frame
 long_df   <- dplyr::select(par_long, par_v) %>% format_pars( 'Longitude' )
 noabio_df <- dplyr::select(par_noabio, par_v) %>% format_pars( 'No abiotic' ) 
 clim_df   <- dplyr::select(par_clim, par_v) %>% format_pars( 'Precipitation' ) 
 all_df    <- list( long_df, noabio_df, clim_df ) %>% bind_rows
   
-# 
+# Plot estimates of variance by model
 ggplot(all_df) +
   geom_line( aes(x,y, color = Model),
              lwd = 2) +
@@ -157,7 +161,8 @@ poar_allsites.surv <- poar_allsites %>%
   mutate( log_size_t0   = log(tillerN_t0),
           log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
 
-calc_resid <- function( x, y ){
+# Calculate RMSE for survival data
+calc_rmse_s <- function( x, y ){
   
   x2 <- dplyr::select(y,predS.1:predS.2170) %>% 
           sapply(mean) %>% 
@@ -173,9 +178,16 @@ calc_resid <- function( x, y ){
   
 }
 
-calc_resid(poar_allsites.surv$surv_t1, par_long)
-calc_resid(poar_allsites.surv$surv_t1, par_clim)
-calc_resid(poar_allsites.surv$surv_t1, par_noabio)
+# Store RMSE values for survival data
+surv_rmse <- data.frame( rmse = c( 
+                calc_rmse_s(poar_allsites.surv$surv_t1, par_long),
+                calc_rmse_s(poar_allsites.surv$surv_t1, par_clim),
+                calc_rmse_s(poar_allsites.surv$surv_t1, par_noabio) ) 
+                        ) %>% 
+                mutate( model    = c('Longitude',
+                                     'Precipitation',
+                                     'No Abiotic'),
+                        response = 'Survival' )
 
 
 # growth 
@@ -195,7 +207,8 @@ poar_allsites.grow <- poar_allsites %>%
   mutate( log_size_t0   = log(tillerN_t0),
           log_size_t0_z = log(tillerN_t0) %>% scale %>% .[,1] )
 
-calc_resid <- function( x, y ){
+# calculate rmse for growth data
+calc_rmse_g <- function( x, y ){
   
   x2 <- dplyr::select(y, predG.1:predG.1472) %>% 
           sapply(mean) 
@@ -210,9 +223,16 @@ calc_resid <- function( x, y ){
   
 }
 
-calc_resid(poar_allsites.grow$tillerN_t1, par_long)
-calc_resid(poar_allsites.grow$tillerN_t1, par_clim)
-calc_resid(poar_allsites.grow$tillerN_t1, par_noabio)
+# Store RMSE values for survival data
+grow_rmse <- data.frame( rmse = c( 
+  calc_rmse_g(poar_allsites.grow$tillerN_t1, par_long),
+  calc_rmse_g(poar_allsites.grow$tillerN_t1, par_clim),
+  calc_rmse_g(poar_allsites.grow$tillerN_t1, par_noabio) )
+                        ) %>% 
+  mutate( model    = c('Longitude',
+                       'Precipitation',
+                       'No Abiotic'),
+          response = 'Growth' )
 
 
 # flowering
@@ -232,7 +252,8 @@ poar_allsites.flow <- poar_allsites %>%
   mutate( log_size_t1   = log(tillerN_t1),
           log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
 
-calc_resid <- function( x, y ){
+# calculate rmse for flowering data
+calc_resid_f <- function( x, y ){
   
   x2 <- dplyr::select(y,predF.1:predF.1433) %>% 
     sapply(mean) %>% 
@@ -248,9 +269,16 @@ calc_resid <- function( x, y ){
   
 }
 
-calc_resid(poar_allsites.flow$flow_t1, par_long)
-calc_resid(poar_allsites.flow$flow_t1, par_clim)
-calc_resid(poar_allsites.flow$flow_t1, par_noabio)
+# Store RMSE values for survival data
+flow_rmse <- data.frame( rmse = c( 
+  calc_resid_f(poar_allsites.flow$flow_t1, par_long),
+  calc_resid_f(poar_allsites.flow$flow_t1, par_clim),
+  calc_resid_f(poar_allsites.flow$flow_t1, par_noabio) )
+                        ) %>% 
+  mutate( model    = c('Longitude',
+                       'Precipitation',
+                       'No Abiotic'),
+          response = 'Flowering' )
 
 
 # Panicles 
@@ -271,8 +299,8 @@ poar_allsites.panic<- poar_allsites %>%
   mutate( log_size_t1   = log(tillerN_t1),
           log_size_t1_z = log(tillerN_t1) %>% scale %>% .[,1] )
 
-
-calc_resid <- function( x, y ){
+# calculate rmse for panicle data
+calc_resid_p <- function( x, y ){
   
   x2 <- dplyr::select(y,predP.1:predP.512) %>% 
     sapply(mean) %>% 
@@ -288,6 +316,22 @@ calc_resid <- function( x, y ){
   
 }
 
-calc_resid(poar_allsites.panic$panic_t1, par_long)
-calc_resid(poar_allsites.panic$panic_t1, par_clim)
-calc_resid(poar_allsites.panic$panic_t1, par_noabio)
+# Store RMSE values for survival data
+panic_rmse <- data.frame( rmse = c( 
+  calc_resid_p(poar_allsites.panic$panic_t1, par_long),
+  calc_resid_p(poar_allsites.panic$panic_t1, par_clim),
+  calc_resid_p(poar_allsites.panic$panic_t1, par_noabio) )
+                        ) %>% 
+  mutate( model    = c('Longitude',
+                       'Precipitation',
+                       'No Abiotic'),
+          response = 'Panicles' )
+
+# store it all in one place!
+list( surv_rmse, 
+      grow_rmse, 
+      flow_rmse, 
+      panic_rmse ) %>% 
+  bind_rows %>% 
+  write.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/climate_analyses/rmse_climate_mods.csv',
+             row.names = F )
