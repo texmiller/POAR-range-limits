@@ -70,7 +70,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 poar_allsites <- read.csv("https://www.dropbox.com/s/xk4225mn8btqhbm/demography_allsites.csv?dl=1", stringsAsFactors = F)
 #seed viability and germination
 viabVr <- read.csv("https://www.dropbox.com/s/jfkgoxgv8o1fgqx/viability.csv?dl=1")
-
+#lat/long of exp sites -- this is already in poar_allsites but in the code below I call it from a different object
+latlong <- read.csv("https://www.dropbox.com/s/gxxpn9y0yrzhqx6/latlong.csv?dl=1")
 
 # Survival
 poar_allsites.surv <- poar_allsites %>% 
@@ -974,6 +975,8 @@ fit_surv <- stan(
 ## pull out coefficients
 coef_surv <- rstan::extract(fit_surv,par=c("b0","b_long"))
 coef_surv_mean <- lapply(coef_surv,mean)
+sr_post_draws <- sample.int(length(coef_surv$b0), n_post_draws)
+
 ## dummy variable for plotting
 x_long <- seq(min(survey_dat$longit),max(survey_dat$longit),length = 100)
 
@@ -1022,8 +1025,9 @@ ggplot(garden_sr)+
   geom_point(aes(x=long.center,y=sr,color=as.factor(year)))
 
 ## quick glm fit to thesex ratios (do this in rstan later)
-osr_glm <- glm(osr ~ long.center*as.factor(year), weights = tot_pan, family="binomial",data=garden_osr)
-sr_glm <- glm(sr ~ long.center*as.factor(year), weights = total, family="binomial",data=garden_sr)
+#osr_glm <- glm(osr ~ long.center*as.factor(year), weights = tot_pan, family="binomial",data=garden_osr)
+#sr_glm <- glm(sr ~ long.center*as.factor(year), weights = total, family="binomial",data=garden_sr)
+
 
 #print figure
 #pdf("Manuscript/Figures/garden_sex_ratios.pdf",useDingbats = F,height=6,width=12)
@@ -1065,35 +1069,84 @@ lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm)[1] + coef(osr_gl
 #dev.off()
 
 ## glms with pooled-year sex ratios
-osr_glm_poolyr <- glm(osr ~ long.center, weights = tot_pan, family="binomial",data=garden_osr_poolyr)
-sr_glm_poolyr <- glm(sr ~ long.center, weights = total, family="binomial",data=garden_sr_poolyr)
+#osr_glm_poolyr <- glm(osr ~ long.center, weights = tot_pan, family="binomial",data=garden_osr_poolyr)
+#sr_glm_poolyr <- glm(sr ~ long.center, weights = total, family="binomial",data=garden_sr_poolyr)
+
+## Use the same stan model as above to fit these longitudinal trends
+garden_osr_dat <- list(y = garden_osr_poolyr$fem_pan,
+                       n_trials = garden_osr_poolyr$tot_pan,
+                       longit = garden_osr_poolyr$long.center,
+                       N = nrow(garden_osr_poolyr))
+fit_garden_osr <- stan(
+  file = 'code/stan/poar_survey.stan',
+  data = garden_osr_dat,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+## pull out coefficients
+coef_garden_osr <- rstan::extract(fit_garden_osr,par=c("b0","b_long"))
+coef_garden_osr_mean <- lapply(coef_garden_osr,mean)
+
+garden_sr_dat <- list(y = garden_sr_poolyr$fem,
+                       n_trials = garden_sr_poolyr$total,
+                       longit = garden_sr_poolyr$long.center,
+                       N = nrow(garden_sr_poolyr))
+fit_garden_sr <- stan(
+  file = 'code/stan/poar_survey.stan',
+  data = garden_sr_dat,
+  warmup = sim_pars$warmup,
+  iter = sim_pars$iter,
+  thin = sim_pars$thin,
+  chains = sim_pars$chains )
+## pull out coefficients
+coef_garden_sr <- rstan::extract(fit_garden_sr,par=c("b0","b_long"))
+coef_garden_sr_mean <- lapply(coef_garden_sr,mean)
 
 ## figure option combines natural population survey with common garden sex ratios
 #print figure
-#pdf("Manuscript/Figures/nat_pops_gardens_SR.pdf",useDingbats = F,height=4,width=12)
+pdf("Manuscript/Figures/nat_pops_gardens_SR.pdf",useDingbats = F,height=4,width=12)
 par(mfrow=c(1,3),mar=c(5,5,1,1))
 ## natural populations
 plot(survey_dat$longit + mean(POAR$Longitude),
-     survey_dat$y/survey_dat$n_trials,pch=16,xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
+     survey_dat$y/survey_dat$n_trials,pch=1,xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      cex=log(survey_dat$n_trials),#cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,#
-     xlab="Longitude",ylab="Proportion female panicles",cex.lab=1.4,
-     col=alpha("black",0.35));title("A",adj=0,font=4)
+     xlab="Longitude",ylab="Proportion female panicles",cex.lab=1.8,cex.axis=1.4,
+     col=alpha("black",1),lwd=2);title("A",adj=0,font=4,cex.main=1.8)
 abline(h=0.5,col="gray",lty=2)
-lines(x_long + mean(POAR$Longitude),
-      invlogit(mean(coef_surv$b0) + mean(coef_surv$b_long) * x_long),lwd=3,col="black")
-## common gardens
-plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.4,
-     pch=16,col=alpha("black",0.35),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
-     xlab="Longitude",ylab="Proportion female panicles",cex=log(garden_osr_poolyr$tot_pan))#cex=4*(garden_osr_poolyr$tot_pan/max(garden_osr_poolyr$tot_pan))+1.5)#
-abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4)
-lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
+#lines(x_long + mean(POAR$Longitude),
+#      invlogit(mean(coef_surv$b0) + mean(coef_surv$b_long) * x_long),lwd=3,col="black")
+for(p in 1:n_post_draws){
+  lines(x_long + mean(POAR$Longitude),
+        invlogit(coef_surv$b0[sr_post_draws[p]] + coef_surv$b_long[sr_post_draws[p]] * x_long),
+        col=alpha("darkgrey",0.1))
+}
 
-plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.4,
-     pch=16,col=alpha("black",0.35),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
+## common gardens
+plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.8,cex.axis=1.4,
+     pch=1,lwd=2,col=alpha("black",1),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
+     xlab="Longitude",ylab="Proportion female panicles",cex=log(garden_osr_poolyr$tot_pan))#cex=4*(garden_osr_poolyr$tot_pan/max(garden_osr_poolyr$tot_pan))+1.5)#
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4,cex.main=1.8)
+#lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
+#lines(long_seq + mean(latlong$Longitude),invlogit(coef_garden_osr_mean$b0 + coef_garden_osr_mean$b_long*long_seq),lwd=3)
+for(p in 1:n_post_draws){
+  lines(long_seq + mean(latlong$Longitude),
+        invlogit(coef_garden_osr$b0[sr_post_draws[p]] + coef_garden_osr$b_long[sr_post_draws[p]] * long_seq),
+        col=alpha("darkgrey",0.1))
+}
+
+plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.8,cex.axis=1.4,
+     pch=1,lwd=2,col=alpha("black",1),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      xlab="Longitude",ylab="Proportion female plants",cex=log(garden_sr_poolyr$total))#cex=4*(garden_sr_poolyr$total/max(garden_sr_poolyr$total))+1.5)#
-abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4)
-lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
-#dev.off()
+abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4,cex.main=1.8)
+#lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
+#lines(long_seq + mean(latlong$Longitude),invlogit(coef_garden_sr_mean$b0 + coef_garden_sr_mean$b_long*long_seq),lwd=3)
+for(p in 1:n_post_draws){
+  lines(long_seq + mean(latlong$Longitude),
+        invlogit(coef_garden_sr$b0[sr_post_draws[p]] + coef_garden_sr$b_long[sr_post_draws[p]] * long_seq),
+        col=alpha("darkgrey",0.1))
+}
+dev.off()
 
 # Two-sex matrix model --------------------------------------------------------
 ## load MPM functions
