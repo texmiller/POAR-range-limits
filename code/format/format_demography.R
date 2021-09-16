@@ -485,3 +485,6 @@ write.csv(poar %>%
 
 # analysis data including three "bad" sites
 write.csv(poar,"POAR-range-limits/data/demography_allsites.csv", row.names = F)
+
+# write stand-alone lat-long df
+write.csv(latlong,"POAR-range-limits/data/latlong.csv", row.names = F)
