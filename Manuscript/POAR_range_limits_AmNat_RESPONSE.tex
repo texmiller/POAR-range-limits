@@ -1,0 +1,245 @@
+% ======================================================= %
+% Document: TEMPLATE FOR RESPONSES TO REVIEWERS
+% Author: Andrea Ballatore
+% Date: Jan 7, 2013
+% Source: https://raw.githubusercontent.com/ucd-spatial/Datasets/master/tex_response_to_reviewers_template/responses_to_reviewers.tex
+% Modified by Eduard Szöcs, 10.03.2015
+% ======================================================= %
+\documentclass[12pt]{article}
+
+% packages
+\usepackage{xr}
+\externaldocument[ms-]{POAR_range_limits_AmNat_submission2}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{color}
+\definecolor{mygray}{gray}{0.6}
+\usepackage[utf8]{inputenc}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[
+	round,	%(defaultage in the main file and \input ) for round parentheses;
+	colon,	% (default) to separate multiple citations with colons;
+	authoryear,% (default) for author-year citations;
+	sort,		% orders multiple citations into the sequence in which they
+]{natbib}
+\usepackage[%disable
+	]{todonotes}
+
+\usepackage{anysize}
+\marginsize{2.5cm}{2.5cm}{1.5cm}{2.5cm}
+
+% macros
+% add a counter
+\newcounter{cN}
+\setcounter{cN}{0}
+
+\newcommand{\comment}[1]{
+	\vspace{2em}
+	\refstepcounter{cN} % incrment counter
+	\noindent \hangindent=0em \textbf{\textcolor{Maroon}{\uline{Comment \thecN}:~}}\emph{``#1''}
+	}
+
+\newcommand{\response}[1]{
+	\\[0.25em]
+	\hangindent=2.3em \textbf{\textcolor{NavyBlue}{\uline{Response}:~}}#1
+	}
+
+\newcommand{\revise}[1]{{\color{Mahogany}{#1}}}
+
+\usepackage[normalem]{ulem}
+\definecolor{darkred}{rgb}{1,.6,.6}
+\DeclareRobustCommand\problemline{\bgroup\markoverwith{\textcolor{darkred}{\rule[-0.9ex]{4pt}{3pt}}}\ULon}
+\DeclareRobustCommand{\problem}[1]{\problemline{#1}} % soul
+\setcounter{secnumdepth}{-1}
+
+\begin{document}
+% ======================================================= %
+\title{Manuscript 60699 --- Response to reviewers}
+
+\maketitle
+% ======================================================= %
+\noindent To the editorial board,
+Thank you for the opportunity to submit a revision of our manuscript for your consideration. 
+In this document, we reproduce comments from the associate editor and reviewers and provide our point-by-point responses. 
+All of our changes are denoted in the manuscript with \revise{Mahogany font}.
+We think the review process has greatly strengthened our manuscript such that it is now suitable for publication.
+We hope you agree. 
+
+\vspace{2em}
+\hfill On behalf of myself and A. Compagnoni,
+
+\hfill Tom Miller
+\newpage
+
+% ======================================================= %
+\section{Response to Dr. Akcay}
+\vspace{-2em}
+
+\comment{This manuscript is an impressive piece of work, especially in its combination of several different lines of evidence to disentangle what sets geographic range limits. I personally really enjoyed reading it, and appreciated your use of two-sex demographic model to bring together all the data which without the model might have suggested a completely different story. We think there is a great Am Nat in the making here, and some relatively minor revisions will get it there.}
+\response{}
+
+\comment{Dr. Blackman summarizes the reviewer comments, which I also agree that you should consider all reviewer comments. I want to highlight Reviewer 2's comment about mismatch between sites as a potential factor in determining demography, not so much as an alternative to your analyses, but I think an additional interesting dimension you can explore with this data set. }
+\response{}
+
+\comment{Overall, I think the suggestions made by Dr. Blackman and the two reviewers will improve the manuscript, and I encourage you to submit a revision that addresses all of them. One minor of my own is about the figures: I found the labels and legends in the figures too small and hard to read. Consider using larger fonts and also think about labeling figures for easier orientation. For example, in Figure 6, you can label B and C as female and male contribution to sensitivity on the panels themselves. (See also reviewer comments about figures). }
+\response{}
+
+\section{Response to Dr. Blackman}
+\vspace{-2em}
+
+\comment{In their manuscript, the authors derive results from a series of field experiments to parameterize models and distinguish how intraspecific niche variation related to sex contributes to decreasing population viability at range margins in Texas bluegrass. The experimental work is large in scope and duration, the statistical and modeling work is thoughtfully performed, the manuscript is clearly written, and the insights gained are notable and timely.
+\\	
+\\
+I have secured two helpful reviews of the manuscript, both of which were very positive about the strength, interest, and potential influence of the work. The reviewers also provided several helpful suggestions for how the authors may improve their analysis, scholarship, or writing, and they each raised several conceptual or practical questions about the work that merit further consideration. Therefore, based on these reviews and my own reading of the manuscript, I would like to invite the authors to revise their manuscript to accommodate the suggestions and address the questions raised by the reviewers and myself.}
+\response{}
+
+\comment{I have only two additional comments beyond those made by the reviewers.
+	1)	In addition to the sites of the common gardens, the authors should add markers to Fig. 2 to indicate the locations of the sites sampled in the natural population survey. Alternately, if that makes the map in Fig. 2 too busy, they could provide a comparable map in the Appendix for these sites.}
+\response{}
+
+\comment{2)	The authors should describe the methods of the tetrazolium-based seed viability assays with full experimental detail (lines 193-4).}
+\response{}
+
+\section{Response to Reviewer 1}
+\vspace{-2em}
+
+\comment{This study combines population surveys, common gardens, and sex-ratio manipulations to test the contributions of sex-based niche differences to longitudinal range limits. The authors find that sex-ratios vary systematically across the species longitudinal range and influence female reproductive success, but have little role in setting geographic range limits. Instead, they find striking correspondence between demographic limits of females and the observed species range limit, suggesting that female niche limits play an outsized role in setting species ranges. 
+\\
+\\	
+Overall, this study addresses an interesting and important question with a comprehensive set of experiments and analyses. I found the manuscript to be engaging and clearly written. The main limitation, as the authors acknowledge, is the lack of data on the vital rates of the larger size classes observed in natural populations. However, I found the analyses in Appendix C convincing that this is unlikely to overturn the main result of the study, and this limitation was adequately discussed in the main text.
+}
+\response{See line \ref{ms-mod1}.}
+
+\comment{I have only a few minor clarifying comments:
+	\\
+	1.	L66: Geographic gradients are not always concordant with environmental marginality, see Pironon, S., et al. (2017). ``Geographic variation in genetic and demographic performance: new insights from an old biogeographical paradigm.'' Biol. Rev. 92(4): 1877-1909.}
+\response{We now acknowledge that geographic range limits do not always occur at environmental extremes, and we cite Pironon et al. (line \ref{ms-}).}
+
+\comment{2.	Fig. 3: Please provide some measure of statistical uncertainty such as credible intervals or p-values}
+\response{We have re-drawn this figure to represent uncertainty given the posterior distribution of regression parameters.}
+
+\comment{3.	Fig. 4: Please include in the legend the interpretation of the different grey shaded intervals around the posterior means}
+\response{We have updated the Figure 4 legend to include this.}
+
+\comment{4.	L433-444: Or perhaps that reproductive costs are cumulative and would require a longer duration to detect}
+\response{We now include this possibility (line \ref{ms-}).}
+
+\section{Response to Reviewer 2}
+\vspace{-2em}
+
+\comment{In this manuscript, the authors pair a common garden experiment spanning the range of a dieocious perennial grass species with data from a sex-ratio manipulation experiment, and use demographic models to examine the extent to which declines in lambda are affected by males/mate limitation of females (in addition to female vital rates). They find that while the sexes demonstrate some niche differentiation and seed viability is sensitive to extremely female biased sex ratios, vital rates of female plants are still the most important drivers of population growth rates and likely are most important in shaping range limits.
+\\
+\\	
+Overall, the goals of this study are interesting and timely. The combination of approaches is very nice, and will, I think, inspire similar work down the line. The manuscript reads very well, and most methods and results are described clearly.}
+\response{}
+	
+\comment{My major comments on the manuscript focus on the biological effects of aridity in this system, the ways in which latitude is/is not a good proxy or these biological effects, and whether niche differentiation between populations (local adaptation to aridity) should be considered in addition to niche differentiation between the sexes. I've starred the points that I think are most critical to address. I also have some minor comments/questions that mainly aim to clarify details in the text.
+}
+\response{}
+
+\comment{MAJOR COMMENTS
+	\\
+	1. Niche differentiation (local adaptation) among source populations and precipitation mismatch:
+	\\
+	In the introduction, the authors mention intraspecific niche heterogeneity, which can be a result of population differentiation due to local adaptation to climate. Common garden/reciprocal transplant experiments are a classic way to quantify local adaptation, and can include explicit consideration of climate (Wilczek et al. 2014, Bontrager et al. 2019), often assuming that (or testing whether) populations will perform best in the conditions under which they have evolved. I wonder if, given the design of the common garden experiment, explicit consideration of the environmental (aridity) differences between sources and sites is interesting/important?
+	\\
+	Wilczek, Amity M., et al. ``Lagging adaptation to warming climate in Arabidopsis thaliana.'' Proceedings of the National Academy of Sciences 111.22 (2014): 7906-7913.
+	\\
+	Bontrager, Megan, and Amy L. Angert. ``Gene flow improves fitness at a range edge under climate change.'' Evolution letters 3.1 (2019): 55-68.
+}
+\response{}
+
+\comment{- **Did you consider including an effect in your regression models of precipitation/longitudinal mismatch (e.g., how different is the garden from the source population environment)? This could be done using linear and quadratic terms and maintaining dry/wet directionality, or using the absolute deviation with a linear term only. This might allow you to estimate the extent to which populations are adapted to local precipitation regimes and compare this effect size to the sex differences. This could be compared to the current model, which, as I understand it, tests for site effects only (e.g., effect of garden longitude). Alternatively or additionally, perhaps you could make the displacement parameter indexed by sex, to see if sexes differ in the extent to which they are affected by mismatch from historic precipitation regimes. I'm not sure if any of this could/should carry through to the demographic models but it seems like an interesting direction to explore given the experimental design.}
+\response{}
+	
+\comment{- This might also allow the authors to begin to explore another cool question: if different individuals within a species have different niches (different environmental optima), how much of this variation is explained by sex vs. environment of origin?}
+\response{}
+	
+\comment{- **If precipitation mismatch has an effect on vital rates, depending on the shape of that response, vital rates measured in common gardens could be driven down at range edges simply because the greatest average mismatch occurs there (from a quick skim of tables A1 and A2, it seems like sources tend to be more central than sites). Is it possible to check this statistically by including precipitation/longitudinal mismatch in the demographic model (or, alternatively, demonstrating no effect in the vital rate regressions)? It is important to consider this possibility when interpreting the relationship between lambda and longitude--if more range edge sources were incorporated into the design, would they do well in their home environments and increase lambda near edges? In the discussion, consider commenting on how source population selection could affect vital rates measured in common gardens if local adaptation to aridity is present in this system.}
+\response{}
+
+\comment{2. Shape of precipitation responses, longitude as a proxy:
+	\\
+	- **While the relationship between precipitation and longitude is strong, it does seem non-linear. That is, in Fig. A1, precip is similar among garden sites across westernmost 3 degrees of longitude, then sharply increases over next 4 degrees, then kind of plateaus again among eastern gardens. Consider justifying the use of longitude as a proxy for precipitation in light of this, or switching to using precipitation directly. Consider adding source populations and the approximate longitudinal range limits to Fig. A1, and perhaps making it a second panel of Fig. 2 in the main text.}
+\response{}
+
+\comment{- Are effects of aridity expected to be linear? For example, is the expected difference in the linear predictor between a 100 mm site and a 200 mm site the same as between a 1200 mm site and a 1300 mm site? Sometimes precip is log-transformed to better match biological expectations. I don't think this is necessary, just curious if the authors considered it.}
+\response{}
+
+\comment{- I find it surprising and interesting that a given vital rate often responds similarly at both edges, despite different potential stressors at mesic vs. xeric edges--in other words, vital rate responses often look fairly symmetric despite asymmetry in the main stressor. Naively, I might have expected some vital rates to decline at dry edges, and others at wet edges. Were the authors surprised by this at all? Consider addressing in the discussion.}
+\response{}
+
+\comment{- Consider mentioning how precipitation is seasonally distributed in these sites when introducing the study system. Do storms occur during flowering, and if so, might they interfere with pollen production/dispersal? Are all sites getting the majority of precip in winter, regardless of the total precipitation they receive?}
+\response{}
+
+\comment{MINOR COMMENTS and things that could be clarified (by line number):
+	\\
+	58: Maybe "demographic advantage" instead of "advantage"?}
+\response{}
+	
+\comment{66: It's not always the case that range margins are environmentally extreme (Oldfather et al. 2019, Bontrager et al. 2021), so maybe rephrase along the lines of: ``When range margins are environmentally extreme relative to the range core...''
+	\\
+	Oldfather, Meagan F., et al. ``Range edges in heterogeneous landscapes: Integrating geographic scale and climate complexity into range dynamics.'' Global Change Biology 26.3 (2020): 1055-1067.
+	\\
+	Bontrager, Megan, et al. ``Adaptation across geographic ranges is consistent with strong selection in marginal climates and legacies of range expansion.'' Evolution (2021).}
+\response{}
+	
+\comment{68-69 or somewhere nearby: Consider adding a sentence about what aspects of physiology/biology are likely to underlie niche differentiation between sexes in plants.}
+\response{}
+	
+\comment{78-79: I found this phrasing a bit confusing, is this implying that females are favored in marginal environments? Consider rephrasing.}
+\response{}
+	
+\comment{88: ``Longitudinal variation in aridity''? or just ``variation in aridity''?}
+\response{}
+	
+\comment{120: What is the lifespan of an inflorescence across the season (i.e., could you be fairly confident that the ratios you captured were not sensitive to phenology at the time of the visit)?}
+\response{}
+	
+\comment{122/125: Would it also be interesting to see if patch counts of sexes differ? As mentioned in the discussion, the slope in 3a much steeper than in 3c, could differences in the sex ratio of plants/patches amplify the pattern of more female panicles in wet sites? (in addition to size structure effects on the strength of this pattern that are mentioned in results/appendix)}
+\response{}
+	
+\comment{173: ``size'' instead of ``growth''? or should line 176 also use ``growth''?}
+\response{}
+	
+\comment{183: Maybe briefly mention the source material for this experiment: was it a single population or multiple? was it local to the experimental site?}
+\response{}
+	
+\comment{191-192: Consider clarifying what ``seed viability'' means as it is used here. That term is sometimes used to describe seeds that have survived/remained viable--i.e., the proportion of seeds viable might be the proportion still alive out of some original number of ovules that were fertilized and developed. But in this study system, it seems like ``viable'' is used to describe ovules that were fertilized. In this species, are unfertilized ovules present and developed enough to be countable? Do the seed counts here reflect total female reproductive attempts?}
+\response{}
+	
+\comment{207: What factors influence germinability of viable seeds? Does dormancy change across the aridity gradient? I'm a bit confused about the purpose of estimating germination probability if it is a constant and not influenced by OSR or aridity. Maybe it's just for the demographic model? Consider stating that purpose in this section.}
+\response{}
+	
+\comment{273-274: Maybe here just remind the reader which longitudinal direction is wetter vs. drier?}
+\response{}
+	
+\comment{285-294: Are the results highlighted here based on visual divergence of the male and female model fit lines, or whether the XX\% posterior distribution interval of the difference includes/excludes 0? If the latter, consider specifying the interval used and making the shading darker in Fig. 4 so these results are easier to pick out visually.}
+\response{}
+	
+\comment{305: Fertilization typo. Also fertilization `by' or `of' females?--phrasing seems a bit awkward.}
+\response{}
+	
+\comment{316: `processed-based' or `process based'?}
+\response{}
+	
+\comment{438-439: Could you clarify what Fig. 3B is showing? I thought this was demonstrating male biased OSR in the west. Is this sentence saying that demographic rates/contributions aren't male biased (even though the proportion of panicles that are male (OSR) does show a longitudinal trend)?}
+\response{}
+	
+\comment{Fig. 2. Consider adding source population locations to this map. Consider combining with Fig. A1.}
+\response{}
+	
+\comment{Fig. 3. Consider annotating with ``wetter'', ``drier''.}
+\response{}
+	
+\comment{Fig. 4. Are there multiple levels of shading in the posterior difference panels (perhaps for different posterior intervals)? Consider clarifying in the caption. On my screen, I have to zoom in a lot to see whether the outermost shading overlaps the "no difference" line; I think it would be easier to see if the shading were darker.}
+\response{}
+	
+\comment{Table A1, A2: Consider arranging by longitude, or at a minimum, having both sites and sources in the map figure so readers can see longitudinal coverage easily.}
+\response{}
+
+% ======================================================= %
+\end{document}
+% ======================================================= %

@@ -31,7 +31,18 @@ results
 *.mtc1
 *.out
 *.synctex.gz
-*.tex
 *.rds
 
 Manuscript/POAR_range_limits_MS.pdf
+Manuscript/POAR_range_limits_MS.tex
+Manuscript/POAR_range_limits_AmNat_submission1.tex
+Manuscript/POAR_range_limits_AmNat_submission1.pdf
+Manuscript/POAR_range_limits_AmNat_submission2.tex
+Manuscript/POAR_range_limits_AmNat_submission2.pdf
+Manuscript/AmNat_MS_template.tex
+Manuscript/POAR_range_limits_AmNat_submission1-concordance.tex
+Manuscript/POAR_range_limits_AmNat_submission2-concordance.tex
+Manuscript/POAR_range_limits_MS-concordance.tex
+Manuscript/POAR_range_limits_AmNat_RESPONSE.pdf
+Manuscript/POAR_range_limits_AmNat_RESPONSE.pdf
+Manuscript/POAR_range_limits_AmNat_RESPONSE.pdf
