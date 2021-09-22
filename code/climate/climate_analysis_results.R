@@ -8,6 +8,7 @@
 
 # load packages
 library(rstan)
+library(loo)
 # set rstan options
 rstan_options( auto_write = TRUE )
 options( mc.cores = parallel::detectCores() )
@@ -19,20 +20,59 @@ library(rmutil)
 library(actuar)
 library(SPEI)
 library(shinystan)
+library(ggthemes)
 in_dir  <- "C:/Users/ac22qawo/poar/climate_analysis/"
 
 # read in stan fits
-mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7786865-4_4_poar_full_climate_mismatch_nologlik.RDS') )
+# mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7786865-4_4_poar_full_climate_mismatch_nologlik.RDS') )
+mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7885228-5_5_poar_full_climate_mismatch_nologlik.RDS') )
 mod_long     <- readRDS( paste0(in_dir, 'poar_climate-7786866-1_1_poar_full_climate_nologlik.RDS') )
 mod_noabio   <- readRDS( paste0(in_dir, 'poar_climate-7786869-3_3_poar_full_noabiotic.RDS') )
 mod_clim     <- readRDS( paste0(in_dir, 'poar_climate-7786870-2_2_poar_full_climate_nologlik.RDS') )
 
+mod_clim_ll  <- readRDS( paste0(in_dir, 'poar_climate-7814747-2_2_poar_full_climate.RDS') )
+mod_long_ll  <- readRDS( paste0(in_dir, 'poar_climate-7668184-1_1full_climate_mod.RDS') )
+  
 # extract parameters
 par_mmatch   <- rstan::extract(mod_mmatch) %>% as.data.frame
 par_long     <- rstan::extract(mod_long) %>% as.data.frame
 par_noabio   <- rstan::extract(mod_noabio) %>% as.data.frame
 par_clim     <- rstan::extract(mod_clim) %>% as.data.frame
 
+# Log likelihood analyses -------------------------------------
+
+mod_names <- data.frame( mod_n = 1:2,
+                         model = c('Longitude', 'Climate') ) 
+
+form_modsel <- function( x ){
+  x %>% 
+    as.data.frame %>% 
+    tibble::add_column(model = row.names(.), .before = 1) %>% 
+    mutate( model = gsub('model','',model) %>% as.numeric ) %>% 
+    rename( mod_n = model ) %>%   
+    left_join( mod_names )  
+}
+
+mod_fit   <- list( mod_long_ll, mod_clim_ll)
+log_liks  <- lapply(mod_fit, extract_log_lik)
+loo_l     <- lapply(log_liks, loo) %>% 
+                setNames( c('loo_long', 'loo_clim') )  
+loo_df    <- loo_compare( loo_l$loo_long, 
+                          loo_l$loo_clim ) %>% 
+                form_modsel %>% 
+                dplyr::select( model, elpd_diff:se_looic)
+
+waic_l    <- lapply(log_liks, waic) %>% 
+                setNames( c('waic_long', 'waic_clim') )  
+waic_df    <- loo_compare( waic_l$waic_long, 
+                           waic_l$waic_clim ) %>% 
+                form_modsel %>% 
+                dplyr::select( model, elpd_diff:se_waic)
+
+out_dir <- 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/climate_analyses/'
+
+write.csv( loo_df,  paste0(out_dir, 'looic_long_vs_climate.csv'), row.names = F)
+write.csv( waic_df, paste0(out_dir, 'waic_long_vs_climate.csv'),  row.names = F)
 
 # effect of precipitation mismatch ----------------------------
 
@@ -55,7 +95,7 @@ kernel_df <- dplyr::select( par_mmatch,
                'Longitude_Flowering', 'Mismatch_Flowering',
                'Longitude_Panicles',  'Mismatch_Panicles' ) ) %>% 
   gather( param, value, 
-          Longitude_Survival:Mismatch_Panicules ) %>% 
+          Longitude_Survival:Mismatch_Panicles ) %>% 
   group_by( param ) %>% 
   summarise( x = dens_extr(value, 1),   
              y = dens_extr(value, 2) ) %>% 
@@ -64,7 +104,7 @@ kernel_df <- dplyr::select( par_mmatch,
   
 # plot longitude vs. mismatch
 kernel_df %>% 
-  subset( Parameter == 'Mismatch' ) %>% 
+  subset( Parameter == 'Mismatch' ) %>%
   ggplot( ) +
   geom_line( aes(x,y),
              lwd = 2) +
@@ -80,7 +120,7 @@ kernel_df %>%
          # legend.text  = element_text( size = 15),
          # legend.title = element_text( size = 15),
          strip.text   = element_text( size = 15) ) +
-  ggsave( 'C:/CODE/POAR-range-limits/results/Longitude vs. Mismatch.tiff',
+  ggsave( 'C:/CODE/POAR-range-limits/results/Precipitation Mismatch.tiff',
           width = 6.3, height = 6.3, compression = 'lzw')
 
 
