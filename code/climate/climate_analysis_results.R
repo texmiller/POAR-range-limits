@@ -30,6 +30,7 @@ mod_long     <- readRDS( paste0(in_dir, 'poar_climate-7786866-1_1_poar_full_clim
 mod_noabio   <- readRDS( paste0(in_dir, 'poar_climate-7786869-3_3_poar_full_noabiotic.RDS') )
 mod_clim     <- readRDS( paste0(in_dir, 'poar_climate-7786870-2_2_poar_full_climate_nologlik.RDS') )
 
+# models with log likelihood for model selection
 mod_clim_ll  <- readRDS( paste0(in_dir, 'poar_climate-7814747-2_2_poar_full_climate.RDS') )
 mod_long_ll  <- readRDS( paste0(in_dir, 'poar_climate-7668184-1_1full_climate_mod.RDS') )
   
@@ -39,11 +40,13 @@ par_long     <- rstan::extract(mod_long) %>% as.data.frame
 par_noabio   <- rstan::extract(mod_noabio) %>% as.data.frame
 par_clim     <- rstan::extract(mod_clim) %>% as.data.frame
 
-# Log likelihood analyses -------------------------------------
+
+# Model selection: longitude vs. climate predictor -----------------------------
 
 mod_names <- data.frame( mod_n = 1:2,
                          model = c('Longitude', 'Climate') ) 
 
+# Do this formatting only once!
 form_modsel <- function( x ){
   x %>% 
     as.data.frame %>% 
