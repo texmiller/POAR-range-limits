@@ -108,7 +108,7 @@ It has been hypothesized that sexual niche differentiation may evolve by natural
 
 Sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010origin,eberhart2017sex}.
 Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex,hultine2018does,bisang2020sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex,dudaniec2021latitudinal}. 
-At range margins, where environments are extreme relative to the range core,
+At range margins, where environments \revise{\linelabel{r1.1}are often} extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
 In dioecious plants, for example, populations at upper altitudes and latitudes and in the more xeric margins of species' ranges tend to be male-biased \citep{field2013ecological}.
 
@@ -223,8 +223,15 @@ Details of this experiment, which was conducted in 2014--2015, are described in 
 Briefly, we established 124 experimental populations in $0.4 m \times 0.4 m$ plots that varied in population density (1--48 plants/plot) and sex ratio (0--100\%female), with 2--4 replicates for each of 34 density-sex ratio combinations. 
 The experiment was established ca. 1 km from a natural population at this site and plots were situated with a minimum of 15 m spacing, a buffer that was intended to limit pollen movement between plots (pilot data indicated that $\geq 90\%$ of wind pollination occurred within $13 m$). 
 We measured female reproductive success in different density and sex ratio environments by collecting panicles from a subset of females in each plot at the end of the reproductive season.
-In the lab, we counted the total number of seeds on each panicle and assessed seed viability in the greenhouse with germination trials of 25 seeds per panicle. 
-We also conducted tetrazolium-based seed viability assays (17--57 seeds per panicle, mode: 30). 
+In the lab, we counted the total number of seeds on each panicle.
+
+\revise{\linelabel{tzassay}In Texas bluegrass, unfertilized seeds shatter from the panicle along with fertilized seeds, so seed counts reflect female reproductive effort (seeds initiated) and not mating success (seeds fertilized). 
+We therefore assessed seed fertilization in two ways. 
+First, we conducted greenhouse-based germination trials using 25 seeds per panicle from 112 panicles belonging to 84 census females spanning the range of sex ratio variation. 
+We also conducted tetrazolium-based seed viability assays to estimate seed fertilization independently of germination, since some fertilized seeds may fail to germinate during our trials.
+Tetrazolium trials used 17--57 seeds per panicle (mode: 30) from 65 panicles belonging to 63 females, a subset of those used for the germination trials. To perform these assays, we first let seed batches imbibe on a moistened paper towel for 12 h. 
+We then bisected the seeds in half and soaked them in a pH buffer solution containing 0.1\% of tetrazolium for 12 h. The pH buffer solution contained 0.57\% of sodium phosphate and 0.36\% of potassium phosphate. 
+A seed was scored as viable if the embryo stained pink.}
 
 \subsubsection*{Statistical analysis of sex ratio experiment}
 Our previous study examined how interactions between density and frequency (sex ratio) dependence contributed to female reproductive success \citep{compagnoni2017can}. 
@@ -323,7 +330,9 @@ There was a longitudinal trend to sex ratio variation, with male-biased panicle 
   Points show means by site for females (filled) and males (open) and small (left column), medium (middle column), and large (right column) size classes (discretized, for visualization only).
   Point size is proportional to the sample size of the mean.
   Lines show fitted statistical models for females (solid) and males (dashed) based on posterior mean parameter values.
-  Lower panels below each data panel show the posterior distribution of the difference between females and males as a function of longitude (positive and negative values indicate female and male advantage, respectively); dashed horizontal line shows zero difference.}
+  Lower panels below each data panel show the posterior distribution of the difference between females and males as a function of longitude (positive and negative values indicate female and male advantage, respectively).
+  \revise{Shaded contours show the 25, 50, 75, and 95 percentiles of the posterior distribution.}
+  Dashed horizontal line shows zero difference.}
   \label{fig:vital_rates}
   \end{center}
 \end{figure}
@@ -437,7 +446,7 @@ The link between OSR and responses to climate adds value to studies of the cause
 Previous studies of dioecious plants have shown that male bias is more common than female bias and is particularly pronounced in harsh abiotic environments, likely reflecting the greater resource requirements needed to pay the female cost of reproduction \citep{field2013comparative,field2013ecological,bierzychudek1988spatial}. 
 Our surveys of natural populations are consistent with the broader pattern of male-biased OSR at xeric range edges.
 However, our common garden populations did not exhibit male bias in the xeric west -- averaged across years or in any single year (Fig. \ref{fig:gardens_by_year}) -- nor did we find any strong demographic evidence for a western male advantage (in fact, there was a western female advantage in growth and survival for some sizes). 
-If male advantage / female disadvantage under harsh abiotic conditions is driven by the greater resource requirements of females then it is possible that clonal propagation and/or legacies of greenhouse rearing masked the `true' sex difference at xeric-edge common garden sites. 
+If male advantage / female disadvantage under harsh abiotic conditions is driven by the greater resource requirements of females then it is possible that clonal propagation and/or legacies of greenhouse rearing masked the `true' sex difference at xeric-edge common garden sites, \revise{\linelabel{r1.4}or that reproductive costs accumulate over longer time scales than considered here}. 
 Instead, the stronger pattern of sex ratio bias was the female reproductive advantage at the mesic, eastern range edge. 
 We hypothesize that the mesic edge is limited by competition and that the female reproductive advantage reflects competitive superiority of females, which has been suggested in previous studies of Texas bluegrass \citep{compagnoni2017can} and shown in other dioecious plants \citep{eppley2006females}, particularly under mesic conditions \citep{chen2014intra}. 
 Theory suggests that biotic interactions such as competition are likely to limit species' ranges at the benign (e.g., mesic) end of abiotic gradients \citep{louthan2015and} though this has not been explored, to our knowledge, in the context of sex-structured dynamics.  

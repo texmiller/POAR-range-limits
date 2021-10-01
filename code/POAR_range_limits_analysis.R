@@ -1106,13 +1106,13 @@ coef_garden_sr_mean <- lapply(coef_garden_sr,mean)
 ## figure option combines natural population survey with common garden sex ratios
 #print figure
 pdf("Manuscript/Figures/nat_pops_gardens_SR.pdf",useDingbats = F,height=4,width=12)
-par(mfrow=c(1,3),mar=c(5,5,1,1))
+par(mfrow=c(1,3),mar=c(5,5,2,1))
 ## natural populations
 plot(survey_dat$longit + mean(POAR$Longitude),
      survey_dat$y/survey_dat$n_trials,pch=1,xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      cex=log(survey_dat$n_trials),#cex=4*(survey_dat$n_trials/max(survey_dat$n_trials))+1,#
      xlab="Longitude",ylab="Proportion female panicles",cex.lab=1.8,cex.axis=1.4,
-     col=alpha("black",1),lwd=2);title("A",adj=0,font=4,cex.main=1.8)
+     col=alpha("black",1),lwd=2);title("A",adj=0,font=4,cex.main=2)
 abline(h=0.5,col="gray",lty=2)
 #lines(x_long + mean(POAR$Longitude),
 #      invlogit(mean(coef_surv$b0) + mean(coef_surv$b_long) * x_long),lwd=3,col="black")
@@ -1126,7 +1126,7 @@ for(p in 1:n_post_draws){
 plot(garden_osr_poolyr$long.center + mean(latlong$Longitude),garden_osr_poolyr$osr,ylim=c(0,1),cex.lab=1.8,cex.axis=1.4,
      pch=1,lwd=2,col=alpha("black",1),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      xlab="Longitude",ylab="Proportion female panicles",cex=log(garden_osr_poolyr$tot_pan))#cex=4*(garden_osr_poolyr$tot_pan/max(garden_osr_poolyr$tot_pan))+1.5)#
-abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4,cex.main=1.8)
+abline(h=0.5,col="gray",lty=2);title("B",adj=0,font=4,cex.main=2)
 #lines(long_seq + mean(latlong$Longitude),invlogit(coef(osr_glm_poolyr)[1] + coef(osr_glm_poolyr)[2]*long_seq),lwd=3)
 #lines(long_seq + mean(latlong$Longitude),invlogit(coef_garden_osr_mean$b0 + coef_garden_osr_mean$b_long*long_seq),lwd=3)
 for(p in 1:n_post_draws){
@@ -1138,7 +1138,7 @@ for(p in 1:n_post_draws){
 plot(garden_sr_poolyr$long.center + mean(latlong$Longitude),garden_sr_poolyr$sr,ylim=c(0,1),cex.lab=1.8,cex.axis=1.4,
      pch=1,lwd=2,col=alpha("black",1),xlim=mean(latlong$Longitude)+c(min(garden_osr_poolyr$long.center),max(garden_osr_poolyr$long.center)),
      xlab="Longitude",ylab="Proportion female plants",cex=log(garden_sr_poolyr$total))#cex=4*(garden_sr_poolyr$total/max(garden_sr_poolyr$total))+1.5)#
-abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4,cex.main=1.8)
+abline(h=0.5,col="gray",lty=2);title("C",adj=0,font=4,cex.main=2)
 #lines(long_seq + mean(latlong$Longitude),invlogit(coef(sr_glm_poolyr)[1] + coef(sr_glm_poolyr)[2]*long_seq),lwd=3)
 #lines(long_seq + mean(latlong$Longitude),invlogit(coef_garden_sr_mean$b0 + coef_garden_sr_mean$b_long*long_seq),lwd=3)
 for(p in 1:n_post_draws){
