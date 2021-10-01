@@ -3,9 +3,17 @@ library(tidyverse)
 library(ggthemes)
 in_dir  <- "C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/GIS/"
 
-# read data
-clim_df <- read.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate.csv' ) 
-crts_df <- read.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate_cruts.csv' ) 
+# collection codes
+k_codes <- c("QLP", "HHC", 
+             "CWM", "LAR", 
+             "COB", "SLR", 
+             "LLELA", "SSC")
+
+# read data (use only collections employed in the experiment)
+clim_df <- read.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate.csv' ) %>% 
+             subset( !(coord_type == 'Collection' & !(code %in% k_codes)) )
+crts_df <- read.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/monthly_climate_cruts.csv' ) %>% 
+             subset( !(coord_type == 'Collection' & !(code %in% k_codes)) )
 #              # Update "double codes"
 #              mutate( code = replace( code,
 #                                      full_name == 'buffalolake',
@@ -19,7 +27,6 @@ crts_df <- read.csv( 'C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Moni
 #              mutate( coord_type = replace( coord_type,
 #                                            coord_type == 'site',
 #                                            'Field site' ) )
-
 
 # CHELSA averages -----------------------------------------------------
 
