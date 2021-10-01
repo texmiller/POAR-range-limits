@@ -22,12 +22,19 @@ library(SPEI)
 library(shinystan)
 library(ggthemes)
 in_dir  <- "C:/Users/ac22qawo/poar/climate_analysis/"
+in_dir  <- "C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/results/climate_analyses"
 
 # read in stan fits
 # mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7786865-4_4_poar_full_climate_mismatch_nologlik.RDS') )
-mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7885228-5_5_poar_full_climate_mismatch_nologlik.RDS') )
-mod_long     <- readRDS( paste0(in_dir, 'poar_climate-7786866-1_1_poar_full_climate_nologlik.RDS') )
+#mod_mmatch   <- readRDS( paste0(in_dir, 'poar_climate-7885228-5_5_poar_full_climate_mismatch_nologlik.RDS') )
+mod_mmatch   <- readRDS(gzcon(url("https://www.dropbox.com/s/27ocb9b3vijzm6t/poar_climate-7885228-5_5_poar_full_climate_mismatch_nologlik.RDS?dl=1")))
+
+#mod_long     <- readRDS( paste0(in_dir, 'poar_climate-7786866-1_1_poar_full_climate_nologlik.RDS') )
+mod_long     <- readRDS(gzcon(url("https://www.dropbox.com/s/b1ykbcdvu7u8xtc/poar_climate-7786866-1_1_poar_full_climate_nologlik.RDS?dl=1")))
+  
 mod_noabio   <- readRDS( paste0(in_dir, 'poar_climate-7786869-3_3_poar_full_noabiotic.RDS') )
+mod_noabio   <- readRDS(gzcon(url("https://www.dropbox.com/s/swfubamesi35iev/poar_climate-7786869-3_3_poar_full_noabiotic.RDS?dl=1")))
+  
 mod_clim     <- readRDS( paste0(in_dir, 'poar_climate-7786870-2_2_poar_full_climate_nologlik.RDS') )
 
 # models with log likelihood for model selection
@@ -40,6 +47,35 @@ par_long     <- rstan::extract(mod_long) %>% as.data.frame
 par_noabio   <- rstan::extract(mod_noabio) %>% as.data.frame
 par_clim     <- rstan::extract(mod_clim) %>% as.data.frame
 
+## tom's parameter density plots
+par(mfrow=c(2,2))
+surv_mmdens <- density(par_mmatch$bmmatch_s)
+surv_mmCI <- quantile(par_mmatch$bmmatch_s,probs=c(0.05,0.95))
+x1 <- surv_mmdens$x[which.min(abs(surv_mmdens$x-surv_mmCI[1]))]
+x2 <- surv_mmdens$x[which.min(abs(surv_mmdens$x-surv_mmCI[2]))]
+plot(surv_mmdens);abline(v=0,lty=3)
+rect(x1,0,x2,0.05*max(surv_mmdens$y),col="gray")
+
+grow_mmdens <- density(par_mmatch$bmmatch_g)
+grow_mmCI <- quantile(par_mmatch$bmmatch_g,probs=c(0.05,0.95))
+x1 <- grow_mmdens$x[which.min(abs(grow_mmdens$x-grow_mmCI[1]))]
+x2 <- grow_mmdens$x[which.min(abs(grow_mmdens$x-grow_mmCI[2]))]
+plot(grow_mmdens);abline(v=0,lty=3)
+rect(x1,0,x2,0.05*max(grow_mmdens$y),col="gray")
+
+flow_mmdens <- density(par_mmatch$bmmatch_f)
+flow_mmCI <- quantile(par_mmatch$bmmatch_f,probs=c(0.05,0.95))
+x1 <- flow_mmdens$x[which.min(abs(flow_mmdens$x-flow_mmCI[1]))]
+x2 <- flow_mmdens$x[which.min(abs(flow_mmdens$x-flow_mmCI[2]))]
+plot(flow_mmdens);abline(v=0,lty=3)
+rect(x1,0,x2,0.05*max(flow_mmdens$y),col="gray")
+
+pan_mmdens <- density(par_mmatch$bmmatch_p)
+pan_mmCI <- quantile(par_mmatch$bmmatch_p,probs=c(0.05,0.95))
+x1 <- pan_mmdens$x[which.min(abs(pan_mmdens$x-pan_mmCI[1]))]
+x2 <- pan_mmdens$x[which.min(abs(pan_mmdens$x-pan_mmCI[2]))]
+plot(pan_mmdens);abline(v=0,lty=3)
+rect(x1,0,x2,0.05*max(pan_mmdens$y),col="gray")
 
 # Model selection: longitude vs. climate predictor -----------------------------
 
