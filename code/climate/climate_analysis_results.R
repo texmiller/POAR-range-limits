@@ -47,6 +47,8 @@ par_long     <- rstan::extract(mod_long) %>% as.data.frame
 par_noabio   <- rstan::extract(mod_noabio) %>% as.data.frame
 par_clim     <- rstan::extract(mod_clim) %>% as.data.frame
 
+## change
+
 ## tom's parameter density plots
 par(mfrow=c(2,2))
 surv_mmdens <- density(par_mmatch$bmmatch_s)
