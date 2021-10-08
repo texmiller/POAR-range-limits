@@ -47,37 +47,38 @@ par_long     <- rstan::extract(mod_long) %>% as.data.frame
 par_noabio   <- rstan::extract(mod_noabio) %>% as.data.frame
 par_clim     <- rstan::extract(mod_clim) %>% as.data.frame
 
-## change
-
 ## tom's parameter density plots
+pdf("Manuscript/Figures/climate_mismatch.pdf",height = 8,width = 8,useDingbats = F)
 par(mfrow=c(2,2))
 surv_mmdens <- density(par_mmatch$bmmatch_s)
 surv_mmCI <- quantile(par_mmatch$bmmatch_s,probs=c(0.05,0.95))
 x1 <- surv_mmdens$x[which.min(abs(surv_mmdens$x-surv_mmCI[1]))]
 x2 <- surv_mmdens$x[which.min(abs(surv_mmdens$x-surv_mmCI[2]))]
-plot(surv_mmdens);abline(v=0,lty=3)
+plot(surv_mmdens,lwd=2,main="A) Survival",xlab="Mismatch coefficient",cex.lab=1.4)
+abline(v=0,lty=3)
 rect(x1,0,x2,0.05*max(surv_mmdens$y),col="gray")
 
 grow_mmdens <- density(par_mmatch$bmmatch_g)
 grow_mmCI <- quantile(par_mmatch$bmmatch_g,probs=c(0.05,0.95))
 x1 <- grow_mmdens$x[which.min(abs(grow_mmdens$x-grow_mmCI[1]))]
 x2 <- grow_mmdens$x[which.min(abs(grow_mmdens$x-grow_mmCI[2]))]
-plot(grow_mmdens);abline(v=0,lty=3)
+plot(grow_mmdens,lwd=2,main="B) Growth",xlab="Mismatch coefficient",cex.lab=1.4);abline(v=0,lty=3)
 rect(x1,0,x2,0.05*max(grow_mmdens$y),col="gray")
 
 flow_mmdens <- density(par_mmatch$bmmatch_f)
 flow_mmCI <- quantile(par_mmatch$bmmatch_f,probs=c(0.05,0.95))
 x1 <- flow_mmdens$x[which.min(abs(flow_mmdens$x-flow_mmCI[1]))]
 x2 <- flow_mmdens$x[which.min(abs(flow_mmdens$x-flow_mmCI[2]))]
-plot(flow_mmdens);abline(v=0,lty=3)
+plot(flow_mmdens,lwd=2,main="C) Flowering",xlab="Mismatch coefficient",cex.lab=1.4);abline(v=0,lty=3)
 rect(x1,0,x2,0.05*max(flow_mmdens$y),col="gray")
 
 pan_mmdens <- density(par_mmatch$bmmatch_p)
 pan_mmCI <- quantile(par_mmatch$bmmatch_p,probs=c(0.05,0.95))
 x1 <- pan_mmdens$x[which.min(abs(pan_mmdens$x-pan_mmCI[1]))]
 x2 <- pan_mmdens$x[which.min(abs(pan_mmdens$x-pan_mmCI[2]))]
-plot(pan_mmdens);abline(v=0,lty=3)
+plot(pan_mmdens,lwd=2,main="D) Panicles",xlab="Mismatch coefficient",cex.lab=1.4);abline(v=0,lty=3)
 rect(x1,0,x2,0.05*max(pan_mmdens$y),col="gray")
+dev.off()
 
 # Model selection: longitude vs. climate predictor -----------------------------
 

@@ -108,7 +108,7 @@ It has been hypothesized that sexual niche differentiation may evolve by natural
 
 Sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010origin,eberhart2017sex}.
 Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex,hultine2018does,bisang2020sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex,dudaniec2021latitudinal}. 
-At range margins, where environments \revise{\linelabel{r1.1}are often} extreme relative to the range core,
+At range margins, where environments \revise{\linelabel{r1.1}may be} extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
 In dioecious plants, for example, populations at upper altitudes and latitudes and in the more xeric margins of species' ranges tend to be male-biased \citep{field2013ecological}.
 
@@ -208,7 +208,7 @@ All the vital rates shared a common linear predictor for the expected value that
 We included quadratic effects of longitude to account for the possibility of non-monotonic responses, following the hypothesis that fitness may peak in the center of the range. 
 The linear predictor also included random effects of site, block, and source population of the transplant.
 %; the corresponding variance terms were used in the demographic model (below) to capture process error in demography.  
-We pooled all three years of observations for analysis so we did not explicitly model temporal variation but our results are implicitly averaged over years. 
+We pooled all three years of observations for analysis so our results are implicitly averaged over years. 
 
 The survival and flowering data were Bernoulli distributed, and these models applied the logit link function. 
 We modeled panicle counts as zero-truncated negative binomial using the log link. 
@@ -216,6 +216,12 @@ For growth, we modeled tiller number with a zero-truncated Poisson-Inverse Gauss
 For flowering and panicle production in year $t$, the size covariate was the natural logarithm of tiller number in year $t$. 
 For survival and size in year $t$, the size covariate was the natural logarithm of tiller number in year $t-1$ (for 2015 data, size in year $t-1$ was transplant size at the time of planting). 
 Posterior predictive checks indicated that these models described the data well (Fig. \ref{fig:PPC}). 
+
+\revise{\linelabel{mismatchmethods}In follow-up analyses, we tested the addition of a climate mismatch variable that quantified the deviation between mean annual precipitation of each source population and common garden location.
+This analysis allowed us to evaluate whether local adaptation to climate may have contributed to variation in demographic performance across common garden sites. 
+This was motivated by the observation that most source populations came from the interior of the geographic range (MAP) and were brought to edge and beyond-edge locations that were much drier or wetter than their historical climate regime. 
+The local adaptation hypothesis predicts that demographic performance declines with increasing climatic deviation between common garden and source population locations. 
+We added the absolute value of mean annual precipitation mismatch (using 30-year normals) as a covariate to the vital rate models described above.}
 
 \subsection*{Sex ratio experiment}
 At one site near the center of the range (Lake Lewisville Environmental Learning Area, Texas), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
@@ -354,6 +360,9 @@ Finally, panicle production by flowering plants was similar between the sexes fo
 Sex differences in flowering and panicle production generated a longitudinal trend in the operational sex ratio of our common garden populations consistent with (but weaker than) the trend in natural populations: the fraction of total panicles that were female in our common gardens increased from west to east (Fig. \ref{fig:survey}B) even as the fraction of surviving plants that were female did not show a longitudinal trend (Fig. \ref{fig:survey}C).
 Thus, in recapitulating the natural OSR pattern, the common garden experiment revealed that the longitudinal trend in the mating pool of natural populations was due to the reproductive niche of females extending farther east than that of males, and not to sex differences in mortality.
 
+\revise{\linelabel{mismatchresults}For survival, flowering, and panicle production we did not find strong evidence for local adaptation based on the posterior distributions of the climate mismatch coefficient (Fig. \ref{climate_mismatch}A,C,D). 
+However, climate mismatch negatively affected growth such that plants from populations whose mean annual precipitation strongly differed from that of the common garden location exhibited reduced growth (Fig. \ref{climate_mismatch}B). }
+
 \subsection*{Sex-ratio dependent seed fertilization}
 
 Seed fertilitzation by females declined with increasing female bias in the sex ratio manipulation experiment. 
@@ -463,7 +472,11 @@ Elevated performance in some life history processes can compensate for declines 
 In Texas bluegrass, most vital rates declined toward eastern and western range limits but survival showed the opposite pattern. 
 Increased survival at longitudinal extremes partially offset declines in other vital rates but this positive response was weaker than the negative responses.
 Ultimately, increased survival was not sufficient to prevent declines in population viability from the range center to eastern and western limits, which were dominated by declining female growth and flowering. 
-A recent study found a similar pattern, where compensation between vital rates could not prevent a decrease of population growth rate towards the southern range edge of \textit{Erythranthe cardinalis} \citep{sheth2018demographic}. 
+\revise{\linelabel{mismatchdiscussion}However, we also found evidence that growth patterns exhibited local adaptation: individuals planted into locations that were climatically similar to locations of their source population exhibited greater growth, on average, irrespective of sex. 
+It is therefore possible that our demographic model (which does not explicitly account for local adaptation) over-estimates the decline in fitness approaching range edges, since local adaptation in a high-sensitivity vital rate may dampen the effects of environmental forcing. 
+There is growing awareness that local adaptation can modify expectations for species' distributions under global change \citep{peterson2019incorporating}.
+Mechanistic models of range limits that incorporate potential for local adaptation would be a valuable next step.}
+%A recent study found a similar pattern, where compensation between vital rates could not prevent a decrease of population growth rate towards the southern range edge of \textit{Erythranthe cardinalis} \citep{sheth2018demographic}. 
 
 Third, our results highlight some important considerations in how environment-dependent demographic models are best parameterized to derive insights into the drivers of range limits. 
 Our approach relied heavily on common garden populations, which allowed us to plant and track known-sex individuals in contrasting environmental conditions that encompass and exceed the natural geographic distribution. 
@@ -569,6 +582,15 @@ print(xtable(poar_ms_quantities$exp_site_table, caption = "Sites of common garde
   Lines show density distributions of real data (thick, dark blue) compared to simulated data sets (thin, light blue) generated from the fitted models based on 500 draws of the posterior distribution of parameter estimates. 
   Correspondence of the real and simulated data suggests that the fitted models describe the data well.}
   \label{fig:PPC}
+  \end{center}
+\end{figure}
+
+\newpage
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.75\linewidth]{Figures/climate_mismatch}
+  \caption{\revise{Posterior distributions of statistical coefficients for the influence of source-garden climate mismatch on survival (A), growth (B), flowering (C), and panicle production (D). Gray bars show the 95\% credible interval of the coefficients. Climate mismatch was calculated as the absolute value of the different in mean annual precipitation between source population and common garden location.}}
+  \label{fig:climate_mismatch}
   \end{center}
 \end{figure}
 
