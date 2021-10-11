@@ -90,7 +90,7 @@ demography; dioecy; intra-specific niche heterogeneity; matrix projection model;
 \newpage
 \section*{Introduction}
 
-\revise{\linelabel{mod1}Understanding} the processes that generate species' distributional limits is a foundational objective of ecology.
+Understanding the processes that generate species' distributional limits is a foundational objective of ecology.
 The niche concept is central to theory for range limits \citep{Hutchinson1958} and available evidence suggests that geographic distributions may often be interpreted as ecological niches ``writ large'' \citep{lee2016synthesis,hargreaves2013species}. 
 Species distribution modeling has long capitalized on this idea to infer niche characteristics from statistical associations between occurrence and environmental variables.
 In contrast, there is growing interest in process-based models of range limits, where individual-level demographic responses to environmental variation inform predictions about the ecological niche and environmental limits of population viability (i.e., at least replacement-level population growth, $\lambda \geq 1$) \citep{merow2014using,merow2017climate,diez2014probabilistic}. 
@@ -106,17 +106,17 @@ The prevalence of sexual niche differentiation was recognized by Darwin (\citeye
 There are now many examples of sex differences in trophic position \citep{pekar2011intersexual,law2018carnivory}, habitat use \citep{bowyer2004sexual,phillips2004seasonal,de2018habitat}, and responses to climate \citep{petry2016sex,rozas2009sex,gianuca2019sex}, differences that may or may not be accompanied by sexual dimorphism. 
 It has been hypothesized that sexual niche differentiation may evolve by natural selection when it reduces competitive or other antagonistic interactions between the sexes \citep{bolnick2003sexual,de2015ecological}, as a byproduct of naturally or sexually selected size dimorphism \citep{shine1989ecological,temeles2010evolution}, or when females and males pay different costs of reproduction \citep{bierzychudek1988spatial}.
 
-Sexual niche differentiation can translate to sex-specific advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010origin,eberhart2017sex}.
+Sexual niche differentiation can translate to sex-specific \revise{demographic} advantages in different environments, causing skew in the operational sex ratio (OSR: relative abundance of females and males available for mating) even if the primary (birth) sex ratio is unbiased \citep{veran2009demographic,shelton2010origin,eberhart2017sex}.
 Indeed, environmental clines in OSR have been widely documented in plants and animals at fine spatial scales \citep{eppley2001gender,bertiller2002spatial,groen2010sex,hultine2018does,bisang2020sex} as well as broader climatic clines across alititutdes or latitudes \citep{petry2016sex,ketterson1976geographic,caruso2007sex,dudaniec2021latitudinal}. 
 At range margins, where environments \revise{\linelabel{r1.1}may be} extreme relative to the range core,
 demographic differences between the sexes, and hence skew in the OSR, may be greatest. 
-In dioecious plants, for example, populations at upper altitudes and latitudes and in the more xeric margins of species' ranges tend to be male-biased \citep{field2013ecological}.
+In dioecious plants, for example, populations at upper altitudes and latitudes and in the more xeric margins of species' ranges tend to be male-biased, \revise{\linelabel{resources}possibly due to the greater resource demands of female flower and seed production} \citep{field2013ecological}.
 
 Returning to the question of whose niche determines range limits given the potential for sexual niche differentiation, classic ecological theory assumes the answer. 
 ``Female dominance'' is a pervasive, often implicit feature of population-dynamic models whereby male availability is assumed to have no influence on female fertility \citep{miller2011confronting,rankin2007males,caswell1986two}. 
 This assumption is wrong, of course, but it may be \emph{adequate} when the sex ratio is balanced or exhibits little variation. 
 The female-dominant perspective predicts that female responses to environmental variation should govern range limits (Fig. \ref{fig:concept}). 
-However, females may be mate-limited in environments in which they are favored, which could reduce population viability in marginal environments. 
+However, females may be mate-limited in environments in which they are favored, which could reduce population viability in marginal environments \revise{\linelabel{marginal}that are more suitable for females than males}. 
 This creates an additional, ``two-sex'' pathway by which environmental drivers may set distributional limits, via perturbations to the mating pool that arise from sex-specific responses to the environment (Fig. \ref{fig:concept}). 
 %While sexual niche divergence sets the stage for two-sex dynamics to play an important role in marginal environments, this influence may be dampened in mating systems where single males can fertilize many females \citep{miller2011sex} or in life histories where population viability is weakly sensitive to female fertility \citep{franco2004comparative}. 
 
@@ -148,11 +148,11 @@ We analyzed the demographic model to decompose the decline in $\lambda$ approach
 
 \begin{figure}[h!]
 \begin{center}
-    \includegraphics[width=0.75\linewidth]{Figures/POAR_BONAP_map}
-  \caption{Geographic and environmental distribution of \textit{P. arachnifera} in Texas, Oklahoma, and Kansas. 
+    \includegraphics[width=0.75\linewidth]{Figures/POAR_BONAP_survey_garden_map}
+  \caption{\revise{Geographic and environmental distribution of \textit{P. arachnifera} in Texas, Oklahoma, and Kansas. 
   Hatched shapes show counties with herbarium records of occurrence. 
   Color shows geographic variation in annual precipitation (mm) based on 30-year normals from WorldClim \citep{fick2017worldclim}. 
-  Points show sites for the common garden transplant experiment.
+  Grey diamonds show natural population census locations, black points show sites for the common garden transplant experiment, and red points show locations of the source populations planted in each common garden site.}
   }
   \label{fig:map}
   \end{center}
@@ -162,8 +162,9 @@ We analyzed the demographic model to decompose the decline in $\lambda$ approach
 \section*{Materials and methods}
 
 \subsection*{Study system and natural population surveys}
-\textit{Poa arachnifera} (Texas bluegrass) is a perennial, cool-season (C3) grass endemic to the southern Great Plains. 
+\textit{Poa arachnifera} (Texas bluegrass) is a perennial, cool-season  grass endemic to the southern Great Plains. 
 This species occurs almost exclusively in central Texas, Oklahoma, and southern Kansas (Fig. \ref{fig:map}) though there are occasional records of adventive populations in other U.S. states\footnote{http://bonap.net/Napa/TaxonMaps/Genus/County/Poa}.
+\revise{\linelabel{rainfall}Seasonal rainfall in this region has two annual peaks, in spring and fall, which coincide with the growing-season of this C3 species.}
 Like all grasses, \textit{P. arachnifera} is wind-pollinated.
 Individuals can be sexed only when flowering, in early spring, based on the presence of stigmas (females) or anthers (males) in the inflorescence. 
 Following inflorescence and seed production, plants go dormant for the hot summer months and vegetative growth resumes in fall. 
@@ -172,13 +173,14 @@ Sex in \textit{P. arachnifera} is genetically based \citep{renganayaki2001geneti
 The rhizomatous growth habit allowed us to clonally propagate large numbers of known-sex individuals for experiments, as we describe below. 
 
 We surveyed \textit{P. arachnifera} across its range to establish whether natural populations exhibited geographic clines in OSR corresponding to the longitudinal aridity gradient. 
-We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013 (Table \ref{tab:survey}). 
+We visited \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2012]} populations in spring 2012 and \Sexpr{poar_ms_quantities$n_survey_pops$n[poar_ms_quantities$n_survey_pops$year==2013]} in spring 2013 (Table \ref{tab:survey}, Fig. \ref{fig:map}). 
 At each location, we searched for \textit{P. arachnifera} along roads, trails, or creek drainages and recorded the number of female and male patches that we encountered and the number of inflorescences in each patch. 
 To quantify the mating environment, we focus our analyses on the sex ratio of inflorescences rather than patches, since a single patch makes different contributions to the mating pool depending on whether it has few or many inflorescences. 
 
 \subsubsection*{Statistical analysis of natural population surveys}
 We fit a binomial generalized linear model (glm), where ``successes'' were female inflorescences and ``trials'' were total inflorescences, to test whether the OSR varied systematically with respect to longitude. 
 Here and in the experiments that follow we use longitude as a proxy variable that captures all east-west environmental variation, notably precipitation (Fig. \ref{fig:map}) but also factors that co-vary with precipitation such as productivity. 
+\revise{\linelabel{waic}In Appendix XX, we used WAIC-based model selection to show that models using precipitation and longitude as environmental covariates were statistically indistinguishable, which suggests that longitude is an adequate proxy for aridity.}
 This statistical model and all those that follow were fit in a Bayesian statistical framework using Stan \citep{carpenter2017stan} and \textsf{R} package `rstan' \citep{stan2020rstan} with vague priors on all parameters.
 In all cases, model fit was assessed with posterior predictive checks \citep{gelman1996posterior}. 
 All code for statistical and demographic modeling is available at \url{https://github.com/texmiller/POAR-range-limits}.
@@ -189,7 +191,7 @@ All code for statistical and demographic modeling is available at \url{https://g
 We established a common garden experiment at \Sexpr{poar_ms_quantities$n_sites} sites throughout and beyond the geographic distribution of \textit{P. arachnifera} (Fig. \ref{fig:map}, Table \ref{tab:experiment}).
 Experimental sites spanned latitudinal and longitudinal variation, though we focus here on longitude. 
 During the three years of this experiment (2014--2017), total precipitation at each site closely tracked longitude (Fig. \ref{fig:site_precip}), as expected based on longer-term climate trends (Fig. \ref{fig:map}).
-Source material for the experiment came from \Sexpr{poar_ms_quantities$n_sources} sites, which were a subset of the sites that were visited for the natural population survey (Table \ref{tab:survey}). 
+Source material for the experiment came from \Sexpr{poar_ms_quantities$n_sources} sites, most of which were a subset of the sites that were visited for the natural population survey (Table \ref{tab:survey}, Fig. \ref{fig:map}). 
 At these sites, we collected vegetative tillers from flowering individuals of each sex (mean: \Sexpr{round(mean(poar_ms_quantities$source_plants$n),1)} individuals per site, range: \Sexpr{min(poar_ms_quantities$source_plants$n)}--\Sexpr{max(poar_ms_quantities$source_plants$n)}). 
 These were brought back to the Rice University greenhouse, where they were clonally propagated in ProMix potting soil and supplemented with Osmocote slow-release fertilizer at 78--80$^{\circ}$F under natural humidity and light. 
 
@@ -319,7 +321,7 @@ Finally, we compared the two-sex MPM to the corresponding female-dominant model 
   \textbf{A}, Operational sex ratio (fraction of panicles that were female) in \Sexpr{sum(poar_ms_quantities$n_survey_pops$n)} natural populations; \textbf{B}, Operational sex ratio and \textbf{C}, sex ratio (fraction of plants that were female) in \Sexpr{poar_ms_quantities$n_sites} common gardens. 
   Within panels, point size is proportional to sample size (total number of panicles in \textbf{A,B} and total plants in \textbf{C}) as follows: \textbf{A}, min: \Sexpr{poar_ms_quantities$survey_range[1]}, max: \Sexpr{poar_ms_quantities$survey_range[2]}; \textbf{B}, min: \Sexpr{poar_ms_quantities$garden_osr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_osr_range[2]}; \textbf{C}, min: \Sexpr{poar_ms_quantities$garden_sr_range[1]}, max: \Sexpr{poar_ms_quantities$garden_sr_range[2]}. 
   In \textbf{B,C}, data are pooled across years. 
-  Lines show fitted binomial GLMs.
+  \revise{Gray lines show 500 samples from the posterior distribution of fitted binomial GLMs}.
   }
   \label{fig:survey}
   \end{center}
