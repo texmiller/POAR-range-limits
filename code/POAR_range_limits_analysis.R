@@ -1694,6 +1694,10 @@ garden_osr_range <- range(garden_osr$tot_pan[garden_osr$tot_pan>0])
 
 garden_sr_range <- range(garden_sr$total[garden_sr$total>0])
 
+##climate vs longitude model selection tables
+waic_tab <- read.csv("https://www.dropbox.com/s/v9xruo951us7ugm/waic_long_vs_climate.csv?dl=1")
+waic_tab[,c("model","waic","se_waic","elpd_waic","elpd_diff","se_elpd_waic")]
+
 poar_ms_quantities <- list(
   n_survey_pops=n_survey_pops,
   survey_site_table=survey_site_table,
@@ -1708,7 +1712,8 @@ poar_ms_quantities <- list(
   viab_seeds=round(viab_seeds$`mean(viab_seeds)`,2),
   viab_n=viab_n,
   garden_osr_range=garden_osr_range,
-  garden_sr_range=garden_sr_range
+  garden_sr_range=garden_sr_range,
+  waic_tab
 )
 
 #write out ms quantities

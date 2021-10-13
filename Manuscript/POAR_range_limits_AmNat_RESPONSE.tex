@@ -170,7 +170,7 @@ Overall, the goals of this study are interesting and timely. The combination of 
 \comment{2. Shape of precipitation responses, longitude as a proxy:
 	\\
 	- **While the relationship between precipitation and longitude is strong, it does seem non-linear. That is, in Fig. A1, precip is similar among garden sites across westernmost 3 degrees of longitude, then sharply increases over next 4 degrees, then kind of plateaus again among eastern gardens. Consider justifying the use of longitude as a proxy for precipitation in light of this, or switching to using precipitation directly. Consider adding source populations and the approximate longitudinal range limits to Fig. A1, and perhaps making it a second panel of Fig. 2 in the main text.}
-\response{We have added new analyses to justify our focus on longitude as a proxy for aridity (\ref{}). Specifically, we used WAIC-based model selection to compare longitude vs mean annual precipitation as predictive covariates of the vital rates. We found these to be statistically indistinguishable, which suggests that longitude is likely an adequate stand-in for aridity. We describe this new analysis in the methods section (\ref{}) and show results in Table X.
+\response{We have added new analyses to justify our focus on longitude as a proxy for aridity. Specifically, we used WAIC-based model selection to compare longitude vs mean annual precipitation as predictive covariates of the vital rates. We found these to be statistically indistinguishable, which suggests that longitude is likely an adequate stand-in for aridity. We describe this new analysis in the methods section (\ref{ms-waic}) and show results in Table X.
 \\
 Admittedly, this analysis only scratches the surface of climate-dependence in this system. For example, there may be different climate drivers of different vital rates; the seasonal timing of rainfall may be more important than the annual total; and the interaction of temperature and precipitation should be an important determinant of aridity. For the purposes of the present manuscript, our use of longitude as the environmental covariate was an intentional choice to avoid the complexities of climate modeling, so that we could keep the reader's focus on the core conceptual ideas. The results of our new analyses suggest that this substitution is adequate. However, for the purposes of forecasting future range shifts it will be essential to connect vital rates to climate drivers, and this is the focus of a follow-up manuscript that we are currently working on.
 \\
@@ -180,7 +180,7 @@ Lastly, we have revised Figure 2 to show source population locations with respec
 \response{This is an interesting idea, and something that will be useful to consider in the climate-focused manuscript that we are currently working on. Since we continue to rely on longitude as the environmental covariate in the present study, the idea of log-transforming precipitation is not immediately relevant.}
 
 \comment{- I find it surprising and interesting that a given vital rate often responds similarly at both edges, despite different potential stressors at mesic vs. xeric edges--in other words, vital rate responses often look fairly symmetric despite asymmetry in the main stressor. Naively, I might have expected some vital rates to decline at dry edges, and others at wet edges. Were the authors surprised by this at all? Consider addressing in the discussion.}
-\response{We had not considered this result particularly surprising: for any single vital rate it seems plausible that extremely wet or dry conditions could have negative effects, resulting a an apparently symmetric environmental response functions even though the nature of environmental stress is quite different on both ends. We have not made any change in response to this comment.}
+\response{We had not considered this result particularly surprising: for any single vital rate it seems plausible that extremely wet or dry conditions could have negative effects, resulting a an apparently symmetric environmental response function even though the nature of environmental stress is quite different on both ends. We have not made any change in response to this comment.}
 
 \comment{- Consider mentioning how precipitation is seasonally distributed in these sites when introducing the study system. Do storms occur during flowering, and if so, might they interfere with pollen production/dispersal? Are all sites getting the majority of precip in winter, regardless of the total precipitation they receive?}
 \response{We have added information about the seasonal distribution of rainfall in our study region (l. \ref{ms-rainfall}). There are two peaks of precipitation per year, in spring and fall, which coincide with the Texas bluegrass growing season. It would be interesting to ask how weather events influence wind pollination but anything we could add on this would be pure speculation, so we have added nothing.}
@@ -205,49 +205,49 @@ Lastly, we have revised Figure 2 to show source population locations with respec
 \response{We have edited this sentence for clarity (l. \ref{ms-marginal})}
 	
 \comment{88: ``Longitudinal variation in aridity''? or just ``variation in aridity''?}
-\response{}
+\response{We prefer to keep ``longitudinal'' to emphasize the geographic dimension of variation in aridity.}
 	
 \comment{120: What is the lifespan of an inflorescence across the season (i.e., could you be fairly confident that the ratios you captured were not sensitive to phenology at the time of the visit)?}
-\response{}
+\response{The flowering season is about one month. We tried to keep our sampling late in the season, since inflroescences can be sexed after flowering (males will be empty and brittle, females will be heavy with seeds) but can be difficult to sex early in the season, before flowers have fully emerged. We have added this information to the manuscript (l. \ref{ms-season}).}
 	
 \comment{122/125: Would it also be interesting to see if patch counts of sexes differ? As mentioned in the discussion, the slope in 3a much steeper than in 3c, could differences in the sex ratio of plants/patches amplify the pattern of more female panicles in wet sites? (in addition to size structure effects on the strength of this pattern that are mentioned in results/appendix)}
-\response{}
+\response{This is an interesting question and we would love to know the patch sex ratio in natural populations. Because patches can be sexed only when they are flowering it is unfortunately not possible to know the patch sex ratio without sex-diagnostic molecular markers (which we pursued, without success). We do know that, among the flowering patches that we censused (the data in Fig 3a), patch sex ratio was qualitatively consistent with the panicle sex ratio, but noisier because there were fewer patches per population than panicles. But we are not comfortable presenting this as ``patch sex ratio'' for the reason described above.}
 	
 \comment{173: ``size'' instead of ``growth''? or should line 176 also use ``growth''?}
-\response{}
+\response{We use ``growth'' here because we are modeling current size as a function of previous size. It is not wrong to call this ``size'' but we prefer ``growth'' because that is the process that this model is meant to capture.}
 	
 \comment{183: Maybe briefly mention the source material for this experiment: was it a single population or multiple? was it local to the experimental site?}
-\response{}
+\response{We have added this information (l. \ref{ms-exp_source}).}
 	
 \comment{191-192: Consider clarifying what ``seed viability'' means as it is used here. That term is sometimes used to describe seeds that have survived/remained viable--i.e., the proportion of seeds viable might be the proportion still alive out of some original number of ovules that were fertilized and developed. But in this study system, it seems like ``viable'' is used to describe ovules that were fertilized. In this species, are unfertilized ovules present and developed enough to be countable? Do the seed counts here reflect total female reproductive attempts?}
 \response{We realize now that we should have provided some of these clarifying details. We have re-written this section accordingly (line \ref{ms-tzassay}).}
 	
 \comment{207: What factors influence germinability of viable seeds? Does dormancy change across the aridity gradient? I'm a bit confused about the purpose of estimating germination probability if it is a constant and not influenced by OSR or aridity. Maybe it's just for the demographic model? Consider stating that purpose in this section.}
-\response{}
+\response{We now clarify that the purpose of including germination was to generate more realistic predictions for the demographic model (l. \ref{ms-model}).}
 	
 \comment{273-274: Maybe here just remind the reader which longitudinal direction is wetter vs. drier?}
-\response{}
+\response{Done.}
 	
-\comment{285-294: Are the results highlighted here based on visual divergence of the male and female model fit lines, or whether the XX\% posterior distribution interval of the difference includes/excludes 0? If the latter, consider specifying the interval used and making the shading darker in Fig. 4 so these results are easier to pick out visually.}
-\response{}
+\comment{285-294: Are the results highlighted here based on visual divergence of the male and female model fit lines, or whether the 95\% posterior distribution interval of the difference includes/excludes 0? If the latter, consider specifying the interval used and making the shading darker in Fig. 4 so these results are easier to pick out visually.}
+\response{By providing quantiles of the posterior distribution (now clarified in the legend) our intention was to allow readers to infer the ``significance'' of these results on their own. Our text is based on the visual pattern and not any specific threshold. We have revised the shading as suggested to make the quantiles easier to see.}
 	
 \comment{305: Fertilization typo. Also fertilization `by' or `of' females?--phrasing seems a bit awkward.}
-\response{}
+\response{We fixed the typo and agree this phrasing was awkward so we revised the sentence (l. \ref{ms-fert}).}
 	
 \comment{316: `processed-based' or `process based'?}
-\response{}
+\response{Fixed, thank you.}
 	
 \comment{438-439: Could you clarify what Fig. 3B is showing? I thought this was demonstrating male biased OSR in the west. Is this sentence saying that demographic rates/contributions aren't male biased (even though the proportion of panicles that are male (OSR) does show a longitudinal trend)?}
-\response{}
+\response{The figure indeed shows that the fitted model predicts slight male bias in the west, although this was much weaker than the female bias in the east, which is the result that we emphasize. We understand why the reviewer may have been confused here so we have made some edits to clarify that the trend of western male bias in natural populations was not clearly reproduced in the common gardens, and we provide some speculation as to why (l. \ref{ms-males}).}
 	
 \comment{Fig. 2. Consider adding source population locations to this map. Consider combining with Fig. A1.}
-\response{}
+\response{We have added source populations to the map but we have kept Fig. A1 in the online appendix.}
 	
 \comment{Fig. 3. Consider annotating with ``wetter'', ``drier''.}
-\response{}
+\response{We have longitude on the x-axis of most of our figures and we would like to stay consistent across figures. We think it would be tedious or too busy to add wet/dry on all the axes, and we hope the text and map clearly communicate which direction is wetter and drier.}
 	
 \comment{Fig. 4. Are there multiple levels of shading in the posterior difference panels (perhaps for different posterior intervals)? Consider clarifying in the caption. On my screen, I have to zoom in a lot to see whether the outermost shading overlaps the "no difference" line; I think it would be easier to see if the shading were darker.}
-\response{}
+\response{Thank you for this comment. We have re-drawn the figure with clearer shading.}
 	
 \comment{Table A1, A2: Consider arranging by longitude, or at a minimum, having both sites and sources in the map figure so readers can see longitudinal coverage easily.}
 \response{We have added source populations to the map in Figure 2 as suggested.}
