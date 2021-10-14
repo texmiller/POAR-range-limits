@@ -1551,8 +1551,8 @@ ltre_lty <- c(1,NA,2,NA,3,NA,5,NA)
 #print figure
 #pdf("Manuscript/Figures/lambda_long_ltre.pdf",useDingbats = F,height=10,width=4)
 par(mar=c(5,5,1,1),mfrow=c(3,1))
-plot(long_seq_extend + mean(latlong$Longitude),lambda_long,type="n",ylim=c(0,4),lwd=4,
-     xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.5)
+plot(long_seq_extend + mean(latlong$Longitude),lambda_long_mean,type="n",ylim=c(0,4),lwd=4,
+     xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.8)
 polygon(x=c(long_seq_extend + mean(latlong$Longitude),rev(long_seq_extend + mean(latlong$Longitude))),
         y=c(lambda_long_q95[1,],rev(lambda_long_q95[2,])),
         col=alpha(polygon_col,polygon_alpha),border=NA)
@@ -1572,23 +1572,23 @@ abline(h=1,lty=3)
 
 #lines(long_seq_extend + mean(latlong$Longitude),lambda_long_mean)
 abline(v=c(-103.252677,-95.445907),lwd=1) # brewster and brazoria county
-title(main="A",adj=0)
+title(main="A) Population viability vs longitude",adj=0,cex.main=1.4)
 
 plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[1:8,]),type="l",lwd=4,ylim=c(-0.4,0.5),
-     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
+     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.8)
 abline(h=0,col="gray")
 for(i in seq(1,8,by=2)){
   lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i],col=ltre_cols[i],lwd=2)
 }
-title(main="B",adj=0)
+title(main="B) Female contribution",adj=0,cex.main=1.4)
 
 plot(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[9:16,]),type="l",lwd=4,ylim=c(-0.4,0.5),
-     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.5)
+     xlab="Longitude",ylab=expression(paste(partialdiff,lambda," / ",partialdiff,"Longitude")),cex.lab=1.8)
 abline(h=0,col="gray")
 for(i in seq(9,16,by=2)){
   lines(long_seq_extend + mean(latlong$Longitude),colSums(LTRE_out[i:(i+1),]),lty=ltre_lty[i-8],col=ltre_cols[i-8],lwd=2)
 }
-title(main="C",adj=0)
+title(main="C) Male contribution",adj=0,cex.main=1.4)
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
        lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
 #dev.off()
