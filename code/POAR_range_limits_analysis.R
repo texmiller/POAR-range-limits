@@ -636,14 +636,14 @@ sex_cols <- c("black","white")
 sex_lty <- c(1,2)
 bin_shapes <- 15:17
 diff_col <- "darkgrey"#"dodgerblue"#"black"
-diff_alpha <- 0.15
+diff_alpha <- 0.35
 
 layout.matrix <- rbind(matrix(1:6, nrow = 2, ncol = 3, byrow = F),
                        matrix(7:12, nrow = 2, ncol = 3, byrow = F),
                        matrix(13:18, nrow = 2, ncol = 3, byrow = F),
                        matrix(19:24, nrow = 2, ncol = 3, byrow = F))
 #print figure
-#pdf("Manuscript/Figures/vital_rates.pdf",height = 10,width = 8,useDingbats = F)
+pdf("Manuscript/Figures/vital_rates_v2.pdf",height = 14,width = 10,useDingbats = F)
 layout(mat = layout.matrix,
        heights = rep(c(2, 1),4), # Heights of the two rows
        widths = c(2, 2, 2))
@@ -655,7 +655,7 @@ with(poar_surv_binned,{
     par(mar=c(0,4,1,0))
     plot(long[size_bin==i] + mean(latlong$Longitude),mean_surv[size_bin==i],type="n",ylim=c(0,1),
          xlab=" ",ylab=" ",xaxt="n");box()
-    if(i==1){mtext("Pr(survival)",side=2,line=3)}
+    if(i==1){mtext("Pr(survival)",side=2,line=3,cex=1.6)}
     title(LETTERS[i],adj=0)
     for(s in 1:2){
       points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_surv[sex==s & size_bin==i],
@@ -675,9 +675,9 @@ with(poar_surv_binned,{
       ),lty=sex_lty[s],lwd=3)
     }
     par(mar=c(2,4,0.5,0))
-    plot(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],type="n",lwd=4,
-         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_surv_95[i,,1]),max(sex_diff_surv_95[i,,2])))
-    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=3)}
+    plot(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],type="n",lwd=4,yaxt="n",
+         xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_surv_95[i,,1]),max(sex_diff_surv_95[i,,2])))
+    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=2,cex=1.6)}
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_surv_95[i,,1],rev(sex_diff_surv_95[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
@@ -690,8 +690,9 @@ with(poar_surv_binned,{
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_surv_25[i,,1],rev(sex_diff_surv_25[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
-    lines(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],lwd=2,col=diff_col)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_surv_mean[i,],lwd=2,col="black")
     abline(h=0,lty=2)
+    mtext("0",side=2,at=0)
   }
 })
 
@@ -700,7 +701,7 @@ with(poar_grow_binned,{
     par(mar=c(0,4,1,0))
     plot(long[size_bin==i] + mean(latlong$Longitude),mean_grow[size_bin==i],type="n",
          xlab=" ",ylab=" ",xaxt="n");box()    
-    if(i==1){mtext("#tillers",side=2,line=3)}
+    if(i==1){mtext("#tillers",side=2,line=3,cex=1.6)}
     title(LETTERS[i+3],adj=0)    
     for(s in 1:2){
       points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_grow[sex==s & size_bin==i],
@@ -721,9 +722,9 @@ with(poar_grow_binned,{
             ),lty=sex_lty[s],lwd=3)
     }
     par(mar=c(2,4,0.5,0))
-    plot(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],type="n",lwd=4,
-         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_grow_95[i,,1]),max(sex_diff_grow_95[i,,2])))
-    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=3)}
+    plot(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],type="n",lwd=4,yaxt="n",
+         xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_grow_95[i,,1]),max(sex_diff_grow_95[i,,2])))
+    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=2,cex=1.6)}
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_grow_95[i,,1],rev(sex_diff_grow_95[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
@@ -736,8 +737,9 @@ with(poar_grow_binned,{
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_grow_25[i,,1],rev(sex_diff_grow_25[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
-    lines(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],lwd=2,col=diff_col)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_grow_mean[i,],lwd=2,col="black")
     abline(h=0,lty=2)
+    mtext("0",side=2,at=0)
   }
 })
 
@@ -747,7 +749,7 @@ with(poar_flow_binned,{
     par(mar=c(0,4,1,0))
     plot(long[size_bin==i] + mean(latlong$Longitude),mean_flow[size_bin==i],type="n",
          xlab=" ",ylab=" ",xaxt="n");box()
-    if(i==1){mtext("Pr(flowering)",side=2,line=3)}
+    if(i==1){mtext("Pr(flowering)",side=2,line=3,cex=1.6)}
     title(LETTERS[i+6],adj=0)    
     for(s in 1:2){
       points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_flow[sex==s & size_bin==i],
@@ -768,9 +770,9 @@ with(poar_flow_binned,{
             ),lty=sex_lty[s],lwd=3)
     }
     par(mar=c(2,4,0.5,0))
-    plot(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],type="n",lwd=4,
-         cex.lab=1.6,xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_flow_95[i,,1]),max(sex_diff_flow_95[i,,2])))
-    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=3)}
+    plot(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],type="n",lwd=4,yaxt="n",
+         xlab=" ",ylab=" ",xaxt="n",ylim=c(min(sex_diff_flow_95[i,,1]),max(sex_diff_flow_95[i,,2])))
+    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=2,cex=1.6)}
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_flow_95[i,,1],rev(sex_diff_flow_95[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
@@ -783,8 +785,9 @@ with(poar_flow_binned,{
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_flow_25[i,,1],rev(sex_diff_flow_25[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
-    lines(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],lwd=2,col=diff_col)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_flow_mean[i,],lwd=2,col="black")
     abline(h=0,lty=2)
+    mtext("0",side=2,at=0)
   }
 })
 
@@ -794,7 +797,7 @@ with(poar_panic_binned,{
     par(mar=c(0,4,1,0))
     plot(long[size_bin==i] + mean(latlong$Longitude),mean_panic[size_bin==i],type="n",
          xlab=" ",ylab=" ",xaxt="n",ylim=c(0,max(mean_panic[size_bin==i])));box()    
-    if(i==1){mtext("#panicles",side=2,line=3)}
+    if(i==1){mtext("#panicles",side=2,line=3,cex=1.6)}
     title(LETTERS[i+9],adj=0)    
     for(s in 1:2){
       points(long[sex==s & size_bin==i] + mean(latlong$Longitude),mean_panic[sex==s & size_bin==i],
@@ -815,10 +818,10 @@ with(poar_panic_binned,{
             ),lty=sex_lty[s],lwd=3)
     }
     par(mar=c(2,4,0.5,0))
-    plot(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],type="n",lwd=4,
-         cex.lab=1.6,xlab=" ",ylab=" ",ylim=c(min(sex_diff_panic_95[i,,1]),max(sex_diff_panic_95[i,,2])))
-    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=3)}
-    mtext("Longitude",side=1,line=3)
+    plot(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],type="n",lwd=4,yaxt="n",
+         xlab=" ",ylab=" ",ylim=c(min(sex_diff_panic_95[i,,1]),max(sex_diff_panic_95[i,,2])))
+    if(i==1){mtext(expression(paste(Delta," (F-M)")),side=2,line=2,cex=1.6)}
+    mtext("Longitude",side=1,line=3,cex=1.6)
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_panic_95[i,,1],rev(sex_diff_panic_95[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
@@ -831,11 +834,12 @@ with(poar_panic_binned,{
     polygon(x=c(long_seq + mean(latlong$Longitude),rev(long_seq + mean(latlong$Longitude))),
             y=c(sex_diff_panic_25[i,,1],rev(sex_diff_panic_25[i,,2])),
             col=alpha(diff_col,diff_alpha),border=NA)
-    lines(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],lwd=2,col=diff_col)
+    lines(long_seq + mean(latlong$Longitude),sex_diff_panic_mean[i,],lwd=2,col="black")
     abline(h=0,lty=2)
+    mtext("0",side=2,at=0)
   }
 })
-#dev.off()
+dev.off()
 
 
 # Seed viability figure ---------------------------------------------------

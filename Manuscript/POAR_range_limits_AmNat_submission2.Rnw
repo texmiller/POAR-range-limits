@@ -334,7 +334,7 @@ There was a longitudinal trend to sex ratio variation, with male-biased panicle 
 
 \begin{figure}%[h!]
   \begin{center}
-    \includegraphics[width=0.85\linewidth]{Figures/vital_rates}
+    \includegraphics[width=0.85\linewidth]{Figures/vital_rates_v2}
   \caption{Sex-, size-, and longitude-related variation in:  A--C, inter-annual probability of survival; D--F, inter-annual growth (change in number of tillers); G--I, probability of flowering; J--L, number of panicles produced given flowering. 
   Points show means by site for females (filled) and males (open) and small (left column), medium (middle column), and large (right column) size classes (discretized, for visualization only).
   Point size is proportional to the sample size of the mean.
@@ -385,7 +385,7 @@ The occasional production of viable seeds in female-only populations (Fig. \ref{
 \end{figure}
  
 \subsection*{Two-sex model of range limits}
-The \revise{process-based} demographic model connected sex-specific vital rate responses to longitudinal variation (Fig. \ref{fig:vital_rates}) with sex ratio-dependent mating (Fig. \ref{fig:seed_viability}) to predict the contributions of females and males to range limitation. 
+The \revise{process-based} demographic model connected sex-specific vital rate responses to longitudinal variation (Fig. \ref{fig:vital_rates}) with sex ratio-dependent mating (Fig. \ref{fig:seed_viability}) to predict the contributions of females and males to range limitation. ===
 The model predicted maximum fitness in the center of the range and loss of population viability at longitudes that corresponded well with observed range limits. 
 Specifically, the western-most and eastern-most county records of \textit{P. arachnifera} fell within the uncertainty distribution of the model's predictions (represented by the shading in Fig. \ref{fig:lambda_long}A), bolstering our confidence that the model effectively captured the demographic drivers of range limitation in this species. 
 Also, the asymptotic population structure predicted by the model showed female bias in the operational (panicle) sex ratio toward the eastern range margins, consistent with observations from the common garden and natural populations (Fig. \ref{fig:SR_viab_sens}A). 
@@ -410,7 +410,7 @@ The overall decline in $\lambda$ was driven most strongly by a combination of re
   A, posterior distribution of $\lambda$, where shaded regions show the 25, 50, 75, and 95\% percentiles of parameter uncertainty. 
   Dashed horizontal line indicates the limit of population viability ($\lambda=1$) and vertical lines show the longitudes of Brewster and Brazoria Counties, TX, the western- and eastern-most occurrence records of \textit{P. arachnifera}.
   B--C, LTRE decomposition of the sensitity of $\lambda$ to longitude into additive vital rate contributions of females (B) and males (C) based on posterior mean parameter estimates. }
-  \label{fig:lambda_long}
+  \label{fig:lambda_long}==
   \end{center}
 \end{figure}
 
