@@ -223,7 +223,7 @@ Posterior predictive checks indicated that these models described the data well 
 This analysis allowed us to evaluate whether local adaptation to climate may have contributed to variation in demographic performance across common garden sites. 
 This was motivated by the observation that most source populations came from the interior of the geographic range and were brought to edge and beyond-edge locations that were much drier or wetter than their historical climate regime (Fig. \ref{fig:map}). 
 The local adaptation hypothesis predicts that demographic performance declines with increasing climatic deviation between common garden and source population locations. 
-We added the absolute value of mean annual precipitation mismatch (using 30-year normals) as a covariate to the vital rate models described above.}
+To test this hypothesis we added the absolute value of mean annual precipitation mismatch (using 30-year normals) as a covariate to the vital rate models described above.}
 
 \subsection*{Sex ratio experiment}
 At one site near the center of the range (Lake Lewisville Environmental Learning Area, Texas), we established a separate experiment to quantify how sex ratio variation affects female reproductive success.
@@ -363,8 +363,8 @@ Finally, panicle production by flowering plants was similar between the sexes fo
 Sex differences in flowering and panicle production generated a longitudinal trend in the operational sex ratio of our common garden populations consistent with (but weaker than) the trend in natural populations: the fraction of total panicles that were female in our common gardens increased from west to east (Fig. \ref{fig:survey}B) even as the fraction of surviving plants that were female did not show a longitudinal trend (Fig. \ref{fig:survey}C).
 Thus, in recapitulating the natural OSR pattern, the common garden experiment revealed that the longitudinal trend in the mating pool of natural populations was due to the reproductive niche of females extending farther east than that of males, and not to sex differences in mortality.
 
-\revise{\linelabel{mismatchresults}For survival, flowering, and panicle production we did not find strong evidence for local adaptation based on the posterior distributions of the climate mismatch coefficient (Fig. \ref{climate_mismatch}A,C,D). 
-However, climate mismatch negatively affected growth such that plants from populations whose mean annual precipitation strongly differed from that of the common garden location exhibited reduced growth (Fig. \ref{climate_mismatch}B). }
+\revise{\linelabel{mismatchresults}For survival, flowering, and panicle production we did not find strong evidence for local adaptation based on the posterior distributions of the climate mismatch coefficient (Fig. \ref{fig:climate_mismatch}A,C,D). 
+However, climate mismatch negatively affected growth such that plants from populations whose mean annual precipitation strongly differed from that of the common garden location exhibited reduced growth (Fig. \ref{fig:climate_mismatch}B). }
 
 \subsection*{Sex-ratio dependent seed fertilization}
 
@@ -531,6 +531,7 @@ We gratefully acknowledge the many individuals who facilitated our field work, e
 This work was made possible by a network of biological field stations that hosted our geographically distributed experiment. 
 We acknowledge Sam Houston State University, Texas A\&M University, University of Texas, Texas Tech University, Pittsburgh State University, and Wichita State University for investing in field stations and making these facilities available to us. 
 We thank Marion Donald, Kory Kolis, Nakian Kim, and Alex Espana for valuable assistance in the field, lab, and greenhouse. 
+Two anonymous reviewers helped us improve our manuscript. 
 Our work was supported by NSF Division of Environmental Biology awards 1543651 and 1754468 and by the Rice University Faculty Initiatives Fund. 
 
 \section*{Author contributions}
@@ -592,7 +593,7 @@ print(xtable(poar_ms_quantities$exp_site_table, caption = "Sites of common garde
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.75\linewidth]{Figures/climate_mismatch}
-  \caption{\revise{Posterior distributions of statistical coefficients for the influence of source-garden climate mismatch on survival (A), growth (B), flowering (C), and panicle production (D). Gray bars show the 95\% credible interval of the coefficients. Climate mismatch was calculated as the absolute value of the different in mean annual precipitation between source population and common garden location.}}
+  \caption{\revise{Posterior distributions of statistical coefficients for the influence of source-garden climate mismatch on survival (A), growth (B), flowering (C), and panicle production (D). Gray bars show the 95\% credible interval of the coefficients. Climate mismatch was calculated as the absolute value of the difference in mean annual precipitation between source population and common garden location.}}
   \label{fig:climate_mismatch}
   \end{center}
 \end{figure}
@@ -633,7 +634,7 @@ print(xtable(poar_ms_quantities$exp_site_table, caption = "Sites of common garde
 
 \newpage
 <<waic_table,echo=F, message=F, warning=F, results = 'asis'>>=
-print(xtable(poar_ms_quantities$waic_tab, caption = "\revise{Model selection results for candidate vital rate models with longitude or climate (mean annual precipitation) as environmental covariates. Table shows WAIC (Watanabe-Akaike Information Criterion), ELPD (expected log predictive density), and the standard error of ELPD. The fact that the SE of ELPD is much greater than the difference between models suggests that longitude and climate are effectively interchangeable as environmental covariates.}", label = "tab:waic",include.rownames=F))
+print(xtable(poar_ms_quantities$waic_tab, caption = "Model selection results for candidate vital rate models with longitude or climate (mean annual precipitation) as environmental covariates. Table shows WAIC (Watanabe-Akaike Information Criterion), ELPD (expected log predictive density), and the standard error of ELPD. The fact that the SE of ELPD is much greater than the difference between models suggests that longitude and climate are effectively interchangeable as environmental covariates.", label = "tab:waic",include.rownames=F))
 @
 
 %--------------------------------------------------------------------
