@@ -1549,7 +1549,7 @@ ltre_cols <- c("#e41a1c",NA,"#377eb8",NA,"#4daf4a",NA,"#984ea3",NA)
 ltre_lty <- c(1,NA,2,NA,3,NA,5,NA)
 
 #print figure
-#pdf("Manuscript/Figures/lambda_long_ltre.pdf",useDingbats = F,height=10,width=4)
+pdf("Manuscript/Figures/lambda_long_ltre.pdf",useDingbats = F,height=10,width=4)
 par(mar=c(5,5,1,1),mfrow=c(3,1))
 plot(long_seq_extend + mean(latlong$Longitude),lambda_long_mean,type="n",ylim=c(0,4),lwd=4,
      xlab="Longitude",ylab=expression(paste(lambda)),cex.lab=1.8)
@@ -1591,7 +1591,7 @@ for(i in seq(9,16,by=2)){
 title(main="C) Male contribution",adj=0,cex.main=1.4)
 legend("topright",bty="n",legend=c("Survival","Growth","Flowering","Panicles","Total"),lwd=c(2,2,2,2,4),
        lty=c(na.omit(ltre_lty),1),col=c(na.omit(ltre_cols),"black"),cex=1.5)
-#dev.off()
+dev.off()
 
 ## appendix figrue comparing estimation error with proc + est error
 #pdf("Manuscript/Figures/lambda_long_proc_est.pdf",useDingbats = F,height=10,width=6)
@@ -1709,8 +1709,13 @@ garden_osr_range <- range(garden_osr$tot_pan[garden_osr$tot_pan>0])
 garden_sr_range <- range(garden_sr$total[garden_sr$total>0])
 
 ##climate vs longitude model selection tables
-waic_tab <- read.csv("https://www.dropbox.com/s/v9xruo951us7ugm/waic_long_vs_climate.csv?dl=1")
-waic_tab[,c("model","waic","se_waic","elpd_waic","elpd_diff","se_elpd_waic")]
+waic_tab <- read.csv("https://www.dropbox.com/s/v9xruo951us7ugm/waic_long_vs_climate.csv?dl=1") %>% 
+  mutate(Model=model,
+         WAIC=waic,
+         ELPD=elpd_waic,
+         `ELPD difference`=elpd_diff,
+         `SE(ELPD)`=se_elpd_waic) %>% 
+  select(Model,WAIC,ELPD,`SE(ELPD)`)
 
 poar_ms_quantities <- list(
   n_survey_pops=n_survey_pops,
@@ -1727,8 +1732,8 @@ poar_ms_quantities <- list(
   viab_n=viab_n,
   garden_osr_range=garden_osr_range,
   garden_sr_range=garden_sr_range,
-  waic_tab
+  waic_tab=waic_tab
 )
 
 #write out ms quantities
-#write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
+write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
