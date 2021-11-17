@@ -1,9 +1,5 @@
 # Format demographic data
 rm(list=ls())
-setwd("D:/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
-setwd("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
-setwd("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
-setwd("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography")
 options(stringsAsFactors=F)
 library(dplyr)
 library(testthat)
@@ -11,10 +7,10 @@ library(testthat)
 # read data ----------------------------------------------------------------
 
 # climate data 
-clim_site <- read.csv('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/avg_yr_climate_sites.csv') %>% 
+clim_site <- read.csv("https://www.dropbox.com/s/xmjlg9gkk998xva/avg_yr_climate_sites.csv?dl=1") %>% 
                dplyr::select( site, ppt_avg ) %>% 
                rename( ppt_avg_site = ppt_avg )
-clim_coll <- read.csv('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Monitoring/avg_yr_climate_codes.csv') %>% 
+clim_coll <- read.csv("https://www.dropbox.com/s/a6254egkecw8mhp/avg_yr_climate_codes.csv?dl=1") %>% 
                dplyr::select( Code, ppt_avg_coll ) %>% 
                # only collections used in the study
                subset( Code %in% c("QLP", "HHC", 
@@ -23,18 +19,15 @@ clim_coll <- read.csv('C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Mon
                                    "LLELA", "SSC") )
   
 # 2014
-f14     <- read.csv("fall2014/f2014DemoData.csv")
+f14     <- read.csv("https://www.dropbox.com/s/325x917xtbafl3p/f2014DemoData.csv?dl=1")
 # 2015
-s15     <- read.csv("spr15/s2015DemoData.csv")
+s15     <- read.csv("https://www.dropbox.com/s/u61lf2maaomi01n/s2015DemoData.csv?dl=1")
 # 2016
-s16     <- read.csv("spr16/s2016DemoData.csv")
+s16     <- read.csv("https://www.dropbox.com/s/4evgxj2b1868662/s2016DemoData.csv?dl=1")
 # 2017
-s17     <- read.csv("spr17/s2017DemoData.csv")
+s17     <- read.csv("https://www.dropbox.com/s/hrf28odtfc062je/s2017DemoData.csv?dl=1")
 # all collections in greenhouse (for debugging mistakes)
-all_coll<- read.csv("D:/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
-all_coll<- read.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
-all_coll<- read.csv("C:/Users/tm634/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
-all_coll<- read.csv("C:/Users/ac22qawo/Dropbox/POAR--Aldo&Tom/Range limits/Genetics/allCollections.csv")
+all_coll<- read.csv("https://www.dropbox.com/s/feln8mp8jxidfli/allCollections.csv?dl=1")
 
 # format data for merge-----------------------------------------------------------------
 
@@ -161,7 +154,7 @@ s15_tom <- s15
 # Aldo's reproduction of merge issues ------------------------------------------------------
 
 # re-read data
-s15          <- read.csv("spr15/s2015DemoData.csv") %>% 
+s15          <- read.csv("https://www.dropbox.com/s/u61lf2maaomi01n/s2015DemoData.csv?dl=1") %>% 
                   to_numeric( ) %>% 
                   t1_format( col_id=c(6:16) ) %>% 
                   # remove mistakes originating from white spaces
@@ -408,7 +401,7 @@ d_all <- repl_orig_id(all_coll, d_all, 377)
 # final formatting for data --------------------------------------
 
 # get lat/lon information
-latlong <- read.csv("data/SiteLatLong.csv") %>% 
+latlong <- read.csv("https://www.dropbox.com/s/teszfw6w1jfb515/SiteLatLong.csv?dl=1") %>% 
               # scale/center longitude
               mutate( long.scaled = scale(Longitude)[,1],
                       long.center = scale(Longitude,scale=F)[,1] )
@@ -472,19 +465,19 @@ poar <- d_all %>%
 # Write out data ----------------------------------------------------------------
 
 # demographic data
-write.csv(d_all, "C:/CODE/POAR-range-limits/data/f14_s17_data.csv", row.names = F)
+#write.csv(d_all, "C:/CODE/POAR-range-limits/data/f14_s17_data.csv", row.names = F)
 
 # analysis data frame dropping three "bad" sites
-write.csv(poar %>% 
-            # drop the 3 "bad" sites (Lubbock, Wichita Falls, LLELA)
-            # lubbock: only 7 individuals survived, only in 2015
-            # Wichita Falls: only 7 individuals survive to 2015, 3 to 2016
-            # LLELA: 22 indiv. surviva to 2015, 3 to 2016, 2 to 2017
-            subset( !(site %in% c("llela", "lubbock", "wf")) ), 
-          "POAR-range-limits/data/demography.csv", row.names = F)
+# drop the 3 "bad" sites (Lubbock, Wichita Falls, LLELA)
+# lubbock: only 7 individuals survived, only in 2015
+# Wichita Falls: only 7 individuals survive to 2015, 3 to 2016
+# LLELA: 22 indiv. surviva to 2015, 3 to 2016, 2 to 2017
+#write.csv(poar %>% 
+            #subset( !(site %in% c("llela", "lubbock", "wf")) ), 
+          #"POAR-range-limits/data/demography.csv", row.names = F)
 
 # analysis data including three "bad" sites
-write.csv(poar,"POAR-range-limits/data/demography_allsites.csv", row.names = F)
+#write.csv(poar,"POAR-range-limits/data/demography_allsites.csv", row.names = F)
 
 # write stand-alone lat-long df
-write.csv(latlong,"POAR-range-limits/data/latlong.csv", row.names = F)
+#write.csv(latlong,"POAR-range-limits/data/latlong.csv", row.names = F)
