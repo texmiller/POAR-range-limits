@@ -1737,3 +1737,30 @@ poar_ms_quantities <- list(
 
 #write out ms quantities
 write_rds(poar_ms_quantities,"Manuscript/poar_ms_quantities.rds")
+
+#write out derived data products for Dryad repository
+#1. common garden demography
+poar %>% 
+  mutate(year_t1=year,source_pop=Code,source_ind=ID) %>% 
+  select(site,Longitude,Latitude,Block,Aluminum.Tag,source_pop,source_ind,ppt_mismatch,Sex,year_t1,
+         tillerN_t0,flowerN_t0,flowerLength1_t0,flowerLength2_t0,flowerLength3_t0,
+         MaxLength_t0,MaxWidth_t0,
+         surv_t1,tillerN_t1,flowerN_t1,flowerLength1_t1,flowerLength2_t1,flowerLength3_t1,
+         MaxLength_t1,MaxWidth_t1) %>% 
+  arrange(Longitude,year_t1) %>% 
+  write.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/Dryad data/POAR_common_garden_demography.csv",row.names = F)
+#2. seed viability and germination
+viabVr %>% 
+  mutate(totS_viab=totS,
+         y_viab=yesMaybe,
+         totS_germ=germTot+germFail,
+         y_germ=germTot) %>% 
+  select(plot,F,M,F_flow,M_flow,sr_f,focalI,SeedN,totS_viab,y_viab,totS_germ,y_germ) %>% 
+  write.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/Dryad data/POAR_seed_viab_germ.csv",row.names = F)
+#3. common garden climate
+allsites %>% 
+  write.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/Dryad data/POAR_common_garden_climate.csv",row.names = F)
+#4. natural population surveys
+POAR %>% 
+  select(Population,Latitude,Longitude,Total.Male.Infl.,Total.Female.Infl.) %>% 
+  write.csv("C:/Users/tm9/Dropbox/POAR--Aldo&Tom/Range limits/Experiment/Demography/POAR-range-limits/data/Dryad data/POAR_surveys.csv",row.names = F)
