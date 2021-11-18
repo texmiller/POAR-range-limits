@@ -3,13 +3,13 @@
 This repo contains all the data and code necessary to reproduce the analyses in: Miller and Compagnoni, "Two-sex demography, sexual niche differentiation, and the geographic range limits of Texas bluegrass".
 
 ## In the code folder:
-* The script https://github.com/texmiller/POAR-range-limits/blob/master/code/POAR_range_limits_analysis.R includes all statistical and demographic modeling and produces all of the data figures in the manuscript. This script downloads data from files stored in the cloud. Some sections of this script takes hours-to-days to run; these are commented out and we link straight to the saved objects that they produce. You could always recreate those objects by uncommenting and running that code. 
+* The script https://github.com/texmiller/POAR-range-limits/blob/master/code/POAR_range_limits_analysis.R includes all statistical and demographic modeling and produces all of the data figures in the manuscript. This script downloads data from files stored in the cloud. These data files can also be found in our Dryad repository (doi:10.5061/dryad.kkwh70s5x). Some sections of this script takes hours-to-days to run; these are commented out and we link straight to the saved objects that they produce. You could always recreate those objects by uncommenting and running that code. 
 
 * The script https://github.com/texmiller/POAR-range-limits/blob/master/code/twosexMPM.R includes all of the source functions of the two-sex MPM. This script is sourced by POAR_range_limits_analysis.R.
 
 * The script https://github.com/texmiller/POAR-range-limits/blob/master/code/POAR_size_distribution_appendix.R includes the analysis presented in Appendix C of the manuscript
 
-* There are several sub-folders under "code". The "format" folder includes all of our data manipulation steps (these need not be re-run to reproduce our analysis -- POAR_range_limits_analysis.R works with derived data products produced in the format scripts).
+* There are several sub-folders under "code". The "format" folder includes all of our data manipulation steps. These need not be re-run to reproduce our analysis -- POAR_range_limits_analysis.R works with derived data products produced in the format scripts. Readers interested in working with the original, raw data files can access these as cloud-stored downloads in the "format" scripts. 
 
 * The "stan" folder includes stan model scripts. POAR_range_limits_analysis.R calls one of these scripts.
 
