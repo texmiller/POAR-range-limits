@@ -1,0 +1,79 @@
+% ======================================================= %
+% Document: TEMPLATE FOR RESPONSES TO REVIEWERS
+% Author: Andrea Ballatore
+% Date: Jan 7, 2013
+% Source: https://raw.githubusercontent.com/ucd-spatial/Datasets/master/tex_response_to_reviewers_template/responses_to_reviewers.tex
+% Modified by Eduard Szöcs, 10.03.2015
+% ======================================================= %
+\documentclass[12pt]{article}
+
+% packages
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{color}
+\definecolor{mygray}{gray}{0.6}
+\usepackage[utf8]{inputenc}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[
+	round,	%(defaultage in the main file and \input ) for round parentheses;
+	colon,	% (default) to separate multiple citations with colons;
+	authoryear,% (default) for author-year citations;
+	sort,		% orders multiple citations into the sequence in which they
+]{natbib}
+\usepackage[%disable
+	]{todonotes}
+
+\usepackage{anysize}
+\marginsize{2.5cm}{2.5cm}{1.5cm}{2.5cm}
+
+% macros
+% add a counter
+\newcounter{cN}
+\setcounter{cN}{0}
+
+\newcommand{\comment}[1]{
+	\vspace{2em}
+	\refstepcounter{cN} % incrment counter
+	\noindent \hangindent=0em \textbf{\textcolor{Maroon}{\uline{Comment \thecN}:~}}\emph{``#1''}
+	}
+
+\newcommand{\response}[1]{
+	\\[0.25em]
+	\hangindent=2.3em \textbf{\textcolor{NavyBlue}{\uline{Response}:~}}#1
+	}
+
+\newcommand{\revise}[1]{{\color{Mahogany}{#1}}}
+
+\usepackage[normalem]{ulem}
+\definecolor{darkred}{rgb}{1,.6,.6}
+\DeclareRobustCommand\problemline{\bgroup\markoverwith{\textcolor{darkred}{\rule[-0.9ex]{4pt}{3pt}}}\ULon}
+\DeclareRobustCommand{\problem}[1]{\problemline{#1}} % soul
+\setcounter{secnumdepth}{-1}
+
+\begin{document}
+% ======================================================= %
+\title{Manuscript 60699 --- Response to data editor}
+
+\maketitle
+% ======================================================= %
+\noindent To the editorial board,
+
+We were pleased to receive the tentative acceptance of our article. We thank the data editor for their careful attention and constructive suggestions. Here, we describe the steps we have taken to address issues they raised. 
+
+As suggested, we have created new Dryad and Zenodo repositories that include all of the data, metadata, and code for this study. The Dryad submission may be found at \url{doi:10.5061/dryad.kkwh70s5x}. We have created a release of our Github repo (\url{https://github.com/texmiller/POAR-range-limits}) and are awaiting a DOI from Zenodo. We have also made sure to remove any references to local directories from our analysis scripts; we missed some of these in our last submission. 
+
+There is one suggestion from the data editor that we did not follow. Our raw data comprises many files corresponding to specific sites and years, and the formats of these files evolved over time as we gained experience and streamlined our process. For this reason, we fear that the very rawest form of our data will be cumbersome to work with and difficult to interpret, and so we chose to publish in Dryad derived data products that are elegant, tidy, and ready for use. However, we agree with the spirit of the data editor's comments, specifically that the results of the study reported in the paper must be able to be traced back to the original, raw observations. We emphasize that our paper still meets this standard: the Zenodo repository includes all of our data formatting scripts that source the truly raw data files, so interested readers could dig deeper than the derived data products in Dryad, if they were so inclined. 
+
+Thank you again for a constructive and efficient review process. 
+
+\vspace{2em}
+\hfill On behalf of myself and A. Compagnoni,
+
+\hfill Tom Miller
+\newpage
+
+% ======================================================= %
+\end{document}
+% ======================================================= %
