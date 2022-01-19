@@ -1,0 +1,215 @@
+\documentclass[11pt]{article}
+\usepackage[sc]{mathpazo} %Like Palatino with extensive math support
+\usepackage{fullpage}
+\usepackage[authoryear,sectionbib,sort]{natbib}
+\linespread{1.7}
+\usepackage[utf8]{inputenc}
+\usepackage{lineno}
+\usepackage{titlesec}
+\titleformat{\section}[block]{\Large\bfseries\filcenter}{\thesection}{1em}{}
+\titleformat{\subsection}[block]{\Large\itshape\filcenter}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}[block]{\large\itshape}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[runin]{\itshape}{\theparagraph}{1em}{}[. ]
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+%%%%%%%%%%%%%%%%%%%%%
+% Header
+%%%%%%%%%%%%%%%%%%%%%
+%
+% Customize the line below with the last name of your first author and
+% the short title of your MS. You can comment authorship information out
+% while your MS is undergoing double-blind review.
+%
+\rhead{Supplement to AUTHOR-NAME et al., ``SHORT TITLE,'' \textit{Am.~Nat.}}
+\setlength{\headsep}{0.3in}  
+\lhead{} 
+
+%%%%%%%%%%%%%%%%%%%%%
+% Line numbering
+%%%%%%%%%%%%%%%%%%%%%
+%
+% Please use line numbering with your initial submission and
+% subsequent revisions. After acceptance, please turn line numbering
+% off by adding percent signs to the lines %\usepackage{lineno} and
+% to %\linenumbers{} and %\modulolinenumbers[3] below.
+%
+% To avoid line numbering being thrown off around math environments,
+% the math environments have to be wrapped using
+% \begin{linenomath*} and \end{linenomath*}
+%
+% (Thanks to Vlastimil Krivan for pointing this out to us!)
+
+\title{Online Supplement: \\ 
+\LaTeX{} Template for Author-Supplied Supplementary PDFs, \\ 
+\textit{The~American~Naturalist} }
+
+% This version of the LaTeX supplementary template was last updated on
+% November 8, 2019.
+
+%%%%%%%%%%%%%%%%%%%%%
+% Authorship
+%%%%%%%%%%%%%%%%%%%%%
+% Please remove authorship information while your paper is under review,
+% unless you wish to waive your anonymity under double-blind review. You
+% will need to add this information back in to your final files after
+% acceptance.
+%
+% Once accepted for publication, author-supplied PDFs should have a 
+% title page that includes (at least) the authors' names, the title of 
+% the MS, and the name of the journal. It should also have a header and
+% page numbers.
+
+\author{Owen E. Cook$^{1,\ast}$ \\ 
+Generic H. Collaborator$^{2,\dag}$ \\ 
+Additional Q. Expert$^{3}$}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent{} 1. University of Chicago, Chicago, Illinois 60637;
+
+\noindent{} 2. University of Toronto, Toronto, Ontario M5S 1A5, Canada;
+
+\noindent{} 3. Middle Eastern Technical University, Çankaya, Ankara 06800, Turkey.
+
+\noindent{} $\ast$ Corresponding author; e-mail: amnat@uchicago.edu.
+
+\noindent{} $\dag$ Deceased.
+
+%\linenumbers{}
+%\modulolinenumbers[3]
+
+
+% In many cases, The American Naturalist allows authors to typeset their
+% own supplementary material in an author-supplied PDF. This template
+% applies to such cases. 
+% 
+% For appendices that will be typeset by the AmNat editorial staff, 
+% please see the main LaTeX template, available from
+% https://www.journals.uchicago.edu/journals/an/instruct
+% Such appendices typically include descriptions of methods and tables
+% defining parameters.
+%
+% In general, you have wide discretion for how you want to format an
+% author-supplied PDF. They should in any case have a title page, 
+% page numbers, and a header identifying the MS's (short) title.
+%
+% Counters for the online supplement should normally begin with an S
+% (thus normally figure S1, figure S2, table S1, equation S1, etc.).
+
+\renewcommand{\theequation}{S\arabic{equation}}
+% redefine the command that creates the equation number.
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{equation}{0}  % reset counter 
+\setcounter{figure}{0}
+\setcounter{table}{0}
+
+% In online supplementary PDFs, sections can be numbered or not
+% (at your discretion). If they are numbered, sections should usually
+% begin with an S.
+
+\newpage{}
+
+\section*{Supplementary Figures and Tables}
+
+Lorem ipsum dolor sit amet (fig.~\ref{Fig:OkapiStripe}). Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque.
+
+\begin{figure}[h!]
+%\includegraphics{okapi-stripes}
+\caption{Figure legend.}
+\label{Fig:OkapiStripe}
+\end{figure}
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
+
+Tables can exist too (see table~\ref{Table:Rivers} for an example).
+
+\begin{table}[htbp]
+\caption{Various rivers, cities, and animals}
+\label{Table:Rivers}
+\centering
+\begin{tabular}{lll}\hline
+River        & City        & Animal            \\ \hline
+Chicago      & Chicago     & Raccoon           \\
+Des Plaines  & Joliet      & Coyote            \\
+Illinois     & Peoria      & Cardinal          \\
+Kankakee     & Bourbonnais & White-tailed deer \\
+Mississippi  & Galena      & Bald eagle        \\ \hline
+\end{tabular}
+\bigskip{}
+\\
+{\footnotesize Note: Notes can go here.}
+\end{table}
+
+
+\section*{Additional Methods}
+
+\subsection*{Measuring the height of fox jumps}
+
+The quick red fox jumps over the lazy brown dog. Morbi odio velit, eleifend ut hendrerit vitae, consequat sit amet nulla. Pellentesque porttitor vitae nisl quis tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Praesent ut nisi odio.
+
+\begin{equation}
+{ \frac{1}{N_k-1} \sum \limits_{t=1}^{N_k} (M_{tjk} - \bar{M}_{jk})^2}
+\end{equation}
+
+\subsection*{Quantifying the brownness of the dog}
+
+Pellentesque eu nulla odio (\citealt{Xiao2015,CookEtAl2015}). Nulla aliquam porta metus, quis malesuada orci faucibus quis. Suspendisse nunc magna, tristique sit amet sollicitudin nec, elementum et lacus. Sed vitae elementum mi. In hac habitasse platea dictumst. Etiam eu tortor elit. Sed ac tortor purus. Aliquam volutpat, odio sit amet posuere pretium, dolor ex interdum ante, sed luctus quam eros ac nulla. 
+
+\begin{equation}
+{ (\sum \limits_{p=1}^P {n_{sp}})^{-1}\sum \limits_{p=1}^P {n_{sp}Q_{p}}}
+\end{equation}
+
+\newpage{}
+
+%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%
+%
+% Any references in this section should also be copied into the main 
+% template, under the heading
+% \section*{References Cited Only in the Online Enhancements}
+% except when they are already cited in the main text.
+
+\begin{thebibliography}{}
+
+\bibitem[{Cook et~al.(2015)Cook, Collaborator, and Expert}]{CookEtAl2015}
+Cook, O.~E., G.~H. Collaborator, and A.~Q. Expert. 2015.
+\newblock Data from: Template and guidelines for using \LaTeX{} in \textit{The American Naturalist}.
+\newblock American Naturalist, Dryad Digital Repository, https://dx.doi.org/10.5061/dryad.XYZAB123.
+
+\bibitem[{Darwin(1859)Darwin}]{OriginSpec}
+Darwin, C. 1859.
+\newblock On the origin of species by means of natural selection, or the preservation of favoured races in the struggle for life.
+\newblock J.~Murray, London.
+
+\bibitem[{Davis et~al.(2011)Davis, Brakora, and Lee}]{DavisEtAl2011}
+Davis, E.~B., K.~A. Brakora, and A.~H. Lee. 2011.
+\newblock Evolution of ruminant headgear: a review.
+\newblock Proceedings of the Royal Society~B 278:2857--2865.
+
+\bibitem[{Inglis et~al.(2011)Inglis, Roberts, Gardner, and Buckling}]{Ing11}
+Inglis, R.~F., P.~G. Roberts, A.~Gardner, and A.~Buckling. 2011.
+\newblock Spite and the scale of competition in \textit{Pseudomonas
+  aeruginosa}.
+\newblock American Naturalist 178:276--285.
+
+\bibitem[{Fastovsky(2009)Fastovsky}]{LemKapEx07}
+Fastovsky, D.~E. 2009.
+\newblock Ideas in dinosaur paleontology: resonating to social and political context.
+\newblock Pages 239--253 \emph{in} D. Sepkoski and M. Ruse, eds. The Paleobiological Revolution. University of Chicago Press, Chicago~IL.
+
+\bibitem[{Xiao et~al.(2015)Xiao, McGlinn, and White}]{Xiao2015}
+Xiao, X., D.~J. McGlinn, and E.~P. White. 2015.
+\newblock A strong test of the maximum entropy theory of ecology.
+\newblock American Naturalist 185:E705--E80.
+
+\end{thebibliography}
+
+\end{document}
